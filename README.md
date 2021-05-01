@@ -1,2 +1,3 @@
-# rmx
-rmx: radius minimax estimators
+# MKrobust
+The repository includes the development version of R package MKrobust
+
