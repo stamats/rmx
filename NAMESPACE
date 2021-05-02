@@ -1,2 +1,12 @@
 import("stats")
+importFrom("grid", "grid.draw")
+importFrom("robustbase", "rowMedians")
+importFrom("gridExtra", "arrangeGrob")
+importFrom("ggplot2", "ggplot", "aes_string", "geom_line", "xlab", "ylab", "ylim", "ggtitle")
+
+export("optIF")
+
+S3method(print, optIF)
+S3method(summary, optIF)
+S3method(plot, optIF)
 
