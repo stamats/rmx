@@ -10,9 +10,9 @@
 }
 \usage{
 rowRmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L, 
-       initial.est=NULL, fsCor = TRUE, na.rm = TRUE, computeSE = TRUE)
+       initial.est=NULL, fsCor = TRUE, na.rm = TRUE, computeSE = FALSE)
 colRmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L, 
-       initial.est=NULL, fsCor = TRUE, na.rm = TRUE, computeSE = TRUE)
+       initial.est=NULL, fsCor = TRUE, na.rm = TRUE, computeSE = FALSE)
 }
 \arguments{
   \item{x}{ matrix or data.frame of (numeric) data values. }
@@ -92,11 +92,13 @@ ind <- rbinom(500, size=1, prob=0.05)
 X <- matrix(rnorm(500, mean=ind*3, sd=(1-ind) + ind*9), nrow = 5)
 rowRmx(X)
 rowRmx(X, eps.lower = 0.01, eps.upper = 0.1)
+rowRmx(X, eps.lower = 0.01, eps.upper = 0.1, computeSE = TRUE)
 rowRmx(X, eps = 0.05)
 
 X1 <- t(X)
 colRmx(X1)
 colRmx(X1, eps.lower = 0.01, eps.upper = 0.1)
+colRmx(X, eps.lower = 0.01, eps.upper = 0.1, computeSE = TRUE)
 colRmx(X1, eps = 0.05)
 }
 \keyword{robust}
