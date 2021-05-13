@@ -6,18 +6,22 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0
                        check = FALSE){
     if(radius == 0){
         asVar <- sd^2*diag(c(1, 0.5))
+        rownames(asVar) <- c("mean", "SD")
+        colnames(asVar) <- c("mean", "SD")
         A <- sd^2*diag(c(1, 0.5))
         a <- c(0, 0)
         b <- Inf
         mse <- sd^2*(1 + 0.5)
+        names(mse) <- NULL
         bias <- sqrt(mse - sum(diag(asVar)))
+        names(bias) <- NULL
         param <- c(mean, sd)
         names(param) <- c("mean", "SD")
         IFun <- function(x){}
         body(IFun) <- substitute({ 
                 z <- (x-AM)/sigma
                 res <- sigma*cbind(z, 0.5*(z^2 - 1)) 
-                colnames(res) <- c("IF of mean", "IF of SD")
+                colnames(res) <- c("IF for mean estimate", "IF for SD estimate") 
                 res 
             }, list(AM = mean, sigma = sd))
         range <- function(alpha, n = 501){} 
@@ -48,6 +52,8 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0
         ## print(2*integrate(fun2, lower = 0, upper = Inf, rel.tol = 1e-14)$value, digits = 10)
         V2 <- 0.3652364438
         asVar <- b^2*diag(c(V1, V2))
+        rownames(asVar) <- c("mean", "SD")
+        colnames(asVar) <- c("mean", "SD")
         
         param <- c(mean, sd)
         names(param) <- c("mean", "SD")
@@ -55,10 +61,9 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0
         body(IFun) <- substitute({ 
                 z <- (x-AM)/sigma
                 w <- 1/sqrt(z^2 + (a3*(z^2-1) - a2*sigma)^2)
-
                 Y <- b*cbind(z, a3*(z^2-1)-a2*sigma)
                 res <- Y*w
-                colnames(res) <- c("IF of mean", "IF of SD") 
+                colnames(res) <- c("IF for mean estimate", "IF for SD estimate") 
                 res 
             }, list(AM = mean, sigma = sd, a2 = a[2], a3 = a3, b = b))
         range <- function(alpha, n = 501){} 
@@ -137,11 +142,15 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0
     }
 
     asVar <- sd^2*.getAsVar.norm(b = b, a1 = a1, a2 = a2, a3 = a3)
+    rownames(asVar) <- c("mean", "SD")
+    colnames(asVar) <- c("mean", "SD")
     A <- sd^2*diag(c(a1, a3))
     a <- sd*c(0, a3*(a2-1))
     b <- sd*b
     mse <- sd^2*(a1 + a3)
+    names(mse) <- NULL
     bias <- sqrt(mse - sum(diag(asVar)))
+    names(bias) <- NULL
     param <- c(mean, sd)
     names(param) <- c("mean", "SD")
     IFun <- function(x){}
@@ -152,7 +161,7 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0
         w <- ind1 + (1-ind1)*b/hvkt 
         Y <- cbind(a1*z/sigma, a3*(z^2-1)/sigma-a2)
         res <- Y*w
-        colnames(res) <- c("IF of mean", "IF of SD") 
+        colnames(res) <- c("IF for mean estimate", "IF for SD estimate") 
         res 
         }, list(AM = mean, sigma = sd, 
                 a1 = A[1,1], a2 = a[2], a3 = A[2,2], b = b))

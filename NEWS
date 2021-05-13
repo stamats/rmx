@@ -3,6 +3,15 @@
 ###############################################################################
 
 ###########################################################
+## Version 0.2
+###########################################################
+- added function rmx to compute optimally-robust rmx estimators
+- added methods for print, summary and confint
+
+
+###########################################################
 ## Version 0.1
 ###########################################################
 - start of development
+- added optimally robust IF for normal location and scale
+

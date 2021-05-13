@@ -4,9 +4,17 @@ importFrom("robustbase", "rowMedians")
 importFrom("gridExtra", "arrangeGrob")
 importFrom("ggplot2", "ggplot", "aes_string", "geom_line", "xlab", "ylab", "ylim", "ggtitle")
 
-export("optIF")
+export("optIF",
+       "fsRadius",
+       "rmx")
 
 S3method(print, optIF)
+S3method(print, rmx)
+S3method(print, rmxCI)
 S3method(summary, optIF)
+S3method(summary, rmx)
+S3method(coef, rmx)
+S3method(vcov, rmx)
+S3method(confint, rmx)
 S3method(plot, optIF)
 

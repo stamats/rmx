@@ -100,7 +100,7 @@ summary.optIF <- function(object, digits = getOption("digits"), prefix = " ", ..
     cat(paste(format(names(object$parameter)[i], width = 24L, justify = "right"), 
               format(object$parameter[i], digits = digits), sep = " = "), sep = "\n")
   }
-  cat(paste(format("Radius", width = 24L, justify = "right"), 
+  cat(paste(format("Infinitesimal radius", width = 24L, justify = "right"), 
             format(object$radius, digits = digits), sep = " = "), sep = "\n")
   cat(paste(format("Maximum asymptotic MSE", width = 24L, justify = "right"), 
             format(object$asMSE, digits = digits), sep = " = "), sep = "\n")

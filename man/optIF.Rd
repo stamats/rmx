@@ -25,7 +25,7 @@ optIF(model = "norm", radius = NULL, check = FALSE, delta = 1e-6, itmax = 100L, 
   vector and standardising matrix. For more details we refer to Rieder (1994) 
   or Kohl (2005).
   
-  As model we have implemented so far:
+  As models we have implemented so far:
   \enumerate{
     \item \code{"norm"}: normal location and scale. Parameters can be set 
     via argument \code{mean} and \code{sd}; see examples.
