@@ -3,7 +3,7 @@
 ###############################################################################
 rowRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, 
                    k = 3L, initial.est=NULL, fsCor = TRUE, na.rm = TRUE, 
-                   computeSE = TRUE){
+                   computeSE = FALSE){
     es.call <- match.call()
     if(missing(x))
         stop("'x' is missing with no default")
