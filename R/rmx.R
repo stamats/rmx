@@ -149,7 +149,7 @@ coef.rmx <- function(object, complete = TRUE, ...){
 vcov.rmx <- function(object, ...){
     object$rmxIF$asVar/object$n
 }
-## adapted from stats:::format.perc
+## from stats:::format.perc
 .format.perc <- function (probs, digits){
   paste(format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits), "%")
 }
@@ -182,7 +182,6 @@ confint.rmx <- function (object, parm, level = 0.95, method = "as", ...){
   class(CI) <- "rmxCI"
   CI
 }
-
 ## adapted from MKinfer:::print.confint
 print.rmxCI <- function (x, digits = getOption("digits"), prefix = " ", ...){
   cat("\n")

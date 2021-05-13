@@ -45,7 +45,7 @@ fsRadius(r, n, model = "norm")
 }
 \author{Matthias Kohl \email{Matthias.Kohl@stamats.de}}
 %\note{}
-\seealso{\code{\link{rmx}}, \code{\link{rowRmx}}, \code{\link{colRmx}} }
+\seealso{\code{\link{rmx}}, \code{\link{rowRmx}} }
 \examples{
 ## finite-sample radius is larger (more conservative)
 fsRadius(r = 0.5, n = 3, model = "norm")

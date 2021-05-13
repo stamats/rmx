@@ -6,11 +6,14 @@ importFrom("ggplot2", "ggplot", "aes_string", "geom_line", "xlab", "ylab", "ylim
 
 export("optIF",
        "fsRadius",
-       "rmx")
+       "rmx",
+       "rowRmx",
+       "colRmx")
 
 S3method(print, optIF)
 S3method(print, rmx)
 S3method(print, rmxCI)
+S3method(print, RMXlist)
 S3method(summary, optIF)
 S3method(summary, rmx)
 S3method(coef, rmx)

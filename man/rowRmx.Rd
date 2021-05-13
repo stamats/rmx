@@ -1,17 +1,21 @@
-\name{rmx}
-\alias{rmx}
-\title{Optimally Robust RMX Estimator}
+\name{rowRmx and colRmx}
+\alias{rowRmx}
+\alias{colRmx}
+\title{Optimally robust estimation for location and/or scale}
 \description{
-  The function \code{rmx} computes optimally robust rmx estimators. 
+  The functions \code{rowRmx} and \code{colRmx} compute 
+  optimally robust RMX estimates for (convex) contamination neighborhoods. 
   The definition of these estimators can be found in Kohl (2005) and 
   Rieder et al. (2008), respectively.
 }
 \usage{
-rmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L, 
-    initial.est=NULL, fsCor = TRUE, na.rm = TRUE)
+rowRmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L, 
+       initial.est=NULL, fsCor = TRUE, na.rm = TRUE, computeSE = TRUE)
+colRmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L, 
+       initial.est=NULL, fsCor = TRUE, na.rm = TRUE, computeSE = TRUE)
 }
 \arguments{
-  \item{x}{ numeric vector \code{x} of data values. }
+  \item{x}{ matrix or data.frame of (numeric) data values. }
   \item{model}{ character: short name of the model/distribution 
                 (default = \code{"norm"}); see also details. }
   \item{eps.lower}{ positive real (0 <= \code{eps.lower} <= \code{eps.upper}): 
@@ -25,8 +29,14 @@ rmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L,
         median and MAD are used. }
   \item{fsCor}{ logical: perform finite-sample correction; see function \code{\link{fsRadius}}. }
   \item{na.rm}{logical: if \code{TRUE}, \code{NA} values are removed before the estimator is evaluated.}
+  \item{computeSE}{ logical: compute asymptotic standard errors. }
 }
 \details{
+  These functions are optimized for the situation where one has a matrix 
+  and wants to compute the optimally robust RMX estimator for every row, 
+  respectively column of this matrix. In particular, the amount of cross
+  errors is assumed to be constant for all rows, respectively columns.
+
   If the amount of gross errors (contamination) is known, it can be 
   specified by \code{eps}. The radius of the corresponding infinitesimal 
   contamination neighborhood is obtained by multiplying \code{eps} 
@@ -43,7 +53,7 @@ rmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L,
   }
 }
 \value{
-  An object of class \code{"rmx"} is returned. It contails at least the 
+  An object of class \code{"RMXlist"} is returned. It contails at least the 
   following arguments:
   \item{rmxEst}{ estimates }
   \item{rmxIF}{ object of class \code{optIF}; see \code{\link{optIF}}. }
@@ -76,33 +86,17 @@ rmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L,
 }
 \author{Matthias Kohl \email{Matthias.Kohl@stamats.de}}
 %\note{}
-\seealso{\code{\link{optIF}}, \code{\link{rowRmx}}, \code{\link{fsRadius}}}
+\seealso{\code{\link{rmx}}, \code{\link{optIF}}, \code{\link{fsRadius}}}
 \examples{
-ind <- rbinom(100, size=1, prob=0.05) 
-x <- rnorm(100, mean=ind*3, sd=(1-ind) + ind*9)
+ind <- rbinom(500, size=1, prob=0.05)
+X <- matrix(rnorm(500, mean=ind*3, sd=(1-ind) + ind*9), nrow = 5)
+rowRmx(X)
+rowRmx(X, eps.lower = 0.01, eps.upper = 0.1)
+rowRmx(X, eps = 0.05)
 
-## amount of gross errors unknown
-res1 <- rmx(x, eps.lower = 0.01, eps.upper = 0.1)
-res1
-summary(res1)
-confint(res1)
-confint(res1, method = "as.bias")
-
-## amount of gross errors known
-res2 <- rmx(x, eps = 0.05)
-res2
-summary(res2)
-confint(res2)
-confint(res2, method = "as.bias")
-
-## estimator comparison
-## classical optimal (non-robust)
-c(mean(x), sd(x))
-## most robust
-c(median(x), mad(x))
-## amount of gross errors unknown
-res1$rmxEst
-## amount of gross errors known
-res2$rmxEst
+X1 <- t(X)
+colRmx(X1)
+colRmx(X1, eps.lower = 0.01, eps.upper = 0.1)
+colRmx(X1, eps = 0.05)
 }
 \keyword{robust}

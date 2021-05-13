@@ -77,9 +77,8 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
                    range = range, asMSE = mse, asVar = asVar, asBias = bias,
                    radius = r)
         class(IF) <- "optIF"
-        return(IF)
-        
-        RMX <- list(rmxEst = rmxEst, rmxIF = IF, IFinitial.est = NULL, 
+
+        RMX <- list(rmxEst = rmxEst, rmxIF = IF, initial.est = NULL, 
                     Infos = Info.matrix)
         class(RMX) <- "rmx"
         return(RMX)
