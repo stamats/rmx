@@ -29,7 +29,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
     if(length(x) <= 2){
         warning("Sample size <= 2! => Median and MAD are used for estimation.")
         rmxEst <- c(median(x), mad(x))
-        names(rmxEst) <- c("mean", "SD")
+        names(rmxEst) <- c("mean", "sd")
         Info.matrix <- matrix(c("rmx", "median and MAD"), ncol = 2, 
                               dimnames = list(NULL, c("method", "message")))
         AM <- rmxEst[1]
@@ -52,18 +52,18 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
         V1 <- b1^2
         V2 <- b2^2
         asVar <- diag(c(V1, V2))
-        rownames(asVar) <- c("mean", "SD")
-        colnames(asVar) <- c("mean", "SD")
+        rownames(asVar) <- c("mean", "sd")
+        colnames(asVar) <- c("mean", "sd")
         
         param <- c(AM, SD)
-        names(param) <- c("mean", "SD")
+        names(param) <- c("mean", "sd")
         IFun <- function(x){}
         body(IFun) <- substitute({ 
             z <- (x-AM)/sigma
             y1 <- b1*sign(z)
             y2 <- b2*sign((z^2 - 1)/sigma - a2)
             Y <- cbind(y1, y2)
-            colnames(Y) <- c("IF for mean", "IF for SD")  
+            colnames(Y) <- c("IF for mean", "IF for sd")  
             Y
         }, list(AM = AM, sigma = SD, a2 = a2, b1 = b1, b2 = b2))
         range <- function(alpha, n = 501){} 
@@ -87,14 +87,14 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
         if(eps == 0){
             n <- length(x)
             rmxEst <- c(mean(x), sqrt((n-1)/n)*sd(x))
-            names(rmxEst) <- c("mean", "SD")
-            Info.matrix <- matrix(c("rmx", "mean and SD"), ncol = 2, 
+            names(rmxEst) <- c("mean", "sd")
+            Info.matrix <- matrix(c("rmx", "mean and sd"), ncol = 2, 
                                   dimnames = list(NULL, c("method", "message")))
             mean <- rmxEst[1]
             sd <- rmxEst[2]
             asVar <- sd^2*diag(c(1, 0.5))
-            rownames(asVar) <- c("mean", "SD")
-            colnames(asVar) <- c("mean", "SD")
+            rownames(asVar) <- c("mean", "sd")
+            colnames(asVar) <- c("mean", "sd")
             A <- sd^2*diag(c(1, 0.5))
             a <- c(0, 0)
             b <- Inf
@@ -103,12 +103,12 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
             bias <- sqrt(mse - sum(diag(asVar)))
             names(bias) <- NULL
             param <- c(mean, sd)
-            names(param) <- c("mean", "SD")
+            names(param) <- c("mean", "sd")
             IFun <- function(x){}
             body(IFun) <- substitute({ 
                 z <- (x-AM)/sigma
                 res <- sigma*cbind(z, 0.5*(z^2 - 1)) 
-                colnames(res) <- c("IF for mean", "IF for SD") 
+                colnames(res) <- c("IF for mean", "IF for sd") 
                 res 
             }, list(AM = mean, sigma = sd))
             range <- function(alpha, n = 501){} 
@@ -136,7 +136,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
             warning("'mad(x) = 0' => cannot compute a valid initial estimate. 
                      To avoid division by zero 'mad0' is used. You could also 
                      specify a valid initial estimate for scale via 'initial.est'. 
-                     Note that you have to provide an initial estimate for mean and SD.")
+                     Note that you have to provide an initial estimate for mean and sd.")
             SD <- mad0
         }
     }else{
@@ -146,10 +146,10 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
         MEAN <- initial.est[1]
         SD <- initial.est[2]
         if(SD <= 0)
-            stop("initial estimate for SD <= 0 which is no valid")
+            stop("initial estimate for sd <= 0 which is no valid")
     }
     mean.sd <- c(MEAN, SD)
-    names(mean.sd) <- c("mean","SD")
+    names(mean.sd) <- c("mean","sd")
     if(!is.null(eps)){
         if(r > 10){
             b <- SD*1.618128043
@@ -168,7 +168,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
         rmxEst.all <- .kstep.norm(x = x, initial.est = c(MEAN, SD), 
                               A1 = A1, A2 = A2, a = a, b = b, k = k)
         rmxEst <- rmxEst.all$est
-        names(rmxEst) <- c("mean", "SD")
+        names(rmxEst) <- c("mean", "sd")
         if(fsCor){
             Info.matrix <- matrix(c("rmx", 
                                     paste("fs-corrected estimate for 'eps' =", 
@@ -190,8 +190,8 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
         a2 <- a[2]/rmxEst[2]/a3 + 1
         
         asVar <- rmxEst.all$asvar
-        rownames(asVar) <- c("mean", "SD")
-        colnames(asVar) <- c("mean", "SD")
+        rownames(asVar) <- c("mean", "sd")
+        colnames(asVar) <- c("mean", "sd")
         mse <- rmxEst[2]^2*(a1 + a3)
         names(mse) <- NULL
         bias <- sqrt(mse - sum(diag(asVar)))
@@ -205,7 +205,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
             w <- ind1 + (1-ind1)*b/hvkt 
             Y <- cbind(a1*z/sigma, a3*(z^2-1)/sigma-a2)
             res <- Y*w
-            colnames(res) <- c("IF for mean", "IF for SD")  
+            colnames(res) <- c("IF for mean", "IF for sd")  
             res 
         }, list(AM = rmxEst[1], sigma = rmxEst[2], 
                 a1 = A[1,1], a2 = a[2], a3 = A[2,2], b = b))
@@ -249,7 +249,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
         rmxEst.all <- .kstep.norm(x = x, initial.est = c(MEAN, SD), 
                                   A1 = A1, A2 = A2, a = a, b = b, k = k)
         rmxEst <- rmxEst.all$est
-        names(rmxEst) <- c("mean", "SD")
+        names(rmxEst) <- c("mean", "sd")
         if(fsCor){
             Info.matrix <- matrix(c(rep("rmx", 3), 
                                   paste("fs-corrected rmx estimate for 'eps' in [", 
@@ -278,8 +278,8 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
         a2 <- a[2]/rmxEst[2]/a3 + 1
         
         asVar <- rmxEst.all$asvar
-        rownames(asVar) <- c("mean", "SD")
-        colnames(asVar) <- c("mean", "SD")
+        rownames(asVar) <- c("mean", "sd")
+        colnames(asVar) <- c("mean", "sd")
         mse <- rmxEst[2]^2*(a1 + a3)
         names(mse) <- NULL
         bias <- sqrt(mse - sum(diag(asVar)))
@@ -293,7 +293,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
             w <- ind1 + (1-ind1)*b/hvkt 
             Y <- cbind(a1*z/sigma, a3*(z^2-1)/sigma-a2)
             res <- Y*w
-            colnames(res) <- c("IF for mean", "IF for SD")  
+            colnames(res) <- c("IF for mean", "IF for sd")  
             res 
         }, list(AM = rmxEst[1], sigma = rmxEst[2], 
                 a1 = A[1,1], a2 = a[2], a3 = A[2,2], b = b))

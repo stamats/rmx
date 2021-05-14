@@ -48,7 +48,8 @@ plotIF(x, range.alpha = 1e-6, range.n = 501,
 }
 \details{
   The function is similar to the \code{plot}-methods and function \code{PlotIC} 
-  of the RobASt-family of packages.
+  of the RobASt-family of packages, but instead of the standard graphic methods
+  uses functions from the packages \pkg{ggplot2}, \pkg{grid} and \pkg{gridExtra}.
 }
 \value{
   Invisible object of class \code{ggplot}.

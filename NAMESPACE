@@ -2,14 +2,17 @@ import("stats")
 importFrom("grid", "grid.newpage", "grid.draw")
 importFrom("robustbase", "rowMedians")
 importFrom("gridExtra", "arrangeGrob")
-importFrom("ggplot2", "ggplot", "aes_string", "geom_line", "xlab", "ylab", "ylim", "ggtitle", "geom_point", "scale_size")
+importFrom("ggplot2", "ggplot", "aes", "aes_string", "geom_line", "xlab", 
+                      "ylab", "ylim", "ggtitle", "geom_point", "scale_size")
+importFrom("qqplotr", "stat_qq_band", "stat_qq_point", "stat_qq_line")
 
 export("optIF",
        "fsRadius",
        "rmx",
        "rowRmx",
        "colRmx",
-       "plotIF")
+       "plotIF",
+       "qqplotRmx")
 
 S3method(print, optIF)
 S3method(print, rmx)

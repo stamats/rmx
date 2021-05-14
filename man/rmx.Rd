@@ -87,6 +87,10 @@ res1
 summary(res1)
 confint(res1)
 confint(res1, method = "as.bias")
+plotIF(res1)
+plot(res1, which = 1)
+qqplotRmx(res1)
+plot(res1, which = 2)
 
 ## amount of gross errors known
 res2 <- rmx(x, eps = 0.05)
@@ -94,6 +98,11 @@ res2
 summary(res2)
 confint(res2)
 confint(res2, method = "as.bias")
+plotIF(res2)
+plotIF(res2)
+plot(res2, which = 1)
+qqplotRmx(res2)
+plot(res2, which = 2)
 
 ## estimator comparison
 ## classical optimal (non-robust)

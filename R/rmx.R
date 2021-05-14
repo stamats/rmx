@@ -215,10 +215,14 @@ print.rmxCI <- function (x, digits = getOption("digits"), prefix = " ", ...){
   invisible(x)
 }
 plot.rmx <- function(x, which = 1, 
-                     control = list(plotIF = NULL), ...){
+                     control = list(plotIF = NULL,
+                                    qqplotRmx = NULL), ...){
   show <- rep(FALSE, 6)
   show[which] <- TRUE
   if(show[1]){
     do.call("plotIF", args = c(list(x = x), control$plotIF))
+  }
+  if(show[2]){
+    do.call("qqplotRmx", args = c(list(x = x), control$qqplotRmx))
   }
 }

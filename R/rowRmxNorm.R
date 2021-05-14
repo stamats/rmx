@@ -44,7 +44,7 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
             SE1 <- b1/sqrt(ncol(x))
             SE2 <- b2/sqrt(ncol(x))
             asSE <- cbind(SE1, SE2)
-            colnames(asSE) <- c("SE.mean", "SE.SD")
+            colnames(asSE) <- c("SE.mean", "SE.sd")
         }else{
             asSE <- NA
         }
@@ -73,7 +73,7 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
                 SE1 <- SD/sqrt(ncol(x))
                 SE2 <- 0.5*SD/sqrt(ncol(x))
                 asSE <- cbind(SE1, SE2)
-                colnames(asSE) <- c("SE.mean", "SE.SD")
+                colnames(asSE) <- c("SE.mean", "SE.sd")
             }else{
                 asSE <- NA
             }
@@ -126,7 +126,7 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
                                          A1 = A1, A2 = A2, a = a, b = b, k = k,
                                          na.rm = na.rm)
         rmxEst <- rmxEst.all$est
-        colnames(rmxEst) <- c("mean", "SD")
+        colnames(rmxEst) <- c("mean", "sd")
         if(fsCor){
             Info.matrix <- matrix(c("rowRmx", 
                                     paste("fs-corrected estimate for 'eps' =", 
@@ -151,7 +151,7 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
                 asVar[i,] <- c(tmp[1,1], tmp[2,2])
             }
             asSE <- sqrt(asVar/ncol(x))
-            colnames(asSE) <- c("SE.mean", "SE.SD")
+            colnames(asSE) <- c("SE.mean", "SE.sd")
         }else{
             asSE <- NA
         }
@@ -190,7 +190,7 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
                                      A1 = A1, A2 = A2, a = a, b = b, k = k,
                                      na.rm = na.rm)
         rmxEst <- rmxEst.all$est
-        colnames(rmxEst) <- c("mean", "SD")
+        colnames(rmxEst) <- c("mean", "sd")
         if(fsCor){
             Info.matrix <- matrix(c(rep("rowRmx", 2), 
                                     paste("fs-corrected rmx estimate for eps in [", 
@@ -216,7 +216,7 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
                 asVar[i,] <- c(tmp[1,1], tmp[2,2])
             }
             asSE <- sqrt(asVar/ncol(x))
-            colnames(asSE) <- c("SE.mean", "SE.SD")
+            colnames(asSE) <- c("SE.mean", "SE.sd")
         }else{
             asSE <- NA
         }
