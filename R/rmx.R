@@ -214,4 +214,11 @@ print.rmxCI <- function (x, digits = getOption("digits"), prefix = " ", ...){
   cat("\n")
   invisible(x)
 }
-#plot.rmx <- function -> IF + diagnostische Plots!
+plot.rmx <- function(x, which = 1, 
+                     control = list(plotIF = NULL), ...){
+  show <- rep(FALSE, 6)
+  show[which] <- TRUE
+  if(show[1]){
+    do.call("plotIF", args = c(list(x = x), control$plotIF))
+  }
+}

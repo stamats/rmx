@@ -63,7 +63,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
             y1 <- b1*sign(z)
             y2 <- b2*sign((z^2 - 1)/sigma - a2)
             Y <- cbind(y1, y2)
-            colnames(Y) <- c("IF for mean estimate", "IF for SD estimate")  
+            colnames(Y) <- c("IF for mean", "IF for SD")  
             Y
         }, list(AM = AM, sigma = SD, a2 = a2, b1 = b1, b2 = b2))
         range <- function(alpha, n = 501){} 
@@ -108,7 +108,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
             body(IFun) <- substitute({ 
                 z <- (x-AM)/sigma
                 res <- sigma*cbind(z, 0.5*(z^2 - 1)) 
-                colnames(res) <- c("IF for mean estimate", "IF for SD estimate") 
+                colnames(res) <- c("IF for mean", "IF for SD") 
                 res 
             }, list(AM = mean, sigma = sd))
             range <- function(alpha, n = 501){} 
@@ -205,7 +205,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
             w <- ind1 + (1-ind1)*b/hvkt 
             Y <- cbind(a1*z/sigma, a3*(z^2-1)/sigma-a2)
             res <- Y*w
-            colnames(res) <- c("IF for mean estimate", "IF for SD estimate")  
+            colnames(res) <- c("IF for mean", "IF for SD")  
             res 
         }, list(AM = rmxEst[1], sigma = rmxEst[2], 
                 a1 = A[1,1], a2 = a[2], a3 = A[2,2], b = b))
@@ -293,7 +293,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
             w <- ind1 + (1-ind1)*b/hvkt 
             Y <- cbind(a1*z/sigma, a3*(z^2-1)/sigma-a2)
             res <- Y*w
-            colnames(res) <- c("IF for mean estimate", "IF for SD estimate")  
+            colnames(res) <- c("IF for mean", "IF for SD")  
             res 
         }, list(AM = rmxEst[1], sigma = rmxEst[2], 
                 a1 = A[1,1], a2 = a[2], a3 = A[2,2], b = b))

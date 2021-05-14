@@ -3,17 +3,24 @@
 ###############################################################################
 
 ###########################################################
+## Version 0.4
+###########################################################
+- added plot of IF for rmx estimators
+- added plot method for S3 class rmx
+
+###########################################################
 ## Version 0.3
 ###########################################################
 - added function rowRmx and colRmx to compute optimally-robust rmx estimators
   row- or column-wise
+- added print method for S3 class RMXlist
 
 
 ###########################################################
 ## Version 0.2
 ###########################################################
-- added function rmx to compute optimally-robust rmx estimators
-- added methods for print, summary and confint
+- added function rmx to compute optimally-robust RMX estimators
+- added print, summary and confint methods for S3 class rmx
 
 
 ###########################################################
@@ -21,4 +28,5 @@
 ###########################################################
 - start of development
 - added optimally robust IF for normal location and scale
+- added print, summary and confint methods for S3 class optIF
 

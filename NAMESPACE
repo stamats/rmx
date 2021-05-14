@@ -1,14 +1,15 @@
 import("stats")
-importFrom("grid", "grid.draw")
+importFrom("grid", "grid.newpage", "grid.draw")
 importFrom("robustbase", "rowMedians")
 importFrom("gridExtra", "arrangeGrob")
-importFrom("ggplot2", "ggplot", "aes_string", "geom_line", "xlab", "ylab", "ylim", "ggtitle")
+importFrom("ggplot2", "ggplot", "aes_string", "geom_line", "xlab", "ylab", "ylim", "ggtitle", "geom_point", "scale_size")
 
 export("optIF",
        "fsRadius",
        "rmx",
        "rowRmx",
-       "colRmx")
+       "colRmx",
+       "plotIF")
 
 S3method(print, optIF)
 S3method(print, rmx)
@@ -20,4 +21,5 @@ S3method(coef, rmx)
 S3method(vcov, rmx)
 S3method(confint, rmx)
 S3method(plot, optIF)
+S3method(plot, rmx)
 

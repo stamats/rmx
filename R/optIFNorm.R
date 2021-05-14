@@ -21,7 +21,7 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0
         body(IFun) <- substitute({ 
                 z <- (x-AM)/sigma
                 res <- sigma*cbind(z, 0.5*(z^2 - 1)) 
-                colnames(res) <- c("IF for mean estimate", "IF for SD estimate") 
+                colnames(res) <- c("IF for mean", "IF for SD") 
                 res 
             }, list(AM = mean, sigma = sd))
         range <- function(alpha, n = 501){} 
@@ -63,7 +63,7 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0
                 w <- 1/sqrt(z^2 + (a3*(z^2-1) - a2*sigma)^2)
                 Y <- b*cbind(z, a3*(z^2-1)-a2*sigma)
                 res <- Y*w
-                colnames(res) <- c("IF for mean estimate", "IF for SD estimate") 
+                colnames(res) <- c("IF for mean", "IF for SD") 
                 res 
             }, list(AM = mean, sigma = sd, a2 = a[2], a3 = a3, b = b))
         range <- function(alpha, n = 501){} 
@@ -161,7 +161,7 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0
         w <- ind1 + (1-ind1)*b/hvkt 
         Y <- cbind(a1*z/sigma, a3*(z^2-1)/sigma-a2)
         res <- Y*w
-        colnames(res) <- c("IF for mean estimate", "IF for SD estimate") 
+        colnames(res) <- c("IF for mean", "IF for SD") 
         res 
         }, list(AM = mean, sigma = sd, 
                 a1 = A[1,1], a2 = a[2], a3 = A[2,2], b = b))
