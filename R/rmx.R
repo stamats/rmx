@@ -153,7 +153,7 @@ vcov.rmx <- function(object, ...){
 .format.perc <- function (probs, digits){
   paste(format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits), "%")
 }
-confint.rmx <- function (object, parm, level = 0.95, method = "as", ...){
+confint.rmx <- function (object, parm, level = 0.95, method = "as", R = 9999, ...){
   if(method == "as"){
     Method <- "Asymptotic (LAN-based) confidence interval"
     ci <- confint.default(object)
@@ -175,7 +175,25 @@ confint.rmx <- function (object, parm, level = 0.95, method = "as", ...){
     ci[] <- cf[parm] + ses %o% fac
   }
   if(method == "boot"){
-    stop("not yet implemented")
+    Method <- "Bootstrap confidence interval"
+    n <- length(object$x)
+    t0 <- c(object$rmxEst, diag(object$rmxIF$asVar))
+    seed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+    X <- matrix(sample(object$x, size = R*n, replace = TRUE), nrow = R)
+    boot.res <- rowRmx(X, model = object$rmxIF$model, computeSE = TRUE)
+    t <- cbind(boot.res$rmxEst, n*boot.res$asSE^2)
+    boot.out <- list(t0 = t0, t = t, R = R, data = object$x, seed = seed, 
+                     statistic = function(x, i){}, sim = "ordinary", 
+                     call = boot.res$call, stype = "i", 
+                     strata = rep(1, length(object$x)),
+                     weights = rep(1/length(object$x), length(object$x)))
+    class(boot.out) <- "boot"
+    attr(boot.out, "boot_type") <- "boot"
+    if(object$rmxIF$model %in% c("norm", "gamma")){
+      ci <- list(boot.ci(boot.out, index = c(1,3)),
+                 boot.ci(boot.out, index = c(2,4)))
+      names(ci) <- names(object$rmxIF$parameter)
+    }
   }
   attr(ci, "conf.level") <- level
   CI <- list(method = Method, conf.int = ci, rmxEst = object$rmxEst)

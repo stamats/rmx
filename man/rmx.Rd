@@ -85,8 +85,9 @@ x <- rnorm(100, mean=ind*3, sd=(1-ind) + ind*9)
 res1 <- rmx(x, eps.lower = 0.01, eps.upper = 0.1)
 res1
 summary(res1)
-confint(res1)
+confint(res1) # method = "as"
 confint(res1, method = "as.bias")
+confint(res1, method = "boot", R = 999)
 plotIF(res1)
 plot(res1, which = 1)
 qqplotRmx(res1)
@@ -96,8 +97,9 @@ plot(res1, which = 2)
 res2 <- rmx(x, eps = 0.05)
 res2
 summary(res2)
-confint(res2)
+confint(res2) # method = "as"
 confint(res2, method = "as.bias")
+confint(res2, method = "boot", R = 999)
 plotIF(res2)
 plotIF(res2)
 plot(res2, which = 1)

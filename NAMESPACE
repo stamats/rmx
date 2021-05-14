@@ -1,5 +1,6 @@
 import("stats")
 importFrom("grid", "grid.newpage", "grid.draw")
+importFrom("boot", "boot.ci")
 importFrom("robustbase", "rowMedians")
 importFrom("gridExtra", "arrangeGrob")
 importFrom("ggplot2", "ggplot", "aes", "aes_string", "geom_line", "xlab", 

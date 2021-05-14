@@ -8,7 +8,7 @@ Authors@R: person("Matthias", "Kohl", role = c("aut", "cre"),
 Author: Matthias Kohl [aut, cre] (0000-0001-9514-8910)
 Maintainer: Matthias Kohl <Matthias.Kohl@stamats.de>
 Depends: R(>= 4.0.0)
-Imports: stats, grid, robustbase, ggplot2, gridExtra, qqplotr
+Imports: stats, grid, boot, robustbase, ggplot2, gridExtra, qqplotr
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 Description: Radius-minimax (rmx) estimators are a special class of optimally-robust statistical procedures (Kohl (2005), <https://epub.uni-bayreuth.de/839/2/DissMKohl.pdf>; Rieder et al. (2008), <doi:10.1007/s10260-007-0047-7>). It is a class of asymptotically linear estimators where infinitesimal (shrinking) neighborhoods around parametric models are assumed (Rieder (1994), ISBN:978-1-4684-0624-5; Ruckdeschel (2006), <doi:10.1007/s00184-005-0020-0>; Kohl et al. (2010), <doi:10.1007/s10260-010-0133-0>; Kohl (2012), <doi:10.1080/02331888.2010.540668>).

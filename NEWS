@@ -8,6 +8,8 @@
 - added plot of IF for rmx estimators
 - addet qq-plot for model estimated with rmx estimators
 - added plot method for S3 class rmx
+- added bootstrap confidence intervals for S3 class rmx
+
 
 ###########################################################
 ## Version 0.3
