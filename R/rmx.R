@@ -153,7 +153,8 @@ vcov.rmx <- function(object, ...){
 .format.perc <- function (probs, digits){
   paste(format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits), "%")
 }
-confint.rmx <- function (object, parm, level = 0.95, method = "as", R = 9999, ...){
+confint.rmx <- function (object, parm, level = 0.95, method = "as", R = 9999, 
+                         parallel = FALSE, ncores = NULL, ...){
   if(method == "as"){
     Method <- "Asymptotic (LAN-based) confidence interval"
     ci <- confint.default(object)
@@ -180,7 +181,8 @@ confint.rmx <- function (object, parm, level = 0.95, method = "as", R = 9999, ..
     t0 <- c(object$rmxEst, diag(object$rmxIF$asVar))
     seed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
     X <- matrix(sample(object$x, size = R*n, replace = TRUE), nrow = R)
-    boot.res <- rowRmx(X, model = object$rmxIF$model, computeSE = TRUE)
+    boot.res <- rowRmx(X, model = object$rmxIF$model, computeSE = TRUE,
+                       parallel = parallel, ncores = ncores)
     t <- cbind(boot.res$rmxEst, n*boot.res$asSE^2)
     boot.out <- list(t0 = t0, t = t, R = R, data = object$x, seed = seed, 
                      statistic = function(x, i){}, sim = "ordinary", 

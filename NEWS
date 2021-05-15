@@ -5,11 +5,12 @@
 ###########################################################
 ## Version 0.4
 ###########################################################
-- added plot of IF for rmx estimators
-- addet qq-plot for model estimated with rmx estimators
-- added plot method for S3 class rmx
-- added bootstrap confidence intervals for S3 class rmx
-- added optional parallel computing for standard errors in rowRmx/colRmx.
+- plot of IF for rmx estimators
+- qq-plot for model estimated with rmx estimators
+- plot method for S3 class rmx
+- optional parallel computing for standard errors in rowRmx/colRmx.
+- bootstrap confidence intervals for S3 class rmx including optional 
+  parallel computing
 
 
 ###########################################################

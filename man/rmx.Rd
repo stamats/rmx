@@ -87,7 +87,10 @@ res1
 summary(res1)
 confint(res1) # method = "as"
 confint(res1, method = "as.bias")
-confint(res1, method = "boot", R = 999)
+\dontrun{
+## not run to save check time
+confint(res1, method = "boot", R = 9999)
+confint(res1, method = "boot", R = 9999, parallel = TRUE)}
 plotIF(res1)
 plot(res1, which = 1)
 qqplotRmx(res1)
@@ -99,7 +102,10 @@ res2
 summary(res2)
 confint(res2) # method = "as"
 confint(res2, method = "as.bias")
-confint(res2, method = "boot", R = 999)
+\dontrun{
+## not run to save check time
+confint(res2, method = "boot", R = 9999)
+confint(res2, method = "boot", R = 9999, parallel = TRUE)}
 plotIF(res2)
 plotIF(res2)
 plot(res2, which = 1)
