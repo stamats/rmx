@@ -2,7 +2,7 @@
 ## Evaluate roblox on rows of a matrix
 ###############################################################################
 rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
-                        na.rm, computeSE){
+                        na.rm, computeSE, parallel, ncores){
     mad0 <- 1e-4
     if(!is.null(eps)){
         r <- sqrt(ncol(x))*eps # missing values per row are not considered!
@@ -141,17 +141,42 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
 
         if(computeSE){
             asVar <- matrix(NA, nrow = nrow(x), ncol = 2)
-            for(i in 1:nrow(x)){
-                b <- rmxEst.all$b[i]/rmxEst[i,2]
-                a1 <- rmxEst.all$A1[i]/rmxEst[i,2]^2
-                a3 <- rmxEst.all$A2[i]/rmxEst[i,2]^2
-                a2 <- rmxEst.all$a[i]/rmxEst[i,2]/a3 + 1
-                
-                tmp <- rmxEst[i,2]^2*.getAsVar.norm(b = b, a1 = a1, a2 = a2, a3 = a3)    
-                asVar[i,] <- c(tmp[1,1], tmp[2,2])
+            if(parallel){
+                if(is.null(ncores)){
+                    cores <- detectCores()
+                    cl <- makeCluster(cores[1]-1)
+                }else{
+                    cl <- makeCluster(ncores)
+                }
+                rmxMat <- cbind(rmxEst[,2], rmxEst.all$b, rmxEst.all$A1, 
+                                rmxEst.all$A2, rmxEst.all$a)
+                asVarFun <- function(x){
+                    SD <- x[1]
+                    b <- x[2]/SD
+                    a1 <- x[3]/SD^2
+                    a3 <- x[4]/SD^2
+                    a2 <- x[5]/SD/a3 + 1
+                    
+                    tmp <- SD^2*.getAsVar.norm(b = b, a1 = a1, a2 = a2, a3 = a3)    
+                    c(tmp[1,1], tmp[2,2])
+                }
+                asVar <- parApply(cl = cl, X = rmxMat, MARGIN = 1, FUN = asVarFun)
+                stopCluster(cl)
+                asSE <- sqrt(t(asVar)/ncol(x))
+                colnames(asSE) <- c("SE.mean", "SE.sd")
+            }else{
+                for(i in 1:nrow(x)){
+                    b <- rmxEst.all$b[i]/rmxEst[i,2]
+                    a1 <- rmxEst.all$A1[i]/rmxEst[i,2]^2
+                    a3 <- rmxEst.all$A2[i]/rmxEst[i,2]^2
+                    a2 <- rmxEst.all$a[i]/rmxEst[i,2]/a3 + 1
+                    
+                    tmp <- rmxEst[i,2]^2*.getAsVar.norm(b = b, a1 = a1, a2 = a2, a3 = a3)    
+                    asVar[i,] <- c(tmp[1,1], tmp[2,2])
+                }
+                asSE <- sqrt(asVar/ncol(x))
+                colnames(asSE) <- c("SE.mean", "SE.sd")
             }
-            asSE <- sqrt(asVar/ncol(x))
-            colnames(asSE) <- c("SE.mean", "SE.sd")
         }else{
             asSE <- NA
         }
@@ -206,17 +231,42 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
         }
         if(computeSE){
             asVar <- matrix(NA, nrow = nrow(x), ncol = 2)
-            for(i in 1:nrow(x)){
-                b <- rmxEst.all$b[i]/rmxEst[i,2]
-                a1 <- rmxEst.all$A1[i]/rmxEst[i,2]^2
-                a3 <- rmxEst.all$A2[i]/rmxEst[i,2]^2
-                a2 <- rmxEst.all$a[i]/rmxEst[i,2]/a3 + 1
-                
-                tmp <- rmxEst[i,2]^2*.getAsVar.norm(b = b, a1 = a1, a2 = a2, a3 = a3)    
-                asVar[i,] <- c(tmp[1,1], tmp[2,2])
+            if(parallel){
+                if(is.null(ncores)){
+                    cores <- detectCores()
+                    cl <- makeCluster(cores[1]-1)
+                }else{
+                    cl <- makeCluster(ncores)
+                }
+                rmxMat <- cbind(rmxEst[,2], rmxEst.all$b, rmxEst.all$A1, 
+                                rmxEst.all$A2, rmxEst.all$a)
+                asVarFun <- function(x){
+                    SD <- x[1]
+                    b <- x[2]/SD
+                    a1 <- x[3]/SD^2
+                    a3 <- x[4]/SD^2
+                    a2 <- x[5]/SD/a3 + 1
+                    
+                    tmp <- SD^2*.getAsVar.norm(b = b, a1 = a1, a2 = a2, a3 = a3)    
+                    c(tmp[1,1], tmp[2,2])
+                }
+                asVar <- parApply(cl = cl, X = rmxMat, MARGIN = 1, FUN = asVarFun)
+                stopCluster(cl)
+                asSE <- sqrt(t(asVar)/ncol(x))
+                colnames(asSE) <- c("SE.mean", "SE.sd")
+            }else{
+                for(i in 1:nrow(x)){
+                    b <- rmxEst.all$b[i]/rmxEst[i,2]
+                    a1 <- rmxEst.all$A1[i]/rmxEst[i,2]^2
+                    a3 <- rmxEst.all$A2[i]/rmxEst[i,2]^2
+                    a2 <- rmxEst.all$a[i]/rmxEst[i,2]/a3 + 1
+                    
+                    tmp <- rmxEst[i,2]^2*.getAsVar.norm(b = b, a1 = a1, a2 = a2, a3 = a3)    
+                    asVar[i,] <- c(tmp[1,1], tmp[2,2])
+                }
+                asSE <- sqrt(asVar/ncol(x))
+                colnames(asSE) <- c("SE.mean", "SE.sd")
             }
-            asSE <- sqrt(asVar/ncol(x))
-            colnames(asSE) <- c("SE.mean", "SE.sd")
         }else{
             asSE <- NA
         }

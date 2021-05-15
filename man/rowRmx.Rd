@@ -10,9 +10,11 @@
 }
 \usage{
 rowRmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L, 
-       initial.est=NULL, fsCor = TRUE, na.rm = TRUE, computeSE = FALSE)
+       initial.est=NULL, fsCor = TRUE, na.rm = TRUE, computeSE = FALSE,
+       parallel = FALSE, ncores = NULL)
 colRmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L, 
-       initial.est=NULL, fsCor = TRUE, na.rm = TRUE, computeSE = FALSE)
+       initial.est=NULL, fsCor = TRUE, na.rm = TRUE, computeSE = FALSE,
+       parallel = FALSE, ncores = NULL)
 }
 \arguments{
   \item{x}{ matrix or data.frame of (numeric) data values. }
@@ -30,6 +32,8 @@ colRmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L,
   \item{fsCor}{ logical: perform finite-sample correction; see function \code{\link{fsRadius}}. }
   \item{na.rm}{logical: if \code{TRUE}, \code{NA} values are removed before the estimator is evaluated.}
   \item{computeSE}{ logical: compute asymptotic standard errors. }
+  \item{parallel}{ if \code{computeSE = TRUE}: logical: use package parallel for the computation. }
+  \item{ncores}{ if \code{parallel = TRUE}: number of cores used for the computation. }
 }
 \details{
   These functions are optimized for the situation where one has a matrix 

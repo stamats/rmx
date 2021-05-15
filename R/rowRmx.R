@@ -3,7 +3,7 @@
 ###############################################################################
 rowRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, 
                    k = 3L, initial.est=NULL, fsCor = TRUE, na.rm = TRUE, 
-                   computeSE = FALSE){
+                   computeSE = FALSE, parallel = FALSE, ncores = NULL){
     es.call <- match.call()
     if(missing(x))
         stop("'x' is missing with no default")
@@ -50,9 +50,10 @@ rowRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL,
     stopifnot(is.logical(na.rm))
     
     if(model == 1){ # normal distribution
-        RMXest <- rowRmx.norm(x, eps.lower=eps.lower, eps.upper=eps.upper, eps=eps, 
-                              k = k, initial.est=initial.est, fsCor = fsCor,
-                              na.rm = na.rm, computeSE = computeSE)
+        RMXest <- rowRmx.norm(x, eps.lower = eps.lower, eps.upper = eps.upper, 
+                              eps = eps, k = k, initial.est=initial.est, 
+                              fsCor = fsCor, na.rm = na.rm, computeSE = computeSE, 
+                              parallel = parallel, ncores = ncores)
     }
     if(model != 1){
         stop("Given 'model' not yet implemented")
@@ -73,7 +74,7 @@ rowRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL,
     RMXest$call <- es.call
     RMXest
 }
-print.RMXlist <- function (x, digits = getOption("digits"), prefix = " ", ...){
+print.RMXlist <- function (x, digits = getOption("digits"), prefix = " ", head.n = 6L, ...){
     cat("\n")
     cat(strwrap(paste0("RMX estimator for ", x$modelName), 
                 prefix = " "), sep = "\n")
@@ -98,11 +99,14 @@ print.RMXlist <- function (x, digits = getOption("digits"), prefix = " ", ...){
                   format(x$radius, digits = digits), sep = " = "), sep = "\n")
     }
     cat("\n Estimates:\n")
-    print(x$rmxEst, digits = digits, ...)
+    print(head(x$rmxEst, n = head.n), digits = digits, ...)
+    if(head.n < nrow(x$rmxEst)) cat(paste0("[", head.n+1, ",]  ..."), "\n")
     if(any(!is.na(x$asSE))) {
         cat("\n Asymptotic standard errors:\n")
-        print(x$asSE, digits = digits, ...)
+        print(head(x$asSE, n = head.n), digits = digits, ...)
     }
+    if(head.n < nrow(x$rmxEst)) cat(paste0("[", head.n+1, ",]  ..."), "\n")
+    cat("\n NOTE:", nrow(x$asSE)-head.n, "rows omitted\n")
     cat("\n Call:\n ", paste(deparse(x$call), sep = "\n", collapse = "\n"), 
         "\n\n", sep = "")
     invisible(x)
