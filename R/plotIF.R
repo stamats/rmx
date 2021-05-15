@@ -17,9 +17,9 @@ plotIF <- function(x, range.alpha = 1e-6, range.n = 501,
   DF <- data.frame(y, IF)
   IFx <- x$rmxIF$IFun(x$x)
   if(ncol(IFx) == 1){
-    info <- IFx
+    info <- IFx^2
   }else{
-    info <- sqrt(rowSums(IFx^2))
+    info <- rowSums(IFx^2)
   }
   DFx <- data.frame(x = x$x, IFx, info = signif(info, info.digits))
   if(x$rmxIF$model %in% c("norm", "gamma")){
