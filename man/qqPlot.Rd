@@ -1,15 +1,16 @@
-\name{qqplotRmx}
-\alias{qqplotRmx}
-\title{qq-Plot of Model Estimated by Optimally Robust RMX Estimator}
+\name{qqPlot}
+\alias{qqPlot}
+\alias{qqPlot.rmx}
+\title{qq-Plot of Estimators}
 \description{
-  The function \code{qqplotRmx} generates a qq-Plot of a model fitted 
-  by an optimally robust RMX estimator (S3 class \code{rmx}) computed
-  with function \code{rmx}. 
+  The function \code{qqPlot} generates a qq-Plot for fitted models. 
 }
 \usage{
-qqplotRmx(x, param.digits = 3, ggplot.xlab = "Theoretical Quantiles", 
-          ggplot.ylab = "Sample Quantiles", ggplot.ggtitle = NULL,
-          point.col = "#0072B5", point.alpha = 1)
+qqPlot(x, \dots)
+
+\method{qqPlot}{rmx}(x, param.digits = 3, ggplot.xlab = "Theoretical Quantiles", 
+                     ggplot.ylab = "Sample Quantiles", ggplot.ggtitle = NULL,
+                     point.col = "#0072B5", point.alpha = 1, \dots)
 }
 \arguments{
   \item{x}{ object of S3 class \code{rmx}. }
@@ -20,6 +21,7 @@ qqplotRmx(x, param.digits = 3, ggplot.xlab = "Theoretical Quantiles",
   \item{ggplot.ggtitle}{ plot title. If \code{NULL} default plot title is generated. }
   \item{point.col}{ single color used for colouring the data points. }
   \item{point.alpha}{ alpha used for color shading.}
+  \item{\dots}{ further arguments passed through. }
 }
 \details{
   The function is based on the function provided by packages \pkg{ggplot2} 
@@ -49,14 +51,13 @@ qqplotRmx(x, param.digits = 3, ggplot.xlab = "Theoretical Quantiles",
 ind <- rbinom(100, size=1, prob=0.05) 
 x <- rnorm(100, mean=ind*3, sd=(1-ind) + ind*9)
 res <- rmx(x, eps.lower = 0.01, eps.upper = 0.1)
-qqplotRmx(res)
+qqPlot(res)
 
 ## plot-method
 plot(res, which = 2)
 
 ## setting and passing argument
-qqplotRmx(res, ggplot.xlab = "Quantiles of estimated model", 
-               point.col = "black")
+qqPlot(res, ggplot.xlab = "Quantiles of estimated model", point.col = "black")
 plot(res, which = 2, 
      control = list(qqplotRmx = list(ggplot.xlab = "Quantiles of estimated model", 
                                      point.col = "black")))

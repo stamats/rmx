@@ -1,7 +1,9 @@
-qqplotRmx <- function(x, param.digits = 3, ggplot.xlab = "Theoretical Quantiles", 
+qqPlot <- function(x, ...){
+  UseMethod("qqPlot")
+}
+qqPlot.rmx <- function(x, param.digits = 3, ggplot.xlab = "Theoretical Quantiles", 
                       ggplot.ylab = "Sample Quantiles", ggplot.ggtitle = NULL,
-                      point.col = "#0072B5", point.alpha = 1){
-  stopifnot(inherits(x, "rmx"))
+                      point.col = "#0072B5", point.alpha = 1, ...){
   stopifnot(length(ggplot.xlab) == 1)
   stopifnot(length(ggplot.ylab) == 1)
   
