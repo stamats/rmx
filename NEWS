@@ -3,6 +3,18 @@
 ###############################################################################
 
 ###########################################################
+## Version 0.5
+###########################################################
+- renamed plotIF to ifPlot for consistent naming of plot functions
+- method qqPlot for rmx objects
+- computation of cniper region
+- identification of cnipers
+- plot cniper contamination
+- computation of outlier region
+- identification of outliers
+
+
+###########################################################
 ## Version 0.4
 ###########################################################
 - plot of IF for rmx estimators

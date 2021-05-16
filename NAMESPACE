@@ -6,7 +6,8 @@ importFrom("parallel", "detectCores", "makeCluster", "parApply", "stopCluster")
 importFrom("robustbase", "rowMedians")
 importFrom("gridExtra", "arrangeGrob")
 importFrom("ggplot2", "ggplot", "aes", "aes_string", "geom_line", "xlab", 
-                      "ylab", "ylim", "ggtitle", "geom_point", "scale_size")
+                      "ylab", "ylim", "ggtitle", "geom_point", "scale_size",
+                      "geom_vline", "geom_hline", "annotate")
 importFrom("qqplotr", "stat_qq_band", "stat_qq_point", "stat_qq_line")
 
 export("optIF",
@@ -14,13 +15,19 @@ export("optIF",
        "rmx",
        "rowRmx",
        "colRmx",
-       "plotIF",
-       "qqplotRmx")
+       "cniper",
+       "getCnipers",
+       "outlier",
+       "getOutliers",
+       "ifPlot",
+       "qqPlot")
 
 S3method(print, optIF)
 S3method(print, rmx)
 S3method(print, rmxCI)
 S3method(print, RMXlist)
+S3method(print, cniper)
+S3method(print, outlier)
 S3method(summary, optIF)
 S3method(summary, rmx)
 S3method(coef, rmx)
@@ -28,4 +35,9 @@ S3method(vcov, rmx)
 S3method(confint, rmx)
 S3method(plot, optIF)
 S3method(plot, rmx)
+S3method(plot, cniper)
+S3method(cniper, rmx)
+S3method(outlier, rmx)
+S3method(ifPlot, rmx)
+S3method(qqPlot, rmx)
 
