@@ -58,7 +58,6 @@ plot(res, which = 4)
 ## setting and passing arguments
 dPlot(res, ggplot.xlab = "data", density.lwd = 2)
 plot(res, which = 4, 
-     control = list(dPlot = list(ggplot.xlab = "data", 
-                                  point.lwd = 2)))
+     control = list(dPlot = list(ggplot.xlab = "data", density.lwd = 2)))
 }
 \keyword{robust}
