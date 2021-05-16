@@ -124,17 +124,17 @@ summary.rmx <- function(object, digits = getOption("digits"), ...){
   }
   if(object$fsCor){
     cat(paste(format("FS-corrected radius", width = 24L, justify = "right"), 
-              format(object$rmxIF$radius, digits = digits), sep = " = "), sep = "\n")
+              format(object$rmxIF$radius, digits = 3), sep = " = "), sep = "\n")
   }else{
     cat(paste(format("Infinitesimal radius", width = 24L, justify = "right"), 
-              format(object$rmxIF$radius, digits = digits), sep = " = "), sep = "\n")
+              format(object$rmxIF$radius, digits = 3), sep = " = "), sep = "\n")
   }
   cat(paste(format("Maximum asymptotic MSE", width = 24L, justify = "right"), 
-            format(object$rmxIF$asMSE, digits = digits), sep = " = "), sep = "\n")
+            format(object$rmxIF$asMSE, digits = 3), sep = " = "), sep = "\n")
   cat(paste(format("Maximum asymptotic bias", width = 24L, justify = "right"), 
-            format(object$rmxIF$asBias, digits = digits), sep = " = "), sep = "\n")
+            format(object$rmxIF$asBias, digits = 3), sep = " = "), sep = "\n")
   cat(format("Asymptotic variance:", width = 24L, justify = "right"), "\n")
-  print(object$rmxIF$asVar, digits = digits, ...)
+  print(object$rmxIF$asVar, digits = 3, ...)
   cat("\n Call:\n ", paste(deparse(object$call), sep = "\n", collapse = "\n"), 
       "\n\n", sep = "")
   invisible(object)
@@ -235,14 +235,14 @@ print.rmxCI <- function (x, digits = getOption("digits"), prefix = " ", ...){
   invisible(x)
 }
 plot.rmx <- function(x, which = 1, 
-                     control = list(plotIF = NULL,
-                                    qqplotRmx = NULL), ...){
+                     control = list(ifPlot = NULL,
+                                    qqPlot = NULL), ...){
   show <- rep(FALSE, 6)
   show[which] <- TRUE
   if(show[1]){
-    do.call("plotIF", args = c(list(x = x), control$plotIF))
+    do.call("ifPlot", args = c(list(x = x), control$ifPlot))
   }
   if(show[2]){
-    do.call("qqplotRmx", args = c(list(x = x), control$qqplotRmx))
+    do.call("qqPlot", args = c(list(x = x), control$qqPlot))
   }
 }

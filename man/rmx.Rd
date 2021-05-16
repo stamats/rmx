@@ -78,41 +78,94 @@ rmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L,
 %\note{}
 \seealso{\code{\link{optIF}}, \code{\link{rowRmx}}, \code{\link{fsRadius}}}
 \examples{
+###########################################################
+## generate some contaminated random data
+###########################################################
 ind <- rbinom(100, size=1, prob=0.05) 
 x <- rnorm(100, mean=ind*3, sd=(1-ind) + ind*9)
 
+
+###########################################################
 ## amount of gross errors unknown
+###########################################################
 res1 <- rmx(x, eps.lower = 0.01, eps.upper = 0.1)
 res1
+coef(res1)
+vcov(res1)
+sqrt(diag(vcov(res1)))
+
 summary(res1)
+
 confint(res1) # method = "as"
 confint(res1, method = "as.bias")
 \dontrun{
 ## not run to save check time
 confint(res1, method = "boot", R = 9999)
 confint(res1, method = "boot", R = 9999, parallel = TRUE)}
-plotIF(res1)
+
+(cni.res1 <- cniper(res1))
+getCnipers(cni.res1)
+## or
+getCnipers(res1)
+plot(cni.res1)
+
+(out.res1 <- outlier(res1))
+getOutliers(out.res1)
+## or
+getOutliers(res1)
+
+ifPlot(res1)
 plot(res1, which = 1)
-qqplotRmx(res1)
+
+## only influence function
+plot(res1$rmxIF)
+
+qqPlot(res1)
 plot(res1, which = 2)
 
+
+###########################################################
 ## amount of gross errors known
+###########################################################
 res2 <- rmx(x, eps = 0.05)
 res2
+coef(res2)
+vcov(res2)
+sqrt(diag(vcov(res2)))
+
 summary(res2)
+
 confint(res2) # method = "as"
 confint(res2, method = "as.bias")
 \dontrun{
 ## not run to save check time
 confint(res2, method = "boot", R = 9999)
 confint(res2, method = "boot", R = 9999, parallel = TRUE)}
-plotIF(res2)
-plotIF(res2)
+
+(cni.res2 <- cniper(res2))
+getCnipers(cni.res2)
+## or
+getCnipers(res2)
+plot(cni.res2)
+
+(out.res2 <- outlier(res2))
+getOutliers(out.res2)
+## or
+getOutliers(res2)
+
+ifPlot(res2)
 plot(res2, which = 1)
-qqplotRmx(res2)
+
+## only influence function
+plot(res2$rmxIF)
+
+qqPlot(res2)
 plot(res2, which = 2)
 
+
+###########################################################
 ## estimator comparison
+###########################################################
 ## classical optimal (non-robust)
 c(mean(x), sd(x))
 ## most robust

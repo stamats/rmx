@@ -106,7 +106,9 @@ print.RMXlist <- function (x, digits = getOption("digits"), prefix = " ", head.n
         print(head(x$asSE, n = head.n), digits = digits, ...)
     }
     if(head.n < nrow(x$rmxEst)) cat(paste0("[", head.n+1, ",]  ..."), "\n")
-    cat("\n NOTE:", nrow(x$asSE)-head.n, "rows omitted\n")
+    if(nrow(x$rmxEst) > head.n){
+        cat("\n NOTE:", nrow(x$rmxEst)-head.n, "rows omitted\n")
+    }
     cat("\n Call:\n ", paste(deparse(x$call), sep = "\n", collapse = "\n"), 
         "\n\n", sep = "")
     invisible(x)

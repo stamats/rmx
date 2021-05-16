@@ -102,7 +102,7 @@ rowRmx(X, eps = 0.05)
 X1 <- t(X)
 colRmx(X1)
 colRmx(X1, eps.lower = 0.01, eps.upper = 0.1)
-colRmx(X, eps.lower = 0.01, eps.upper = 0.1, computeSE = TRUE)
+colRmx(X1, eps.lower = 0.01, eps.upper = 0.1, computeSE = TRUE)
 colRmx(X1, eps = 0.05)
 }
 \keyword{robust}
