@@ -1,24 +1,32 @@
-\name{plotIF}
-\alias{plotIF}
-\title{Plot IF of Optimally Robust RMX Estimator}
+\name{ifPlot}
+\alias{ifPlot}
+\alias{ifPlot.rmx}
+\title{Plot IF of Estimators}
 \description{
-  The function \code{plotIF} plots the influence function (IF) of 
-  an optimally robust RMX estimator (S3 class \code{rmx}) computed
-  with function \code{rmx}. In addition, the data that was used 
-  to compute the estimator is added to the plot, where the point size
-  is proportional to the absolute/total information (= length of the IF squared) 
-  attributed to each point.
+  The function \code{ifPlot} plots the influence function (IF) of 
+  estimators.
 }
 \usage{
-plotIF(x, range.alpha = 1e-6, range.n = 501, 
-       info.digits = 2, param.digits = 2, 
-       ggplot.xlab = "x", ggplot.ylab = "IF(x)",
-       ggplot.ggtitle = NULL,
-       point.col = "#0072B5", point.alpha = 0.4, 
-       point.length.out = 5, point.range = c(1,7))
+ifPlot(x, \dots)
+
+\method{ifPlot}{rmx}(x, add.cniper = TRUE, color.cniper = "#E18727", 
+                     add.outlier = TRUE, prob.outlier = 0.001, 
+                     color.outlier = "#BC3C29",
+                     range.alpha = 1e-6, range.n = 501, 
+                     info.digits = 2, param.digits = 2, 
+                     ggplot.xlab = "x", ggplot.ylab = "IF(x)",
+                     ggplot.ggtitle = NULL,
+                     point.col = "#0072B5", point.alpha = 0.4, 
+                     point.length.out = 5, point.range = c(1,7), \dots)
 }
 \arguments{
   \item{x}{ object of S3 class \code{rmx}. }
+  \item{add.cniper}{ logical: add cniper region; see also \code{\link{cniper}}.}
+  \item{color.cniper}{ color used for cniper region.}
+  \item{add.outlier}{ logical: add outlier region; see also \code{\link{cniper}}.}
+  \item{prob.outlier}{ probability used to define outlier region; see also 
+                       \code{\link{cniper}}.}
+  \item{color.outlier}{ color used for outlier region.}
   \item{range.alpha}{ alpha-quantile used to compute plot range, which is from
                       \code{range.alpha}-quantile to 1-\code{range.alpha}-quantile 
                       of the fitted model.}
@@ -45,11 +53,17 @@ plotIF(x, range.alpha = 1e-6, range.n = 501,
   \item{point.range}{ a numeric vector of length 2 specifing the minimum and maximum 
                       size of the data points; see argument
                       \code{range} of function \code{\link{scale_size}}}
+  \item{\dots}{ further arguments passed through. }
 }
 \details{
-  The function is similar to the \code{plot}-methods and function \code{PlotIC} 
-  of the RobASt-family of packages, but instead of the standard graphic methods
-  uses functions from the packages \pkg{ggplot2}, \pkg{grid} and \pkg{gridExtra}.
+  The function is inspired by the \code{plot}-methods and function \code{PlotIC} 
+  of the RobASt-family of packages.
+  
+  In case of optimally-robust RMX estimators computed with function \code{rmx}
+  (S3 class \code{rmx}), the influence function is plotted in combination with 
+  the data that was used  to compute the estimator. The point size is proportional 
+  to the absolute/total information (= length of the IF squared) attributed to 
+  each point.
 }
 \value{
   Invisible object of class \code{ggplot}.
@@ -75,13 +89,13 @@ plotIF(x, range.alpha = 1e-6, range.n = 501,
 ind <- rbinom(100, size=1, prob=0.05) 
 x <- rnorm(100, mean=ind*3, sd=(1-ind) + ind*9)
 res <- rmx(x, eps.lower = 0.01, eps.upper = 0.1)
-plotIF(res)
+ifPlot(res)
 
 ## plot-method
 plot(res, which = 1)
 
 ## setting and passing argument
-plotIF(res, ggplot.xlab = "data", ggplot.ylab = "influence",
+ifPlot(res, ggplot.xlab = "data", ggplot.ylab = "influence",
        ggplot.ggtitle = c("Location part of RMX-IF",
                           "Scale part of RMX-IF"))
 plot(res, which = 1, 

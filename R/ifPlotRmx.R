@@ -1,15 +1,23 @@
-plotIF <- function(x, range.alpha = 1e-6, range.n = 501, 
+ifPlot <- function(x, ...){
+  UseMethod("ifPlot")
+}
+ifPlot.rmx <- function(x, add.cniper = TRUE, color.cniper = "#E18727", 
+                   add.outlier = TRUE, prob.outlier = 0.001, 
+                   color.outlier = "#BC3C29",
+                   range.alpha = 1e-6, range.n = 501, 
                    info.digits = 2, param.digits = 2, 
                    ggplot.xlab = "x", ggplot.ylab = "IF(x)",
                    ggplot.ggtitle = NULL,
                    point.col = "#0072B5", point.alpha = 0.4, 
-                   point.length.out = 5, point.range = c(1,7)){
-  stopifnot(inherits(x, "rmx"))
+                   point.length.out = 5, point.range = c(1,7), ...){
   stopifnot(length(range.alpha) == 1)
   stopifnot(is.numeric(range.alpha))
   stopifnot(range.alpha > 0 & range.alpha < 1)
 
-  y <- sort(unique(c(x$x, x$rmxIF$range(alpha = range.alpha, n = range.n))))
+  rg <- x$rmxIF$range(alpha = range.alpha, n = 2)
+  y <- c(seq(from = min(rg[1], x$x), to = max(rg[2], x$x), length.out = range.n), 
+         x$x)
+  y <- sort(unique(y))
   IF <- x$rmxIF$IFun(y)
   IFmin <- min(IF)
   IFmax <- max(IF)
@@ -61,6 +69,16 @@ plotIF <- function(x, range.alpha = 1e-6, range.n = 501,
           scale_size(breaks = seq(from = min(DFx$info), to = max(DFx$info), 
                                   length.out = point.length.out), range = point.range) +
           ggt
+        if(add.cniper){
+          x.cnip <- cniper(x, range.alpha = range.alpha)
+          gg[[i]] <- gg[[i]] + geom_vline(xintercept = c(x.cnip$lower, x.cnip$upper),
+                                          color = color.cniper)
+        }
+        if(add.outlier){
+          x.out <- x$rmxIF$range(alpha = prob.outlier, n = 2)
+          gg[[i]] <- gg[[i]] + geom_vline(xintercept = c(x.out[1], x.out[2]),
+                                          color = color.outlier)
+        }
       }
       grid.newpage()
       grid.draw(arrangeGrob(grobs = gg, ncol = ncol(DF)-1, nrow = 1))
@@ -84,6 +102,16 @@ plotIF <- function(x, range.alpha = 1e-6, range.n = 501,
                    inherit.aes = FALSE, color = point.col, alpha = point.alpha) +
         scale_size(breaks = c(min(DFx$info), max(DFx$info)), range = point.range) +
         ggt
+      if(add.cniper){
+        x.cnip <- cniper(x, range.alpha = range.alpha)
+        gg <- gg + geom_vline(xintercept = c(x.cnip$lower, x.cnip$upper),
+                              color = color.cniper)
+      }
+      if(add.outlier){
+        x.out <- x$rmxIF$range(alpha = prob.outlier, n = 2)
+        gg <- gg + geom_vline(xintercept = c(x.out[1], x.out[2]),
+                              color = color.outlier)
+      }
       print(gg)
     }
   }
