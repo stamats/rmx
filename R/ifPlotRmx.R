@@ -12,7 +12,7 @@ ifPlot.rmx <- function(x, add.cniper = TRUE, color.cniper = "#E18727",
                    point.length.out = 5, point.range = c(1,7), ...){
   stopifnot(length(range.alpha) == 1)
   stopifnot(is.numeric(range.alpha))
-  stopifnot(range.alpha > 0 & range.alpha < 1)
+  stopifnot(range.alpha > 0 & range.alpha < 0.5)
 
   rg <- x$rmxIF$range(alpha = range.alpha, n = 2)
   y <- c(seq(from = min(rg[1], x$x), to = max(rg[2], x$x), length.out = range.n), 

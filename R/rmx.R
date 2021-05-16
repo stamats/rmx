@@ -235,8 +235,8 @@ print.rmxCI <- function (x, digits = getOption("digits"), prefix = " ", ...){
   invisible(x)
 }
 plot.rmx <- function(x, which = 1, 
-                     control = list(ifPlot = NULL,
-                                    qqPlot = NULL), ...){
+                     control = list(ifPlot = NULL, qqPlot = NULL,
+                                    ppPlot = NULL, dPlot = NULL), ...){
   show <- rep(FALSE, 6)
   show[which] <- TRUE
   if(show[1]){
@@ -244,5 +244,11 @@ plot.rmx <- function(x, which = 1,
   }
   if(show[2]){
     do.call("qqPlot", args = c(list(x = x), control$qqPlot))
+  }
+  if(show[3]){
+    do.call("ppPlot", args = c(list(x = x), control$ppPlot))
+  }
+  if(show[4]){
+    do.call("dPlot", args = c(list(x = x), control$dPlot))
   }
 }

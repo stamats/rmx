@@ -98,10 +98,10 @@ summary(res1)
 
 confint(res1) # method = "as"
 confint(res1, method = "as.bias")
-\dontrun{
-## not run to save check time
-confint(res1, method = "boot", R = 9999)
-confint(res1, method = "boot", R = 9999, parallel = TRUE)}
+\donttest{
+## to save check time
+confint(res1, method = "boot", R = 999)
+confint(res1, method = "boot", R = 999, parallel = TRUE, ncores = 2)}
 
 (cni.res1 <- cniper(res1))
 getCnipers(cni.res1)
@@ -123,7 +123,15 @@ plot(res1$rmxIF)
 qqPlot(res1)
 plot(res1, which = 2)
 
+ppPlot(res1)
+plot(res1, which = 3)
 
+dPlot(res1)
+plot(res1, which = 4)
+
+
+\donttest{
+## to save check time
 ###########################################################
 ## amount of gross errors known
 ###########################################################
@@ -137,10 +145,8 @@ summary(res2)
 
 confint(res2) # method = "as"
 confint(res2, method = "as.bias")
-\dontrun{
-## not run to save check time
-confint(res2, method = "boot", R = 9999)
-confint(res2, method = "boot", R = 9999, parallel = TRUE)}
+confint(res2, method = "boot", R = 999)
+confint(res2, method = "boot", R = 999, parallel = TRUE, ncores = 2)
 
 (cni.res2 <- cniper(res2))
 getCnipers(cni.res2)
@@ -162,6 +168,12 @@ plot(res2$rmxIF)
 qqPlot(res2)
 plot(res2, which = 2)
 
+ppPlot(res2)
+plot(res2, which = 3)
+
+dPlot(res2)
+plot(res2, which = 4)
+}
 
 ###########################################################
 ## estimator comparison
