@@ -2,7 +2,7 @@
 ## Compute RMX estimators for various models
 ###############################################################################
 rmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L, 
-                initial.est=NULL, fsCor = TRUE, na.rm = TRUE){
+                initial.est=NULL, fsCor = TRUE, na.rm = TRUE, message = TRUE){
   es.call <- match.call()
   
   if(missing(x))
@@ -27,7 +27,7 @@ rmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L,
       stop("'eps' has to be of length 1")
     if((eps < 0) || (eps > 0.5))
       stop("'eps' has to be in (0, 0.5]")
-    if(eps == 0){
+    if(eps == 0 && message){
       message("'eps=0': Maximum likelihood estimator is computed.")
     }
   }

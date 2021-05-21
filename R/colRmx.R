@@ -3,7 +3,8 @@
 ###############################################################################
 colRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, 
                    k = 3L, initial.est=NULL, fsCor = TRUE, na.rm = TRUE, 
-                   computeSE = FALSE, parallel = FALSE, ncores = NULL){
+                   computeSE = FALSE, parallel = FALSE, ncores = NULL, 
+                   message = TRUE){
     es.call <- match.call()
     if(missing(x))
         stop("'x' is missing with no default")
@@ -19,7 +20,7 @@ colRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL,
                   eps.lower = eps.lower, eps.upper = eps.upper, eps = eps, 
                   k = k, initial.est = initial.est, fsCor = fsCor, 
                   na.rm = na.rm, computeSE = computeSE, parallel = parallel,
-                  ncores = ncores)
+                  ncores = ncores, message = message)
     res$call <- es.call
     res
 }

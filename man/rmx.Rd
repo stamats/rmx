@@ -8,7 +8,7 @@
 }
 \usage{
 rmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L, 
-    initial.est=NULL, fsCor = TRUE, na.rm = TRUE)
+    initial.est=NULL, fsCor = TRUE, na.rm = TRUE, message = TRUE)
 }
 \arguments{
   \item{x}{ numeric vector \code{x} of data values. }
@@ -25,6 +25,7 @@ rmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L,
         median and MAD are used. }
   \item{fsCor}{ logical: perform finite-sample correction; see function \code{\link{fsRadius}}. }
   \item{na.rm}{logical: if \code{TRUE}, \code{NA} values are removed before the estimator is evaluated.}
+  \item{message}{logical: if \code{FALSE}, messages are suppressed.}
 }
 \details{
   If the amount of gross errors (contamination) is known, it can be 
