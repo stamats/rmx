@@ -130,6 +130,15 @@ plot(res1, which = 3)
 dPlot(res1)
 plot(res1, which = 4)
 
+aiPlot(res1)
+plot(res1, which = 5)
+
+riPlot(res1)
+plot(res1, which = 6)
+
+iiPlot(res1)
+plot(res1, which = 7)
+
 
 \donttest{
 ## to save check time
@@ -174,6 +183,15 @@ plot(res2, which = 3)
 
 dPlot(res2)
 plot(res2, which = 4)
+
+aiPlot(res1)
+plot(res1, which = 5)
+
+riPlot(res1)
+plot(res1, which = 6)
+
+iiPlot(res1)
+plot(res1, which = 7)
 }
 
 ###########################################################

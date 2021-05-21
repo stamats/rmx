@@ -3,6 +3,13 @@
 ###############################################################################
 
 ###########################################################
+## Version 0.6
+###########################################################
+- plots of absolute (aiPlot) and relative (riPlot) information
+- plot absolute information of ML vs RMX (iiPlot)
+
+
+###########################################################
 ## Version 0.5
 ###########################################################
 - renamed plotIF to ifPlot for consistent naming of plot functions

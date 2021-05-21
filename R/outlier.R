@@ -18,7 +18,7 @@ outlier.rmx <- function(x, prob = 0.001, ...){
   res
 }
 getOutliers <- function(x, ...){
-  if(!inherits(x, "outlier")) x <- cniper(x, ...)
+  if(!inherits(x, "outlier")) x <- outlier(x, ...)
   if(x$rmx$rmxIF$model == "norm"){
     out <- c(which(x$rmx$x < x$lower), which(x$rmx$x > x$upper))
     val <- x$rmx$x[out]
