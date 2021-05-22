@@ -105,5 +105,11 @@ colRmx(X1)
 colRmx(X1, eps.lower = 0.01, eps.upper = 0.1)
 colRmx(X1, eps.lower = 0.01, eps.upper = 0.1, computeSE = TRUE)
 colRmx(X1, eps = 0.05)
+
+## adaptive determination of outlier contamination
+RMXlist <- apply(X, 1, rmx, eps.upper = 0.5)
+eps.up <- max(sapply(RMXlist, function(x) outlier(x)$prop.outlier))
+rowRmx(X, eps.upper = eps.up)
+rowRmx(X, eps.upper = eps.up, computeSE = TRUE)
 }
 \keyword{robust}
