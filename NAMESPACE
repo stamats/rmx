@@ -27,7 +27,9 @@ export("optIF",
        "dPlot",
        "aiPlot",
        "riPlot",
-       "iiPlot")
+       "iiPlot",
+       "absInfo",
+       "relInfo")
 
 S3method(print, optIF)
 S3method(print, rmx)
@@ -52,4 +54,6 @@ S3method(dPlot, rmx)
 S3method(aiPlot, rmx)
 S3method(riPlot, rmx)
 S3method(iiPlot, rmx)
+S3method(absInfo, rmx)
+S3method(relInfo, rmx)
 
