@@ -87,7 +87,7 @@ ifPlot(x, \dots)
 \seealso{\code{\link{rmx}}, \code{\link{optIF}}}
 \examples{
 ind <- rbinom(100, size=1, prob=0.05) 
-x <- rnorm(100, mean=ind*3, sd=(1-ind) + ind*9)
+x <- rnorm(100, mean=ind*3, sd=(1-ind) + ind*3)
 res <- rmx(x, eps.lower = 0.01, eps.upper = 0.1)
 ifPlot(res)
 

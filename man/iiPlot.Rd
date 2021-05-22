@@ -9,24 +9,26 @@
 \usage{
 iiPlot(x, \dots)
 
-\method{iiPlot}{rmx}(x, param.digits = 2, ggplot.xlim = NULL,
-                     ggplot.xlab = "Absolute Information of ML", 
-                     ggplot.ylab = "Absolute Information of RMX",
-                     ggplot.ggtitle = NULL,
+\method{iiPlot}{rmx}(x, param.digits = 2, ggplot.ylim = NULL,
+                     ggplot.xlab = "Absolute Information of RMX", 
+                     ggplot.ylab = "Absolute Information of ML",
+                     ggplot.ggtitle = NULL, color.line = "#E18727",
                      point.col = "#0072B5", point.alpha = 0.4, \dots)
 }
 \arguments{
   \item{x}{ object of S3 class \code{rmx}. }
   \item{param.digits}{ number of digits used for the estimated parameter values, if
                        default \code{ggplot.ggtitle} is used. }
-  \item{ggplot.xlim}{ numeric vector of length two defining the limits of the 
-                      x-axis. }
+  \item{ggplot.ylim}{ numeric vector of length two defining the limits of the 
+                      y-axis. }
   \item{ggplot.xlab}{ label(s) of x-axis, recycled if length is equal to 1 and more
                       than 1 parameter has been estimated. }
   \item{ggplot.ylab}{ label(s) of y-axis, recycled if length is equal to 1 and more
                       than 1 parameter has been estimated. }
   \item{ggplot.ggtitle}{ if \code{NULL} a default plot title is. If it is specified,
                          it should have length 1. }
+  \item{color.line}{ single color used for colouring the line that represents the
+                     maximum absolute information in case of RMX. }
   \item{point.col}{ single color used for colouring the data points. }
   \item{point.alpha}{ alpha used for color shading.}
   \item{\dots}{ further arguments passed through. }
@@ -60,18 +62,20 @@ iiPlot(x, \dots)
 %\note{}
 \seealso{\code{\link{rmx}}, \code{\link{optIF}}}
 \examples{
-ind <- rbinom(100, size=1, prob=0.05) 
-x <- rnorm(100, mean=ind*3, sd=(1-ind) + ind*9)
+ind <- rbinom(50, size=1, prob=0.05) 
+x <- rnorm(50, mean=0, sd=(1-ind) + ind*2)
 res <- rmx(x, eps.lower = 0.01, eps.upper = 0.1)
-iiPlot(res)
+gg <- iiPlot(res)
+gg
+gg$data
 
 ## plot-method
 plot(res, which = 7)
 
 ## setting and passing argument
-iiPlot(res, ggplot.xlim = c(0.5, 10), point.col = "darkred")
+iiPlot(res, ggplot.ylim = c(0.5, 10), point.col = "darkred")
 plot(res, which = 7, 
-     control = list(iiPlot = list(ggplot.xlim = c(0.5, 10), 
+     control = list(iiPlot = list(ggplot.ylim = c(0.5, 10), 
                                   point.col = "#0072B5")))
 }
 \keyword{robust}

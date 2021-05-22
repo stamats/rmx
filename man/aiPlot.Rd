@@ -39,7 +39,7 @@ aiPlot(x, \dots)
   
   In case of optimally-robust RMX estimators computed with function \code{rmx}
   (S3 class \code{rmx}), the absolute information is plotted which corresponds 
-  to the squared length of the influence function. 
+  to the squared length of the influence function; see Kohl (2005). 
 }
 \value{
   Invisible object of class \code{ggplot}.
