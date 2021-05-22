@@ -1,7 +1,7 @@
 ###############################################################################
 ## Compute RMX estimators for various models
 ###############################################################################
-rmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L, 
+rmx <- function(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
                 initial.est=NULL, fsCor = TRUE, na.rm = TRUE, message = TRUE){
   es.call <- match.call()
   
@@ -14,6 +14,16 @@ rmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L,
   if(!is.na(pmatch(model, "norm")))  model <- "norm"
   MODELS <- c("norm", "binom", "pois", "gamma", "weibull")
   model <- pmatch(model, MODELS)
+  if(is.null(eps) && is.null(eps.upper)){
+    res0 <- rmx(x = x, model = MODELS[model], eps.upper = 0.5, k = k, 
+                initial.est = initial.est, fsCor = fsCor, na.rm = na.rm,
+                message = message)
+    eps.lower <- 0
+    eps.upper <- outlier(res0)$prop.outlier
+    if(eps.upper == 0){
+      eps <- 0
+    }
+  }
   
   if(is.null(eps)){
     if(length(eps.lower) != 1 || length(eps.upper) != 1)

@@ -7,7 +7,7 @@
   Rieder et al. (2008), respectively.
 }
 \usage{
-rmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L, 
+rmx(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
     initial.est=NULL, fsCor = TRUE, na.rm = TRUE, message = TRUE)
 }
 \arguments{
@@ -36,6 +36,10 @@ rmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L,
   If the amount of gross errors (contamination) is unknown, try to find a 
   rough estimate for the amount of gross errors, such that it lies 
   between \code{eps.lower} and \code{eps.upper}.
+  
+  If neither \code{eps} nor \code{eps.upper} is provided, \code{eps.upper}
+  will be estimated by applying function \code{outlier} to the RMX estimator
+  with \code{eps.lower = 0} and \code{eps.upper = 0.5}.
   
   As models we have implemented so far:
   \enumerate{
@@ -85,9 +89,60 @@ rmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L,
 ind <- rbinom(100, size=1, prob=0.05) 
 x <- rnorm(100, mean=ind*3, sd=(1-ind) + ind*9)
 
-
 ###########################################################
-## amount of gross errors unknown
+## amount of gross errors estimated by function outlier
+###########################################################
+res <- rmx(x)
+res
+coef(res)
+vcov(res)
+sqrt(diag(vcov(res)))
+
+summary(res)
+
+confint(res) # method = "as"
+confint(res, method = "as.bias")
+confint(res, method = "boot", R = 999)
+confint(res, method = "boot", R = 999, parallel = TRUE, ncores = 2)
+
+(cni.res <- cniper(res))
+getCnipers(cni.res)
+## or
+getCnipers(res)
+plot(cni.res)
+
+(out.res <- outlier(res))
+getOutliers(out.res)
+## or
+getOutliers(res)
+
+ifPlot(res)
+plot(res, which = 1)
+
+## only influence function
+plot(res$rmxIF)
+
+qqPlot(res)
+plot(res, which = 2)
+
+ppPlot(res)
+plot(res, which = 3)
+
+dPlot(res)
+plot(res, which = 4)
+
+aiPlot(res)
+plot(res, which = 5)
+
+riPlot(res)
+plot(res, which = 6)
+
+iiPlot(res)
+plot(res, which = 7)
+
+\donttest{
+###########################################################
+## amount of gross errors in [1, 10]%
 ###########################################################
 res1 <- rmx(x, eps.lower = 0.01, eps.upper = 0.1)
 res1
@@ -99,10 +154,8 @@ summary(res1)
 
 confint(res1) # method = "as"
 confint(res1, method = "as.bias")
-\donttest{
-## to save check time
 confint(res1, method = "boot", R = 999)
-confint(res1, method = "boot", R = 999, parallel = TRUE, ncores = 2)}
+confint(res1, method = "boot", R = 999, parallel = TRUE, ncores = 2)
 
 (cni.res1 <- cniper(res1))
 getCnipers(cni.res1)
@@ -138,7 +191,7 @@ plot(res1, which = 6)
 
 iiPlot(res1)
 plot(res1, which = 7)
-
+}
 
 \donttest{
 ## to save check time

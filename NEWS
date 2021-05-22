@@ -8,6 +8,8 @@
 - plots of absolute (aiPlot) and relative (riPlot) information
 - plot absolute information of ML vs RMX (iiPlot)
 - functions to compute absolute and relative information for RMX
+- added calculation of contamination by applying funtion outlier to RMX 
+  estimator for eps in [0, 0.5]
 
 
 ###########################################################
