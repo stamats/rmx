@@ -1,0 +1,225 @@
+---
+title: "Computation of finite-sample correction for normal location and scale"
+author: "Matthias Kohl"
+date: "26 12 2021"
+output: html_document
+---
+
+# Introduction
+
+From many simulation studies we know that our asymptotic optimally robust 
+estimators tend to be too optimistic for finite sample sizes. In this
+script we compute a finite-sample correction for normal location and scale 
+based on Monte-Carlo simulations. That means, we replace the asymptotic radius
+by a finite-sample corrected radius, which is larger or equal to the asymptotic
+radius. A larger radius leads to a more conservative estimator.
+
+
+# Preparations
+
+We load the required functions and data we need for the computations.
+
+```{r}
+library(robustbase)
+source("../R/ZZZinternal.R")
+source("../R/rowRmxNorm.R")
+load("../R/sysdata.rda")
+```
+
+We define the function that we will use for the computations.
+
+```{r}
+rowRMX <- function(x, r, k = 3L){
+    mean <- robustbase::rowMedians(x, na.rm = TRUE)
+    sd <- robustbase::rowMedians(abs(x-mean), na.rm = TRUE)/qnorm(0.75)
+    if(r > 10){
+        b <- sd*1.618128043
+        const <- 1.263094656
+        A2 <- b^2*(1+r^2)/(1+const)
+        A1 <- const*A2
+        a <- -0.6277527697*A2/sd
+    }else{
+        A1 <- sd^2*.getA1.norm(r)
+        A2 <- sd^2*.getA2.norm(r)
+        a <- sd*.geta.norm(r)
+        b <- sd*.getb.norm(r)
+    }
+    robEst <- .kstep.norm.matrix(x = x, initial.est = cbind(mean, sd), 
+                                 A1 = A1, A2 = A2, a = a, b = b, k = k,
+                                 na.rm = TRUE)
+    colnames(robEst$est) <- c("mean", "sd")
+    robEst$est
+}
+```
+
+
+# Least favorable contamination
+
+We compute the contaminating distribution that leads to the maximum empirical
+finite-sample MSE. 
+
+```{r, eval = FALSE}
+n <- 10
+M <- 1e6
+eps <- 0.01
+D <- 0.1
+empMSE <- function(r, x, n){
+    RadMinmax <- rowRMX(x, r = r)
+    n*(mean(RadMinmax[,1]^2) + mean((RadMinmax[,2]-1)^2))
+}
+r <- rbinom(n*M, prob = eps, size = 1)
+Mid <- rnorm(n*M)
+Mcont <- rep(D, n*M)
+Mre <- matrix((1-r)*Mid + r*Mcont, ncol = n)
+ind <- rowSums(matrix(r, ncol = n)) >= n/2
+while(any(ind)){
+    M1 <- sum(ind)
+    cat("M1:\t", M1, "\n")
+    r <- rbinom(n*M1, prob = eps, size = 1)
+    Mid <- rnorm(n*M1)
+    Mcont <- r(contD)(n*M1)
+    Mre[ind,] <- (1-r)*Mid + r*Mcont
+    ind[ind] <- rowSums(matrix(r, ncol = n)) >= n/2
+}
+fun1 <- function(D){
+    Mcont <- rep(D, n*M)
+    Mre <- matrix((1-r)*Mid + r*Mcont, ncol = n)
+    empMSE(r = 1, x = Mre, n = n)
+}
+sapply(c(seq(0.1, 10, length = 20), 20, 50, 100, 1000, 1e4, 1e6), fun1)
+```
+
+The simulations show that a Dirac measure at some very high value leads to 
+the maximum empirical MSE. We will use it as contaminating distribution in our
+subsequent simulations.
+
+
+# Finite-sample corrected radius
+
+We now compute the finite-sample optimal radius for a grid of sample sizes
+and contaminations. The sample size n is at least 3, as it is impossible to 
+have less than 50% contamination in case of n = 2.
+
+We define functions to determine the empirical MSE and finite-sample radius.
+
+```{r}
+empMSE <- function(r, x, n){
+    RadMinmax <- rowRMX(x, r = r)
+    n*(mean(RadMinmax[,1]^2) + mean((RadMinmax[,2]-1)^2))
+}
+finRad <- function(n, eps, D, M){
+  r.fi <- numeric(length(eps))
+  names(r.fi) <- eps
+  i <- 0
+  repeat{
+    i <- i + 1
+    r <- rbinom(n*M, prob = eps[i], size = 1)
+    Mid <- rnorm(n*M)
+    Mcont <- rep(D, n*M)
+    Mre <- matrix((1-r)*Mid + r*Mcont, ncol = n)
+    rm(Mid, Mcont)
+    gc()
+    ind <- rowSums(matrix(r, ncol = n)) >= n/2
+    rm(r)
+    gc()
+    while(any(ind)){
+      M1 <- sum(ind)
+      r <- rbinom(n*M1, prob = eps[i], size = 1)
+      Mid <- rnorm(n*M1)
+      Mcont <- rep(D, n*M1)
+      Mre[ind,] <- (1-r)*Mid + r*Mcont
+      ind[ind] <- rowSums(matrix(r, ncol = n)) >= n/2
+      rm(Mid, Mcont, r)
+      gc()
+    }
+    r.fi[i] <- optimize(empMSE, 
+                        interval = c(eps[i], min(max(2, n*eps[i]*25), 10)), 
+                        x = Mre, n = n)$minimum
+    rm(Mre)
+    gc()
+    if(round(r.fi[i], 2) == 1.74 | i == length(eps)) break
+  }
+  r.fi
+}
+```
+
+To speed up the computations, we use packages foreach and doParallel.
+
+```{r}
+library(foreach)
+library(doParallel)
+M <- 1e2
+D <- 1e6
+n <- c(3:50, seq(55, 100, by = 5), seq(110, 200, by = 10), seq(250, 500, by = 25))
+eps <- c(seq(0.001, 0.05, by = 0.001), seq(0.06, to = 0.5, by = 0.01))
+cores <- detectCores()
+cl <- makeCluster(cores[1]-1)
+registerDoParallel(cl)
+```
+
+We compute the finite-sample radii.
+
+```{r}
+r.fi <- foreach(i=seq(along = n)) %dopar% {
+  finRad(n[i], eps, D, M)
+}
+```
+
+We take a look at the results.
+
+```{r}
+r.fi <- do.call("cbind", r.fi)
+save(r.fi, file = "FiniteSampleRadiusNorm.RData")
+r.as <- outer(eps, sqrt(n))
+## no convergence resp. wrong optima
+sum(r.fi > 1.744, na.rm = TRUE)
+r.fi[r.fi > 1.744 & !is.na(r.fi)]
+```
+
+```{r}
+r.finit <- r.fi
+## setze auf NA
+r.finit[r.fi > 1.744 & !is.na(r.fi)] <- NA
+r.finit[r.finit > 1.744 & !is.na(r.finit)]
+sum(r.finit > r.as & !is.na(r.finit), na.rm = TRUE)
+sum(!is.na(r.finit))
+
+## r.finit muss größer oder gleich r.as sein
+r.finit[r.finit <= r.as & !is.na(r.finit)]
+r.as[r.finit <= r.as & !is.na(r.finit)]
+r.finit[r.finit <= r.as & !is.na(r.finit)] <- r.as[r.finit <= r.as & !is.na(r.finit)]
+r.finit[r.finit < r.as & !is.na(r.finit)]
+
+for(i in 1:nrow(r.finit)){
+    cat("====================================================================\n")
+    cat(eps[i], "\n")
+    ind <- r.finit[i,] > 1.744
+    fit <- lm(r.finit[i,!ind] ~ I(1/sqrt(n[!ind])) + I(1/n[!ind]) + I(1/n[!ind]^(3/2)))
+    print(summary(fit))
+#    fit <- lm(r.finit[i,!ind] ~ I(1/n[!ind]^(3/2)))
+#    print(summary(fit))
+}
+
+## ab ca. 1.655 keine Änderung mehr sichtbar
+r.finit[18,]
+r.finit2 <- r.finit
+## minimales b, ab ca. r = 1.67
+r.finit2[is.na(r.finit) | r.finit > 1.655] <- 1.67
+
+plot(n, r.finit[19,])
+plot(n, r.finit2[19,])
+
+for(i in c(1:11)){
+    r.finit2[i, r.finit2[i,] > 1.655] <- approx(n[r.finit2[i,] <= 1.655], 
+                                                r.finit2[i,r.finit2[i,] <= 1.655], 
+                                                n[r.finit2[i,] > 1.655], rule = 2)$y
+}
+r.finit2[12,2] <- 1.67
+
+r.finit2 <- round(r.finit2, 4)
+
+#load("sysdata.rda")
+#.fsRadius.norm <- r.finit2
+#save(.fsRadius.norm, .radius.gitter.norm, .A1.norm, .A2.norm, 
+#     .a.norm, .b.norm, file = "sysdata.rda")
+```
