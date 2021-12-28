@@ -1,12 +1,12 @@
-absInfo <- function(x, ...){
+absInfo <- function(object, ...){
   UseMethod("absInfo")
 }
-absInfo.rmx <- function(x, ...){
-  IFx <- x$rmxIF$IFun(x$x)
+absInfo.rmx <- function(object, ...){
+  IFx <- object$rmxIF$IFun(object$x)
   if(ncol(IFx) == 1){
     info <- IFx^2
   }else{
     info <- rowSums(IFx^2)
   }
-  cbind(x = x$x, absInfo = info)
+  cbind(x = object$x, absInfo = info)
 }

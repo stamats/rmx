@@ -9,10 +9,10 @@
 ppPlot(x, \dots)
 
 \method{ppPlot}{rmx}(x, param.digits = 3, 
-                     ggplot.xlab = "Theoretical Cumulative Probabilities", 
-                     ggplot.ylab = "Empirical Cumulative Probabilities", 
-                     ggplot.ggtitle = NULL,
-                     point.col = "#0072B5", point.alpha = 1, \dots)
+        ggplot.xlab = "Theoretical Cumulative Probabilities", 
+        ggplot.ylab = "Empirical Cumulative Probabilities", 
+        ggplot.ggtitle = NULL,
+        point.col = "#0072B5", point.alpha = 1, \dots)
 }
 \arguments{
   \item{x}{ object of S3 class \code{rmx}. }

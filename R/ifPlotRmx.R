@@ -9,7 +9,8 @@ ifPlot.rmx <- function(x, add.cniper = TRUE, color.cniper = "#E18727",
                    ggplot.xlab = "x", ggplot.ylab = "IF(x)",
                    ggplot.ggtitle = NULL,
                    point.col = "#0072B5", point.alpha = 0.4, 
-                   point.length.out = 5, point.range = c(1,7), ...){
+                   point.length.out = 5, point.range = c(1,7), 
+                   plot = TRUE, ...){
   stopifnot(length(range.alpha) == 1)
   stopifnot(is.numeric(range.alpha))
   stopifnot(range.alpha > 0 & range.alpha < 0.5)
@@ -80,8 +81,10 @@ ifPlot.rmx <- function(x, add.cniper = TRUE, color.cniper = "#E18727",
                                           color = color.outlier)
         }
       }
-      grid.newpage()
-      grid.draw(arrangeGrob(grobs = gg, ncol = ncol(DF)-1, nrow = 1))
+      if(plot){ 
+        grid.newpage()
+        grid.draw(arrangeGrob(grobs = gg, ncol = ncol(DF)-1, nrow = 1))
+      }
     }else{
       Param <- paste(names(x$rmxIF$parameter), 
                      signif(x$rmxIF$parameter, param.digits), 
@@ -112,7 +115,7 @@ ifPlot.rmx <- function(x, add.cniper = TRUE, color.cniper = "#E18727",
         gg <- gg + geom_vline(xintercept = c(x.out[1], x.out[2]),
                               color = color.outlier)
       }
-      print(gg)
+      if(plot) print(gg)
     }
   }
   invisible(gg)

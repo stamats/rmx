@@ -9,14 +9,14 @@
   linear estimators.
 }
 \usage{
-absInfo(x, \dots)
-relInfo(x, \dots)
+absInfo(object, \dots)
+relInfo(object, \dots)
 
-\method{absInfo}{rmx}(x, \dots)
-\method{relInfo}{rmx}(x, \dots)
+\method{absInfo}{rmx}(object, \dots)
+\method{relInfo}{rmx}(object, \dots)
 }
 \arguments{
-  \item{x}{ object of S3 class \code{rmx}. }
+  \item{object}{ object of S3 class \code{rmx}. }
   \item{\dots}{ further arguments passed through. }
 }
 \details{

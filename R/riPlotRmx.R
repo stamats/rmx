@@ -6,7 +6,8 @@ riPlot.rmx <- function(x, range.alpha = 1e-6, range.n = 501,
                        ggplot.ylab = NULL, 
                        ggplot.ggtitle = NULL,
                        point.col = "#0072B5", point.alpha = 0.4, 
-                       point.length.out = 5, point.range = c(1,7), ...){
+                       point.length.out = 5, point.range = c(1,7), 
+                       plot = TRUE, ...){
   if(length(x$rmxIF$parameter) == 1)
     stop("Relative Information is only usefull for models with at least two parameters.")
   
@@ -74,7 +75,7 @@ riPlot.rmx <- function(x, range.alpha = 1e-6, range.n = 501,
         ggt
     }
     grid.newpage()
-    grid.draw(arrangeGrob(grobs = gg, ncol = ncol(DF)-1, nrow = 1))
+    if(plot) grid.draw(arrangeGrob(grobs = gg, ncol = ncol(DF)-1, nrow = 1))
   }
   invisible(gg)
 }

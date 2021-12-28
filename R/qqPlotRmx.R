@@ -25,6 +25,5 @@ qqPlot.rmx <- function(x, param.digits = 3, ggplot.xlab = "Theoretical Quantiles
                   color = point.col, alpha = point.alpha) + 
     stat_qq_line(dparams = param, distribution = Dname, identity = TRUE) + 
     xlab(ggplot.xlab) + ylab(ggplot.ylab) + ggt
-  print(gg)
-  invisible(gg)
+  gg
 }

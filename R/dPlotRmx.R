@@ -3,7 +3,8 @@ dPlot <- function(x, ...){
 }
 dPlot.rmx <- function(x, param.digits = 3, ggplot.xlab = "x", 
                       ggplot.ylab = "Density", ggplot.ggtitle = NULL, 
-                      density.col = "#0072B5", density.lwd = 1, ...){
+                      density.col = "#0072B5", density.lwd = 1, 
+                      density.n = 501, ...){
   stopifnot(length(ggplot.xlab) == 1)
   stopifnot(length(ggplot.ylab) == 1)
   
@@ -18,14 +19,17 @@ dPlot.rmx <- function(x, param.digits = 3, ggplot.xlab = "x",
     ggt <- ggtitle(ggplot.ggtitle)
   }
   if(x$rmxIF$model == "norm"){
-    ggd <- stat_function(fun = dnorm, args = param, lwd = density.lwd)
+    ggd <- stat_function(fun = dnorm, args = param, lwd = density.lwd,
+                         n = density.n)
+  }
+  if(x$rmxIF$model %in% c("norm", "gamma")){
+    ggempD <- geom_density(color = density.col, lwd = density.lwd, bw = "SJ")
+      
   }
   
   DF <- data.frame(x = x$x)
   gg <- ggplot(DF, aes(x = x)) + 
-    geom_rug() + ggd +
-    geom_density(color = density.col, lwd = density.lwd) + 
+    geom_rug() + ggd + ggempD + 
     xlab(ggplot.xlab) + ylab(ggplot.ylab) + ggt
-  print(gg)
-  invisible(gg)
+  gg
 }

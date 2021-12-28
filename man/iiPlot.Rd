@@ -10,10 +10,10 @@
 iiPlot(x, \dots)
 
 \method{iiPlot}{rmx}(x, param.digits = 2, ggplot.ylim = NULL,
-                     ggplot.xlab = "Absolute Information of RMX", 
-                     ggplot.ylab = "Absolute Information of ML",
-                     ggplot.ggtitle = NULL, color.line = "#E18727",
-                     point.col = "#0072B5", point.alpha = 0.4, \dots)
+        ggplot.xlab = "Absolute Information of RMX", 
+        ggplot.ylab = "Absolute Information of ML",
+        ggplot.ggtitle = NULL, color.line = "#E18727",
+        point.col = "#0072B5", point.alpha = 0.4, \dots)
 }
 \arguments{
   \item{x}{ object of S3 class \code{rmx}. }

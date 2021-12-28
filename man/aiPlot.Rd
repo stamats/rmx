@@ -9,10 +9,10 @@
 aiPlot(x, \dots)
 
 \method{aiPlot}{rmx}(x, range.alpha = 1e-6, range.n = 501, 
-                    param.digits = 2, ggplot.xlab = "x", 
-                    ggplot.ylab = expression(paste(abs(IF(x))^2)),
-                    ggplot.ggtitle = NULL,
-                    point.col = "#0072B5", point.alpha = 0.4, \dots)
+        param.digits = 2, ggplot.xlab = "x", 
+        ggplot.ylab = expression(paste(abs(IF(x))^2)),
+        ggplot.ggtitle = NULL,
+        point.col = "#0072B5", point.alpha = 0.4, \dots)
 }
 \arguments{
   \item{x}{ object of S3 class \code{rmx}. }
@@ -42,7 +42,7 @@ aiPlot(x, \dots)
   to the squared length of the influence function; see Kohl (2005). 
 }
 \value{
-  Invisible object of class \code{ggplot}.
+  Object of class \code{ggplot}.
 }
 \references{
   Kohl, M. (2005) \emph{Numerical Contributions to the Asymptotic Theory of Robustness}. 

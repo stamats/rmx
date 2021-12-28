@@ -173,11 +173,11 @@ mse.rmx <- function(object, ...){
 }
 
 ## from stats:::format.perc
-.format.perc <- function (probs, digits){
+.format.perc <- function(probs, digits){
   paste(format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits), "%")
 }
-confint.rmx <- function (object, parm, level = 0.95, method = "as", R = 9999, 
-                         parallel = FALSE, ncores = NULL, ...){
+confint.rmx <- function(object, parm, level = 0.95, method = "as", R = 9999, 
+                        parallel = FALSE, ncores = NULL, ...){
   if(method == "as"){
     Method <- "Asymptotic (LAN-based) confidence interval"
     ci <- confint.default(object)
@@ -261,7 +261,7 @@ plot.rmx <- function(x, which = 1,
                      control = list(ifPlot = NULL, qqPlot = NULL,
                                     ppPlot = NULL, dPlot = NULL,
                                     aiPlot = NULL, riPlot = NULL,
-                                    iiPlot = NULL), ...){
+                                    iiPlot = NULL, plot = TRUE), ...){
   show <- rep(FALSE, 7)
   show[which] <- TRUE
   if(show[1]){

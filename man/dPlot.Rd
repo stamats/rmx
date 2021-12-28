@@ -9,8 +9,9 @@
 dPlot(x, \dots)
 
 \method{dPlot}{rmx}(x, param.digits = 3, ggplot.xlab = "x", 
-                    ggplot.ylab = "Density", ggplot.ggtitle = NULL, 
-                    density.col = "#0072B5", density.lwd = 1, \dots)
+        ggplot.ylab = "Density", ggplot.ggtitle = NULL, 
+        density.col = "#0072B5", density.lwd = 1, 
+        density.n = 501, \dots)
 }
 \arguments{
   \item{x}{ object of S3 class \code{rmx}. }
@@ -20,7 +21,8 @@ dPlot(x, \dots)
   \item{ggplot.ylab}{ label of y-axis. }
   \item{ggplot.ggtitle}{ plot title. If \code{NULL} default plot title is generated. }
   \item{density.col}{ single color used for colouring the empirical density. }
-  \item{density.lwd}{ line width for empirical and theoretical density.}
+  \item{density.lwd}{ line width for empirical density and density of the estimated model.}
+  \item{density.n}{ number of points to interpolate the density of the estimated model.}
   \item{\dots}{ further arguments passed through. }
 }
 \details{

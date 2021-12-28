@@ -2,7 +2,7 @@
 \alias{optIF}
 \title{Computation of the optimally robust IF for AL estimators}
 \description{
-  The function computes the optimally robust IC for AL estimators 
+  The function computes the optimally robust IF for AL estimators 
   in case of shrinking contamination neighborhoods / gross error models. 
   The definition of these estimators can be found in Rieder (1994) and 
   Kohl (2005).
@@ -21,7 +21,7 @@ optIF(model = "norm", radius = NULL, check = FALSE, delta = 1e-6, itmax = 100L, 
   see details. }
 }
 \details{The Lagrange multipliers contained in the expression
-  of the optimally robust IC are computed; i.e., clipping constant, centering
+  of the optimally robust IF are computed; i.e., clipping constant, centering
   vector and standardising matrix. For more details we refer to Rieder (1994) 
   or Kohl (2005).
   

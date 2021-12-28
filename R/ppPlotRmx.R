@@ -26,6 +26,5 @@ ppPlot.rmx <- function(x, param.digits = 3,
     stat_pp_point(dparams = param, distribution = Dname, 
                   color = point.col, alpha = point.alpha) + 
     stat_pp_line() + xlab(ggplot.xlab) + ylab(ggplot.ylab) + ggt
-  print(gg)
-  invisible(gg)
+  gg
 }

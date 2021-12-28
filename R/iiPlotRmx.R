@@ -39,10 +39,9 @@ iiPlot.rmx <- function(x, param.digits = 2, ggplot.ylim = NULL,
     xlab(ggplot.xlab) + ylab(ggplot.ylab) + 
     geom_abline(slope = 1, intercept = 0) +
     geom_point(color = point.col, alpha = point.alpha) + 
-    geom_hline(yintercept = x$rmxIF$b^2, color = color.line) +
+    geom_vline(xintercept = x$rmxIF$b^2, color = color.line) +
     ggt
   if(!is.null(ggplot.ylim)) gg <- gg + ylim(ggplot.ylim)
-  print(gg)
-  invisible(gg)
+  gg
 }
 

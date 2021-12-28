@@ -90,58 +90,6 @@ ind <- rbinom(100, size=1, prob=0.05)
 x <- rnorm(100, mean=ind*3, sd=(1-ind) + ind*9)
 
 ###########################################################
-## amount of gross errors estimated by function outlier
-###########################################################
-res <- rmx(x)
-res
-coef(res)
-vcov(res)
-sqrt(diag(vcov(res)))
-
-summary(res)
-
-confint(res) # method = "as"
-confint(res, method = "as.bias")
-confint(res, method = "boot", R = 999)
-confint(res, method = "boot", R = 999, parallel = TRUE, ncores = 2)
-
-(cni.res <- cniper(res))
-getCnipers(cni.res)
-## or
-getCnipers(res)
-plot(cni.res)
-
-(out.res <- outlier(res))
-getOutliers(out.res)
-## or
-getOutliers(res)
-
-ifPlot(res)
-plot(res, which = 1)
-
-## only influence function
-plot(res$rmxIF)
-
-qqPlot(res)
-plot(res, which = 2)
-
-ppPlot(res)
-plot(res, which = 3)
-
-dPlot(res)
-plot(res, which = 4)
-
-aiPlot(res)
-plot(res, which = 5)
-
-riPlot(res)
-plot(res, which = 6)
-
-iiPlot(res)
-plot(res, which = 7)
-
-\donttest{
-###########################################################
 ## amount of gross errors in [1, 10]%
 ###########################################################
 res1 <- rmx(x, eps.lower = 0.01, eps.upper = 0.1)
@@ -191,7 +139,6 @@ plot(res1, which = 6)
 
 iiPlot(res1)
 plot(res1, which = 7)
-}
 
 \donttest{
 ## to save check time
@@ -245,7 +192,6 @@ plot(res1, which = 6)
 
 iiPlot(res1)
 plot(res1, which = 7)
-}
 
 ###########################################################
 ## estimator comparison
@@ -258,5 +204,6 @@ c(median(x), mad(x))
 res1$rmxEst
 ## amount of gross errors known
 res2$rmxEst
+}
 }
 \keyword{robust}

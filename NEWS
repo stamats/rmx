@@ -7,6 +7,9 @@
 ###########################################################
 - added a vignette (A Guide to rmx)
 - function bias and mse return maximum asymptotic bias and MSE, respectively.
+- new Rd file for the confint method for rmx objects.
+- introduced additional argument plot for suppressing plotting in the plot
+  functions. Can be used to modify the invisibly returned plotting object.
 
 
 ###########################################################

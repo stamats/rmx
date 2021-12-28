@@ -10,11 +10,12 @@
 riPlot(x, \dots)
 
 \method{riPlot}{rmx}(x, range.alpha = 1e-6, range.n = 501, 
-                     param.digits = 2, ggplot.xlab = "x", 
-                     ggplot.ylab = NULL, 
-                     ggplot.ggtitle = NULL,
-                     point.col = "#0072B5", point.alpha = 0.4, 
-                     point.length.out = 5, point.range = c(1,7), \dots)
+        param.digits = 2, ggplot.xlab = "x", 
+        ggplot.ylab = NULL, 
+        ggplot.ggtitle = NULL,
+        point.col = "#0072B5", point.alpha = 0.4, 
+        point.length.out = 5, point.range = c(1,7), 
+        plot = TRUE, \dots)
 }
 \arguments{
   \item{x}{ object of S3 class \code{rmx}. }
@@ -41,6 +42,8 @@ riPlot(x, \dots)
   \item{point.range}{ a numeric vector of length 2 specifing the minimum and maximum 
                       size of the data points; see argument
                       \code{range} of function \code{\link{scale_size}}}
+  \item{plot}{ if \code{FALSE}, the plotting is suppressed. Can be used to modify
+               the invisibly returned plotting object. }
   \item{\dots}{ further arguments passed through. }
 }
 \details{
@@ -54,7 +57,7 @@ riPlot(x, \dots)
   points represents the absolute information.
 }
 \value{
-  Invisible object of class \code{ggplot}.
+  Invisible object of class \code{ggplot} or a list of \code{ggplot} objects.
 }
 \references{
   Kohl, M. (2005) \emph{Numerical Contributions to the Asymptotic Theory of Robustness}. 

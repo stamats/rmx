@@ -51,7 +51,6 @@ aiPlot.rmx <- function(x, range.alpha = 1e-6, range.n = 501,
     geom_point(data = DFx, aes_string(x = "x", y = "info"), 
                inherit.aes = FALSE, color = point.col, alpha = point.alpha) +
     ggt
-  print(gg)
-  invisible(gg)
+  gg
 }
 
