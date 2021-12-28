@@ -159,6 +159,19 @@ coef.rmx <- function(object, complete = TRUE, ...){
 vcov.rmx <- function(object, ...){
     object$rmxIF$asVar/object$n
 }
+bias <- function(object, ...){
+  UseMethod("bias")
+}
+bias.rmx <- function(object, ...){
+  object$rmxIF$asBias
+}
+mse <- function(object, ...){
+  UseMethod("mse")
+}
+mse.rmx <- function(object, ...){
+  object$rmxIF$asMSE
+}
+
 ## from stats:::format.perc
 .format.perc <- function (probs, digits){
   paste(format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits), "%")

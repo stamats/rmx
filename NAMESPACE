@@ -15,6 +15,8 @@ importFrom("qqplotr", "stat_qq_band", "stat_qq_point", "stat_qq_line",
 export("optIF",
        "fsRadius",
        "rmx",
+       "bias",
+       "mse",
        "rowRmx",
        "colRmx",
        "cniper",
@@ -41,6 +43,8 @@ S3method(summary, optIF)
 S3method(summary, rmx)
 S3method(coef, rmx)
 S3method(vcov, rmx)
+S3method(bias, rmx)
+S3method(mse, rmx)
 S3method(confint, rmx)
 S3method(plot, optIF)
 S3method(plot, rmx)
