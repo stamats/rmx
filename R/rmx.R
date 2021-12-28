@@ -143,7 +143,7 @@ summary.rmx <- function(object, digits = getOption("digits"), ...){
             format(object$rmxIF$asMSE, digits = 3), sep = " = "), sep = "\n")
   cat(paste(format("Maximum asymptotic bias", width = 24L, justify = "right"), 
             format(object$rmxIF$asBias, digits = 3), sep = " = "), sep = "\n")
-  cat(format("Asymptotic variance:", width = 24L, justify = "right"), "\n")
+  cat(format("Asymptotic (co)variance:", width = 24L, justify = "right"), "\n")
   print(object$rmxIF$asVar, digits = 3, ...)
   cat("\n Call:\n ", paste(deparse(object$call), sep = "\n", collapse = "\n"), 
       "\n\n", sep = "")
