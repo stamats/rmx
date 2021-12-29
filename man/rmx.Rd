@@ -24,8 +24,8 @@ rmx(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
   \item{initial.est}{ initial estimate for \code{mean} and \code{sd}. If missing 
         median and MAD are used. }
   \item{fsCor}{ logical: perform finite-sample correction; see function \code{\link{fsRadius}}. }
-  \item{na.rm}{logical: if \code{TRUE}, \code{NA} values are removed before the estimator is evaluated.}
-  \item{message}{logical: if \code{FALSE}, messages are suppressed.}
+  \item{na.rm}{ logical: if \code{TRUE}, \code{NA} values are removed before the estimator is evaluated.}
+  \item{message}{ logical: if \code{FALSE}, messages are suppressed.}
 }
 \details{
   If the amount of gross errors (contamination) is known, it can be 
@@ -43,8 +43,7 @@ rmx(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
   
   As models we have implemented so far:
   \enumerate{
-    \item \code{"norm"}: normal location and scale. Parameters can be set 
-    via argument \code{mean} and \code{sd}; see examples.
+    \item \code{"norm"}: normal location (mean) and scale (sd).
   }
 }
 \value{
