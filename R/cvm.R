@@ -1,31 +1,6 @@
 ###############################################################################
 ## Compute Cramer von Mises minimum distance estimators for various models
 ###############################################################################
-## helper function to compute Cramer von Mises distance
-.cvmdist <- function(x, pfun, dfun, mu, abscont, supp){
-  if(mu == "data"){
-    ecdf.x <- ecdf(x)
-    Dist <- sqrt(mean((ecdf.x(x) - pfun(x))^2))
-  }
-  if(mu == "model"){
-    if(abscont){
-      ## code adapted from by P. Ruckdeschel, file CvMDist.R in package distrEx
-      x1 <- sort(x)
-      p <- pfun
-      p0 <- pfun(x1)
-      p1 <- 1-p0
-      p2 <- 1-p0^2
-      n <- length(x1)
-      i1 <- 2*(1:n)-1
-      Dist <- sqrt(mean(i1*p1)/n-mean(p2)+1/3)
-    }else{
-      ecdf.x <- ecdf(x)
-      Dist <- sqrt(sum((ecdf.x(supp) - pfun(supp))^2*dfun(supp)))
-    }
-  }
-  Dist
-}
-
 ## main function
 cvm <- function(x, model = "norm", mu = "model", na.rm = TRUE, 
                 startPar = NULL, ...){
@@ -117,4 +92,29 @@ cvm <- function(x, model = "norm", mu = "model", na.rm = TRUE,
     names(est) <- "lambda"
   }
   est
+}
+
+## helper function to compute Cramer von Mises distance
+.cvmdist <- function(x, pfun, dfun, mu, abscont, supp){
+  if(mu == "data"){
+    ecdf.x <- ecdf(x)
+    Dist <- sqrt(mean((ecdf.x(x) - pfun(x))^2))
+  }
+  if(mu == "model"){
+    if(abscont){
+      ## code adapted from by P. Ruckdeschel, file CvMDist.R in package distrEx
+      x1 <- sort(x)
+      p <- pfun
+      p0 <- pfun(x1)
+      p1 <- 1-p0
+      p2 <- 1-p0^2
+      n <- length(x1)
+      i1 <- 2*(1:n)-1
+      Dist <- sqrt(mean(i1*p1)/n-mean(p2)+1/3)
+    }else{
+      ecdf.x <- ecdf(x)
+      Dist <- sqrt(sum((ecdf.x(supp) - pfun(supp))^2*dfun(supp)))
+    }
+  }
+  Dist
 }

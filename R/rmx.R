@@ -2,7 +2,8 @@
 ## Compute RMX estimators for various models
 ###############################################################################
 rmx <- function(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
-                initial.est=NULL, fsCor = TRUE, na.rm = TRUE, message = TRUE){
+                initial.est=NULL, fsCor = TRUE, na.rm = TRUE, message = TRUE, 
+                ...){
   es.call <- match.call()
   
   if(missing(x))
