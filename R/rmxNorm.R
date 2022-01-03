@@ -1,7 +1,8 @@
 ###############################################################################
 ## RMX estimator for normal location and scale
 ###############################################################################
-rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor, mad0 = 1e-4){
+rmx.norm <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
+                     initial.est=NULL, fsCor = TRUE, na.rm = TRUE, mad0 = 1e-4){
     if(!is.null(eps)){
         r <- sqrt(length(x))*eps
         if(fsCor){ 

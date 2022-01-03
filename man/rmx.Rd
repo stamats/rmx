@@ -1,14 +1,25 @@
 \name{rmx}
 \alias{rmx}
+\alias{rmx.norm}
+\alias{rmx.binom}
 \title{Optimally Robust RMX Estimator}
 \description{
   The function \code{rmx} computes optimally robust rmx estimators. 
   The definition of these estimators can be found in Kohl (2005) and 
-  Rieder et al. (2008), respectively.
+  Rieder et al. (2008), respectively. The other functions are rarely 
+  called directly and are mainly for internal use.
 }
 \usage{
 rmx(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
     initial.est=NULL, fsCor = TRUE, na.rm = TRUE, message = TRUE, \dots)
+    
+rmx.norm(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
+         initial.est=NULL, fsCor = TRUE, na.rm = TRUE, mad0 = 1e-4)
+
+rmx.binom(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
+          initial.est=NULL, fsCor = TRUE, na.rm = TRUE, 
+          size, M = 10000, parallel = FALSE, ncores = NULL, 
+          aUp = 100*size, cUp = 1e4, delta = 1e-9)
 }
 \arguments{
   \item{x}{ numeric vector \code{x} of data values. }
@@ -26,8 +37,17 @@ rmx(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
   \item{fsCor}{ logical: perform finite-sample correction; see function \code{\link{fsRadius}}. }
   \item{na.rm}{ logical: if \code{TRUE}, \code{NA} values are removed before the estimator is evaluated.}
   \item{message}{ logical: if \code{FALSE}, messages are suppressed.}
-  \item{\dots}{ further arguments passed through; e.g., known parameters as 
-                for instance \code{size} in case of the binomial model. }
+  \item{mad0}{ if \code{mad(x)} equal to 0, it is replaced by \code{mad0}. }
+  \item{size}{ size parameter (known!); see \code{\link[stats]{dbinom}}. }
+  \item{M}{ number of Monte-Carlo simulations; see \code{\link{fsRadius}}.}
+  \item{parallel}{ logical: use package \pkg{parallel} for computations. }
+  \item{ncores}{ if \code{parallel = TRUE}: number of cores used for computations.
+                 If missing, the maximum number of cores - 1 is used. }
+  \item{aUp}{ numeric: upper limit for centering constant a. }
+  \item{cUp}{ postive real: upper limit for clipping constant c. }
+  \item{delta}{ positive real: desired accuracy (convergence tolerance). }
+  \item{\dots}{ further arguments passed through; e.g., known parameters such as 
+                \code{size} in case of the binomial model. }
 }
 \details{
   If the amount of gross errors (contamination) is known, it can be 
@@ -46,6 +66,7 @@ rmx(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
   As models we have implemented so far:
   \enumerate{
     \item \code{"norm"}: normal location (mean) and scale (sd).
+    \item \code{"binom"}: binomial probability (size known!).
   }
 }
 \value{
@@ -85,126 +106,29 @@ rmx(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
 \seealso{\code{\link{optIF}}, \code{\link{rowRmx}}, \code{\link{fsRadius}}}
 \examples{
 ###########################################################
-## generate some contaminated random data
+## For more details see vignette (A Guide to rmx)
 ###########################################################
+
+## normal location (mean) and scale (sd)
 ind <- rbinom(100, size=1, prob=0.05) 
 x <- rnorm(100, mean=ind*3, sd=(1-ind) + ind*9)
-
-###########################################################
-## amount of gross errors in [1, 10]%
-###########################################################
 res1 <- rmx(x, eps.lower = 0.01, eps.upper = 0.1)
 res1
-coef(res1)
-vcov(res1)
-sqrt(diag(vcov(res1)))
-
 summary(res1)
-
 confint(res1) # method = "as"
 confint(res1, method = "as.bias")
-confint(res1, method = "boot", R = 999)
-confint(res1, method = "boot", R = 999, parallel = TRUE, ncores = 2)
-
-(cni.res1 <- cniper(res1))
-getCnipers(cni.res1)
-## or
-getCnipers(res1)
-plot(cni.res1)
-
-(out.res1 <- outlier(res1))
-getOutliers(out.res1)
-## or
-getOutliers(res1)
-
-ifPlot(res1)
 plot(res1, which = 1)
-
-## only influence function
-plot(res1$rmxIF)
-
-qqPlot(res1)
 plot(res1, which = 2)
 
-ppPlot(res1)
-plot(res1, which = 3)
-
-dPlot(res1)
-plot(res1, which = 4)
-
-aiPlot(res1)
-plot(res1, which = 5)
-
-riPlot(res1)
-plot(res1, which = 6)
-
-iiPlot(res1)
-plot(res1, which = 7)
-
-\donttest{
-## to save check time
-###########################################################
-## amount of gross errors known
-###########################################################
-res2 <- rmx(x, eps = 0.05)
+## binomial probability
+ind <- rbinom(100, size=1, prob=0.05) 
+x <- rbinom(100, size=5, prob=(1-ind)*0.1 + ind*0.5)
+res2 <- rmx(x, model = "binom", size = 5, eps.lower = 0.01, eps.upper = 0.1)
 res2
-coef(res2)
-vcov(res2)
-sqrt(diag(vcov(res2)))
-
 summary(res2)
-
 confint(res2) # method = "as"
 confint(res2, method = "as.bias")
-confint(res2, method = "boot", R = 999)
-confint(res2, method = "boot", R = 999, parallel = TRUE, ncores = 2)
-
-(cni.res2 <- cniper(res2))
-getCnipers(cni.res2)
-## or
-getCnipers(res2)
-plot(cni.res2)
-
-(out.res2 <- outlier(res2))
-getOutliers(out.res2)
-## or
-getOutliers(res2)
-
-ifPlot(res2)
 plot(res2, which = 1)
-
-## only influence function
-plot(res2$rmxIF)
-
-qqPlot(res2)
 plot(res2, which = 2)
-
-ppPlot(res2)
-plot(res2, which = 3)
-
-dPlot(res2)
-plot(res2, which = 4)
-
-aiPlot(res1)
-plot(res1, which = 5)
-
-riPlot(res1)
-plot(res1, which = 6)
-
-iiPlot(res1)
-plot(res1, which = 7)
-
-###########################################################
-## estimator comparison
-###########################################################
-## classical optimal (non-robust)
-c(mean(x), sd(x))
-## most robust
-c(median(x), mad(x))
-## amount of gross errors unknown
-res1$rmxEst
-## amount of gross errors known
-res2$rmxEst
-}
 }
 \keyword{robust}

@@ -1,8 +1,9 @@
 ###############################################################################
 ## RMX estimator for probability of success of a binomial model
 ###############################################################################
-rmx.binom <- function(x, eps.lower, eps.upper, eps, initial.est = NULL, k = 3L, 
-                      fsCor = FALSE, size, M = 10000, parallel = FALSE, ncores = NULL, 
+rmx.binom <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
+                      initial.est=NULL, fsCor = TRUE, na.rm = TRUE, 
+                      size, M = 10000, parallel = FALSE, ncores = NULL, 
                       aUp = 100*size, cUp = 1e4, delta = 1e-9){
     if(length(x) <= 2){
         stop("A sample size of at least 3 is required!")
