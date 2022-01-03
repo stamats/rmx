@@ -1,13 +1,12 @@
 ###############################################################################
 ## RMX estimator for normal location and scale
 ###############################################################################
-rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
-    mad0 <- 1e-4
+rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor, mad0 = 1e-4){
     if(!is.null(eps)){
         r <- sqrt(length(x))*eps
         if(fsCor){ 
             r.as <- r
-            r <- fsRadius(r = r, n = length(x), model = "norm")
+            r <- fsRadius.norm(r = r, n = length(x))
         }
     }else{
         sqrtn <- sqrt(length(x))
@@ -23,7 +22,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
         }
         if(fsCor){
             r.as <- r
-            r <- fsRadius(r = r, n = length(x), model = "norm")
+            r <- fsRadius.norm(r = r, n = length(x))
         }
     }
     if(length(x) <= 2){
@@ -32,52 +31,9 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
         names(rmxEst) <- c("mean", "sd")
         Info.matrix <- matrix(c("rmx", "median and MAD"), ncol = 2, 
                               dimnames = list(NULL, c("method", "message")))
-        AM <- rmxEst[1]
-        SD <- rmxEst[2]
-        b1 <- SD*sqrt(pi/2)
-        A1 <- 1
-        a1 <- 0
         
-        b2 <- SD/(4*qnorm(0.75)*dnorm(qnorm(0.75)))
-        A2 <- 1
-        a2 <- (qnorm(0.75)^2 - 1)/SD
-        A <- c(A1, A2)
-        a <- c(a1, a2)
-        b <- sqrt(b1^2 + b2^2)
+        IF <- .getMedMADIF(AM = rmxEst[1], SD = rmxEst[2])
         
-        mse <- b1^2*(1+r^2) + b2^2*(1+r^2)
-        names(mse) <- NULL
-        bias <- r^2*(b1^2 + b2^2)
-        names(bias) <- NULL
-        V1 <- b1^2
-        V2 <- b2^2
-        asVar <- diag(c(V1, V2))
-        rownames(asVar) <- c("mean", "sd")
-        colnames(asVar) <- c("mean", "sd")
-        
-        param <- c(AM, SD)
-        names(param) <- c("mean", "sd")
-        IFun <- function(x){}
-        body(IFun) <- substitute({ 
-            z <- (x-AM)/sigma
-            y1 <- b1*sign(z)
-            y2 <- b2*sign((z^2 - 1)/sigma - a2)
-            Y <- cbind(y1, y2)
-            colnames(Y) <- c("IF for mean", "IF for sd")  
-            Y
-        }, list(AM = AM, sigma = SD, a2 = a2, b1 = b1, b2 = b2))
-        range <- function(alpha, n = 501){} 
-        body(range) <- substitute({
-            rg <- qnorm(c(alpha/2, 1-alpha/2), mean = AM, sd = sigma)
-            seq(from = rg[1], to = rg[2], length.out = n)
-        }, list(AM = mean, sigma = sd))
-        
-        IF <- list(model = "norm", modelName = "normal location and scale", 
-                   parameter = param, A = A, a = a, b = b, IFun = IFun,
-                   range = range, asMSE = mse, asVar = asVar, asBias = bias,
-                   radius = r)
-        class(IF) <- "optIF"
-
         RMX <- list(rmxEst = rmxEst, rmxIF = IF, initial.est = NULL, 
                     Infos = Info.matrix)
         class(RMX) <- "rmx"
@@ -90,38 +46,9 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
             names(rmxEst) <- c("mean", "sd")
             Info.matrix <- matrix(c("rmx", "mean and sd"), ncol = 2, 
                                   dimnames = list(NULL, c("method", "message")))
-            mean <- rmxEst[1]
-            sd <- rmxEst[2]
-            asVar <- sd^2*diag(c(1, 0.5))
-            rownames(asVar) <- c("mean", "sd")
-            colnames(asVar) <- c("mean", "sd")
-            A <- sd^2*diag(c(1, 0.5))
-            a <- c(0, 0)
-            b <- Inf
-            mse <- sd^2*(1 + 0.5)
-            names(mse) <- NULL
-            bias <- sqrt(mse - sum(diag(asVar)))
-            names(bias) <- NULL
-            param <- c(mean, sd)
-            names(param) <- c("mean", "sd")
-            IFun <- function(x){}
-            body(IFun) <- substitute({ 
-                z <- (x-AM)/sigma
-                res <- sigma*cbind(z, 0.5*(z^2 - 1)) 
-                colnames(res) <- c("IF for mean", "IF for sd") 
-                res 
-            }, list(AM = mean, sigma = sd))
-            range <- function(alpha, n = 501){} 
-            body(range) <- substitute({
-                rg <- qnorm(c(alpha/2, 1-alpha/2), mean = AM, sd = sigma)
-                seq(from = rg[1], to = rg[2], length.out = n)
-            }, list(AM = mean, sigma = sd))
             
-            IF <- list(model = "norm", modelName = "normal location and scale", 
-                       parameter = param, A = A, a = a, b = b, IFun = IFun,
-                       range = range, asMSE = mse, asVar = asVar, asBias = bias,
-                       radius = r)
-            class(IF) <- "optIF"
+            IF <- .getMLIF.norm(mean = rmxEst[1], sd = rmxEst[2])
+            IF$radius <- 0
 
             RMX <- list(rmxEst = rmxEst, rmxIF = IF, initial.est = NULL, 
                         Infos = Info.matrix)
@@ -146,7 +73,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
         MEAN <- initial.est[1]
         SD <- initial.est[2]
         if(SD <= 0)
-            stop("initial estimate for sd <= 0 which is no valid")
+            stop("initial estimate for sd <= 0 which is not valid")
     }
     mean.sd <- c(MEAN, SD)
     names(mean.sd) <- c("mean","sd")
@@ -166,9 +93,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
             mse <- A1 + A2
         }
         rmxEst.all <- .kstep.norm(x = x, initial.est = c(MEAN, SD), 
-                              A1 = A1, A2 = A2, a = a, b = b, k = k)
-        rmxEst <- rmxEst.all$est
-        names(rmxEst) <- c("mean", "sd")
+                                  A1 = A1, A2 = A2, a = a, b = b, k = k)
         if(fsCor){
             Info.matrix <- matrix(c("rmx", 
                                     paste("fs-corrected estimate for 'eps' =", 
@@ -180,46 +105,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
                                           round(eps, 3))),
                                   ncol = 2, dimnames = list(NULL, c("method", "message")))
         }
-        A1 <- rmxEst.all$A1 
-        A2 <- rmxEst.all$A2
-        A <- diag(c(A1, A2))
-        a <- rmxEst.all$a 
-        b <- rmxEst.all$b
-        a1 <- A1/rmxEst[2]^2
-        a3 <- A2/rmxEst[2]^2
-        a2 <- a[2]/rmxEst[2]/a3 + 1
-        
-        asVar <- rmxEst.all$asvar
-        rownames(asVar) <- c("mean", "sd")
-        colnames(asVar) <- c("mean", "sd")
-        mse <- rmxEst[2]^2*(a1 + a3)
-        names(mse) <- NULL
-        bias <- sqrt(mse - sum(diag(asVar)))
-        names(bias) <- NULL
-        param <- rmxEst
-        IFun <- function(x){}
-        body(IFun) <- substitute({ 
-            z <- (x-AM)/sigma
-            hvkt <- sqrt(a1^2*z^2/sigma^2 + (a3*(z^2-1)/sigma - a2)^2)
-            ind1 <- (hvkt < b)
-            w <- ind1 + (1-ind1)*b/hvkt 
-            Y <- cbind(a1*z/sigma, a3*(z^2-1)/sigma-a2)
-            res <- Y*w
-            colnames(res) <- c("IF for mean", "IF for sd")  
-            res 
-        }, list(AM = rmxEst[1], sigma = rmxEst[2], 
-                a1 = A[1,1], a2 = a[2], a3 = A[2,2], b = b))
-        range <- function(alpha, n = 501){} 
-        body(range) <- substitute({
-            rg <- qnorm(c(alpha/2, 1-alpha/2), mean = AM, sd = sigma)
-            seq(from = rg[1], to = rg[2], length.out = n)
-        }, list(AM = rmxEst[1], sigma = rmxEst[2]))
-        
-        IF <- list(model = "norm", modelName = "normal location and scale", 
-                   parameter = param, A = A, a = a, b = b, IFun = IFun,
-                   range = range, asMSE = mse, asVar = asVar, asBias = bias,
-                   radius = r)
-        class(IF) <- "optIF"
+        IF <- .getRMXIF(r, rmxEst.all)
     }else{
         if(r > 10){
             b <- SD*1.618128043
@@ -248,8 +134,6 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
         }
         rmxEst.all <- .kstep.norm(x = x, initial.est = c(MEAN, SD), 
                                   A1 = A1, A2 = A2, a = a, b = b, k = k)
-        rmxEst <- rmxEst.all$est
-        names(rmxEst) <- c("mean", "sd")
         if(fsCor){
             Info.matrix <- matrix(c(rep("rmx", 3), 
                                   paste("fs-corrected rmx estimate for 'eps' in [", 
@@ -268,49 +152,13 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
                                         signif(ineff, 3), sep = "")), 
                                   ncol = 2, dimnames = list(NULL, c("method", "message")))
         }
-        A1 <- rmxEst.all$A1 
-        A2 <- rmxEst.all$A2 
-        A <- diag(c(A1, A2))
-        a <- rmxEst.all$a 
-        b <- rmxEst.all$b
-        a1 <- A1/rmxEst[2]^2
-        a3 <- A2/rmxEst[2]^2
-        a2 <- a[2]/rmxEst[2]/a3 + 1
-        
-        asVar <- rmxEst.all$asvar
-        rownames(asVar) <- c("mean", "sd")
-        colnames(asVar) <- c("mean", "sd")
-        mse <- rmxEst[2]^2*(a1 + a3)
-        names(mse) <- NULL
-        bias <- sqrt(mse - sum(diag(asVar)))
-        names(bias) <- NULL
-        param <- rmxEst
-        IFun <- function(x){}
-        body(IFun) <- substitute({ 
-            z <- (x-AM)/sigma
-            hvkt <- sqrt(a1^2*z^2/sigma^2 + (a3*(z^2-1)/sigma - a2)^2)
-            ind1 <- (hvkt < b)
-            w <- ind1 + (1-ind1)*b/hvkt 
-            Y <- cbind(a1*z/sigma, a3*(z^2-1)/sigma-a2)
-            res <- Y*w
-            colnames(res) <- c("IF for mean", "IF for sd")  
-            res 
-        }, list(AM = rmxEst[1], sigma = rmxEst[2], 
-                a1 = A[1,1], a2 = a[2], a3 = A[2,2], b = b))
-        range <- function(alpha, n = 501){} 
-        body(range) <- substitute({
-            rg <- qnorm(c(alpha/2, 1-alpha/2), mean = AM, sd = sigma)
-            seq(from = rg[1], to = rg[2], length.out = n)
-        }, list(AM = rmxEst[1], sigma = rmxEst[2]))
-        
-        IF <- list(model = "norm", modelName = "normal location and scale", 
-                   parameter = param, A = A, a = a, b = b, IFun = IFun,
-                   range = range, asMSE = mse, asVar = asVar, asBias = bias,
-                   radius = r)
-        class(IF) <- "optIF"
+        IF <- .getRMXIF(r, rmxEst.all)
     }
+    rmxEst <- rmxEst.all$est
+    names(rmxEst) <- c("mean", "sd")
+    
     RMX <- list(rmxEst = rmxEst, rmxIF = IF, initial.est = c(MEAN, SD), 
-                Infos = Info.matrix)
+                Infos = Info.matrix, n = length(x))
     class(RMX) <- "rmx"
     RMX
 }
@@ -351,7 +199,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
         effup <- (A1 + A2 - b^2*(r^2 - rup^2))/(A1up + A2up)
     }
     
-    return(effup-efflo)
+    effup-efflo
 }
 
 ###############################################################################
@@ -364,7 +212,7 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
     v <- A2*(((x-MEAN)/SD)^2-1)/SD - a[2]
     w <- pmin(1, b/sqrt(u^2 + v^2))
     IC <- c(mean(u*w, na.rm = TRUE), mean(v*w, na.rm = TRUE))
-    return(initial.est + IC)
+    initial.est + IC
 }
 .kstep.norm <- function(x, initial.est, A1, A2, a, b, k){
     est <- .onestep.norm(x = x, initial.est = initial.est, 
@@ -387,7 +235,97 @@ rmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor){
     a1 <- A1/est[2]^2
     a3 <- A2/est[2]^2
     a2 <- a[2]/est[2]/a3 + 1
-    asVar <- est[2]^2*.getAsVar.norm(b = b/est[2], a1 = a1, a2 = a2, a3 = a3)
     
-    return(list(est = est, A1 = A1, A2 = A2, a = a, b = b, asvar = asVar))
+    list(est = est, A1 = A1, A2 = A2, a = a, b = b)
+}
+.getMedMADIF <- function(AM, SD){
+    b1 <- SD*sqrt(pi/2)
+    A1 <- 1
+    a1 <- 0
+    
+    b2 <- SD/(4*qnorm(0.75)*dnorm(qnorm(0.75)))
+    A2 <- 1
+    a2 <- (qnorm(0.75)^2 - 1)/SD
+    A <- c(A1, A2)
+    a <- c(a1, a2)
+    b <- sqrt(b1^2 + b2^2)
+    
+    mse <- b1^2*(1+r^2) + b2^2*(1+r^2)
+    names(mse) <- NULL
+    bias <- r^2*(b1^2 + b2^2)
+    names(bias) <- NULL
+    V1 <- b1^2
+    V2 <- b2^2
+    asVar <- diag(c(V1, V2))
+    rownames(asVar) <- c("mean", "sd")
+    colnames(asVar) <- c("mean", "sd")
+    
+    param <- c(AM, SD)
+    names(param) <- c("mean", "sd")
+    IFun <- function(x){}
+    body(IFun) <- substitute({ 
+        z <- (x-AM)/sigma
+        y1 <- b1*sign(z)
+        y2 <- b2*sign((z^2 - 1)/sigma - a2)
+        Y <- cbind(y1, y2)
+        colnames(Y) <- c("IF for mean", "IF for sd")  
+        Y
+    }, list(AM = AM, sigma = SD, a2 = a2, b1 = b1, b2 = b2))
+    range <- function(alpha, n = 501){} 
+    body(range) <- substitute({
+        rg <- qnorm(c(alpha/2, 1-alpha/2), mean = AM, sd = sigma)
+        seq(from = rg[1], to = rg[2], length.out = n)
+    }, list(AM = mean, sigma = sd))
+    
+    IF <- list(model = "norm", modelName = "normal location and scale", 
+               parameter = param, A = A, a = a, b = b, IFun = IFun,
+               range = range, asMSE = mse, asVar = asVar, asBias = bias,
+               radius = r)
+    class(IF) <- "optIF"
+    IF
+}
+.getRMXIF <- function(r, rmxEst.all){
+    rmxEst <- rmxEst.all$est
+    names(rmxEst) <- c("mean", "sd")
+    A1 <- rmxEst.all$A1 
+    A2 <- rmxEst.all$A2
+    A <- diag(c(A1, A2))
+    a <- rmxEst.all$a 
+    b <- rmxEst.all$b
+    a1 <- A1/rmxEst[2]^2
+    a3 <- A2/rmxEst[2]^2
+    a2 <- a[2]/rmxEst[2]/a3 + 1
+    
+    asVar <- rmxEst[2]^2*.getAsVar.norm.approx(r)
+    rownames(asVar) <- c("mean", "sd")
+    colnames(asVar) <- c("mean", "sd")
+    mse <- rmxEst[2]^2*(a1 + a3)
+    names(mse) <- NULL
+    bias <- sqrt(mse - sum(diag(asVar)))
+    names(bias) <- NULL
+    param <- rmxEst
+    IFun <- function(x){}
+    body(IFun) <- substitute({ 
+        z <- (x-AM)/sigma
+        hvkt <- sqrt(a1^2*z^2/sigma^2 + (a3*(z^2-1)/sigma - a2)^2)
+        ind1 <- (hvkt < b)
+        w <- ind1 + (1-ind1)*b/hvkt 
+        Y <- cbind(a1*z/sigma, a3*(z^2-1)/sigma-a2)
+        res <- Y*w
+        colnames(res) <- c("IF for mean", "IF for sd")  
+        res 
+    }, list(AM = rmxEst[1], sigma = rmxEst[2], 
+            a1 = A[1,1], a2 = a[2], a3 = A[2,2], b = b))
+    range <- function(alpha, n = 501){} 
+    body(range) <- substitute({
+        rg <- qnorm(c(alpha/2, 1-alpha/2), mean = AM, sd = sigma)
+        seq(from = rg[1], to = rg[2], length.out = n)
+    }, list(AM = rmxEst[1], sigma = rmxEst[2]))
+    
+    IF <- list(model = "norm", modelName = "normal location and scale", 
+               parameter = param, A = A, a = a, b = b, IFun = IFun,
+               range = range, asMSE = mse, asVar = asVar, asBias = bias,
+               radius = r)
+    class(IF) <- "optIF"
+    IF
 }

@@ -2,8 +2,7 @@
 ## Compute RMX estimators for various models
 ###############################################################################
 rmx <- function(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
-                initial.est=NULL, fsCor = TRUE, na.rm = TRUE, message = TRUE, 
-                ...){
+                initial.est=NULL, fsCor = NULL, na.rm = TRUE, message = TRUE, ...){
   es.call <- match.call()
   
   if(missing(x))
@@ -12,11 +11,13 @@ rmx <- function(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L
 
   stopifnot(is.character(model))
   stopifnot(length(model) == 1)
-  if(!is.na(pmatch(model, "norm")))  model <- "norm"
-  MODELS <- c("norm", "binom", "pois", "gamma", "weibull")
-  model <- pmatch(model, MODELS)
+  
+  completecases <- !is.na(x)
+  x.org <- x
+  if(na.rm) x <- x[completecases] 
+  
   if(is.null(eps) && is.null(eps.upper)){
-    res0 <- rmx(x = x, model = MODELS[model], eps.upper = 0.5, k = k, 
+    res0 <- rmx(x = x, model = model, eps.upper = 0.5, k = k, 
                 initial.est = initial.est, fsCor = fsCor, na.rm = na.rm,
                 message = message)
     eps.lower <- 0
@@ -54,15 +55,38 @@ rmx <- function(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L
   stopifnot(length(na.rm) == 1)
   stopifnot(is.logical(na.rm))
   
-  completecases <- !is.na(x)
-  x.org <- x
-  if(na.rm) x <- x[completecases] 
-  
-  if(model == 1){ # normal distribution
+  listDots <- list(...)
+  if(model == "norm"){ # normal distribution
+    mad0 <- ifelse("mad0" %in% names(listDots), listDots$mad0, 1e-4)
+    if(is.null(fsCor)) fsCor <- TRUE
     RMXest <- rmx.norm(x, eps.lower=eps.lower, eps.upper=eps.upper, eps=eps, 
-                       k = k, initial.est=initial.est, fsCor = fsCor)
+                       initial.est=initial.est, k = k, fsCor = fsCor, mad0 = mad0)
   }
-  if(model != 1){
+  if(model == "binom"){ # binomial distribution
+    if(!"size" %in% names(listDots))
+      stop("Parameter 'size' is assumed to be known and must be given.")
+    size <- listDots$size
+    
+    ifelse("M" %in% names(listDots), listDots$M, 10000)
+    ifelse("parallel" %in% names(listDots), listDots$parallel, FALSE)
+    if("ncores" %in% names(listDots)){
+      ncores <- listDots$ncores
+    }else{
+      ncores <- NULL
+    }
+    
+    aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 100*size)
+    cUp <- ifelse("cUp" %in% names(listDots), listDots$cUp, 1e4)
+    delta <- ifelse("delta" %in% names(listDots), listDots$delta, 1e-9)
+    
+    if(is.null(fsCor)) fsCor <- FALSE
+    
+    RMXest <- rmx.binom(x, eps.lower=eps.lower, eps.upper=eps.upper, eps=eps, 
+                        initial.est=initial.est, k = k, fsCor = fsCor, 
+                        size = size, M = M, parallel = parallel, ncores = ncores,
+                        aUp = aUp, cUp = cUp, delta = delta)
+  }
+  if(!model %in% c("norm", "binom")){
     stop("Given 'model' not yet implemented")
   }
   if(length(x) < length(x.org)){
@@ -72,7 +96,6 @@ rmx <- function(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L
 
   RMXest$rmxIF$call <- es.call
   RMXest$x <- x.org
-  RMXest$n <- length(x)
   RMXest$eps.lower <- ifelse(is.null(eps), eps.lower, NA)
   RMXest$eps.upper <- ifelse(is.null(eps), eps.upper, NA)
   RMXest$eps <- ifelse(is.null(eps), NA, eps)
@@ -88,7 +111,10 @@ print.rmx <- function(x, digits = getOption("digits"), ...){
   cat(strwrap(paste0("RMX estimator for ", x$rmxIF$modelName), 
               prefix = " "), sep = "\n")
   cat("\n")
-  SD <- sqrt(diag(x$rmxIF$asVar))/sqrt(x$n)
+  if(is.matrix(x$rmxIF$asVar))
+    SD <- sqrt(diag(x$rmxIF$asVar))/sqrt(x$n)
+  else
+    SD <- sqrt(x$rmxIF$asVar)/sqrt(x$n)
   ans <- format(rbind(x$rmxEst, SD), digits = digits)
   ans[1L, ] <- sapply(ans[1L, ], function(x) paste("", x))
   ans[2L, ] <- sapply(ans[2L, ], function(x) paste("(", x, ")", sep = ""))
@@ -109,7 +135,10 @@ summary.rmx <- function(object, digits = getOption("digits"), ...){
   cat(strwrap(paste0("RMX estimator for ", object$rmxIF$modelName), 
               prefix = " "), sep = "\n")
   cat("\n")
-  SD <- sqrt(diag(object$rmxIF$asVar))/sqrt(object$n)
+  if(is.matrix(object$rmxIF$asVar))
+    SD <- sqrt(diag(object$rmxIF$asVar))/sqrt(object$n)
+  else
+    SD <- sqrt(object$rmxIF$asVar)/sqrt(object$n)
   ans <- format(rbind(object$rmxEst, SD), digits = digits)
   ans[1L, ] <- sapply(ans[1L, ], function(x) paste("", x))
   ans[2L, ] <- sapply(ans[2L, ], function(x) paste("(", x, ")", sep = ""))
