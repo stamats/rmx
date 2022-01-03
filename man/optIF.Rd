@@ -1,5 +1,8 @@
 \name{optIF}
 \alias{optIF}
+\alias{print.optIF}
+\alias{summary.optIF}
+\alias{plot.optIF}
 \title{Computation of the optimally robust IF for AL estimators}
 \description{
   The function computes the optimally robust IF for AL estimators 
@@ -8,14 +11,26 @@
   Kohl (2005).
 }
 \usage{
-optIF(model = "norm", radius = NULL, check = FALSE, ...)
+optIF(model = "norm", radius = NULL, check = FALSE, \dots)
+
+\method{print}{optIF}(x, digits = getOption("digits"), prefix = " ", \dots)
+
+\method{summary}{optIF}(object, digits = getOption("digits"), prefix = " ", \dots)
+
+\method{plot}{optIF}(x, alpha = 1e-6, digits = 2, plot = TRUE, \dots)
 }
 \arguments{
   \item{model}{ character: short name of the model/distribution (default = \code{"norm"});
   see also details. }
-  \item{radius}{ non-negative real: neighborhood radius.}
-  \item{check}{ logical: check accuracy of the computation.}
-  \item{\dots}{ further model specific parameters such as parameter value(s); 
+  \item{radius}{ non-negative real: neighborhood radius. }
+  \item{check}{ logical: check accuracy of the computation. }
+  \item{x}{ an \code{optIF} object. }
+  \item{object}{ an \code{optIF} object. }
+  \item{alpha}{ alpha-quantile used to compute plot range, which is from
+  \code{alpha}-quantile to 1-\code{alpha}-quantile of the fitted model.}
+  \item{digits}{ minimal number of significant digits. }
+  \item{prefix}{ string, passed to \code{\link[base]{strwrap}}. }
+  \item{\dots}{ further arguments passed through sucha as model parameter(s); 
   see details. }
 }
 \details{The Lagrange multipliers contained in the expression

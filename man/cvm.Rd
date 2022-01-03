@@ -1,13 +1,26 @@
 \name{cvm}
 \alias{cvm}
+\alias{cvm.norm}
+\alias{cvm.binom}
+\alias{cvm.pois}
+\alias{rowCVM}
 \title{Calculate Cramer von Mises Minimum Distance Estimates}
 \description{
   The function \code{cvm} calculates Cramer von Mises Minimum Distance 
   Estimates. It is used to compute valid starting estimates for simple
-  parametric models inside of function \code{rmx}. 
+  parametric models inside of function \code{rmx}. The functions are 
+  rarely called directly and are mainly for internal use.
 }
 \usage{
-cvm(x, model = "norm", mu = "model", na.rm = TRUE, startPar = NULL, \dots)
+cvm(x, model = "norm", mu = "model", na.rm = TRUE, \dots)
+
+cvm.norm(x, mu, startPar = NULL)
+
+cvm.binom(x, mu, size)
+
+cvm.pois(x, mu)
+
+rowCVM(x, model, mu = "model", na.rm = TRUE, parallel = FALSE, ncores = NULL, \dots)
 }
 \arguments{
   \item{x}{ numeric vector of data. }
@@ -17,11 +30,12 @@ cvm(x, model = "norm", mu = "model", na.rm = TRUE, startPar = NULL, \dots)
              details. }
   \item{na.rm}{ logical: if \code{TRUE}, \code{NA} values are removed before the 
                 estimator is evaluated. }
-  \item{startPar}{ optional numeric vector with parameter values that should be
-                   used as starting values in the numerical optimization via 
-                   \code{optim}. The parameter is only of relevance, if a model
-                   includes two or more unknown parameters. If it is not 
-                   specified, starting values are computed inside the function. }
+  \item{startPar}{ parameter values used as starting point for the optimization.
+  If missing or \code{NULL}, appropriate default values are computed. }
+  \item{size}{ size parameter of binomial distribution (known!); see \code{\link[stats]{dbinom}}. }
+  \item{parallel}{ logical: use package \pkg{parallel} for computations. }
+  \item{ncores}{ if \code{parallel = TRUE}: number of cores used for computations.
+                 If missing, the maximum number of cores - 1 is used. }
   \item{\dots}{ further arguments passed through; e.g., known parameters as 
                 for instance \code{size} in case of the binomial model. }
 }
@@ -72,5 +86,14 @@ cvm(x, model = "binom", size = 3, mu = "data")
 x <- rpois(100, lambda = 1.5)
 cvm(x, model = "pois")
 cvm(x, model = "pois", mu = "data")
+
+X <- matrix(rnorm(200), ncol = 10)
+rowCVM(X, model = "norm")
+
+X <- matrix(rbinom(200, prob = 0.2, size = 3), ncol = 10)
+rowCVM(X, model = "binom", size = 3)
+
+X <- matrix(rpois(200, lambda = 1.5), ncol = 10)
+rowCVM(X, model = "pois")
 }
 \keyword{robust}
