@@ -1,81 +1,35 @@
 ###############################################################################
 ## optimal IF for normal location and scale
 ###############################################################################
-optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0, 
-                       A.sc.start = 0.5, bUp = 1000, delta = 1e-6, itmax = 100L, 
+optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, A.sc.start = 0.5, 
+                       a.sc.start = 0, bUp = 1000, delta = 1e-6, itmax = 100L, 
                        check = FALSE){
+    stopifnot(length(mean) == 1)
+    stopifnot(length(sd) == 1)
+    stopifnot(sd > 0)
+    stopifnot(length(A.loc.start) == 1)
+    stopifnot(length(A.sc.start) == 1)
+    stopifnot(length(a.sc.start) == 1)
+    stopifnot(length(bUp) == 1)
+    stopifnot(bUp > 2)
+    stopifnot(length(delta) == 1)
+    stopifnot(is.numeric(delta))
+    if(delta <= 0)
+        stop("'delta' must be positive")
+    if(delta > 0.1)
+        warning("'delta' is expected to be small or very small.")
+    stopifnot(is.numeric(itmax))
+    if(!is.integer(itmax))  itmax <- as.integer(itmax)
+    if(itmax < 1){
+        stop("'itmax' has to be some positive integer value")
+    }
+    
     if(radius == 0){
-        asVar <- sd^2*diag(c(1, 0.5))
-        rownames(asVar) <- c("mean", "sd")
-        colnames(asVar) <- c("mean", "sd")
-        A <- sd^2*diag(c(1, 0.5))
-        a <- c(0, 0)
-        b <- Inf
-        mse <- sd^2*(1 + 0.5)
-        names(mse) <- NULL
-        bias <- sqrt(mse - sum(diag(asVar)))
-        names(bias) <- NULL
-        param <- c(mean, sd)
-        names(param) <- c("mean", "sd")
-        IFun <- function(x){}
-        body(IFun) <- substitute({ 
-                z <- (x-AM)/sigma
-                res <- sigma*cbind(z, 0.5*(z^2 - 1)) 
-                colnames(res) <- c("IF for mean", "IF for sd") 
-                res 
-            }, list(AM = mean, sigma = sd))
-        range <- function(alpha, n = 501){} 
-        body(range) <- substitute({
-                rg <- qnorm(c(alpha/2, 1-alpha/2), mean = AM, sd = sigma)
-                seq(from = rg[1], to = rg[2], length.out = n)
-            }, list(AM = mean, sigma = sd))
-        
-        IF <- list(model = "norm", modelName = "normal location and scale", 
-                   parameter = param, A = A, a = a, b = b, IFun = IFun,
-                   range = range, asMSE = mse, asVar = asVar, asBias = bias)
-        class(IF) <- "optIF"
+        IF <- .getMLIF.norm(mean = mean, sd = sd)
         return(IF)
     }
     if(radius == Inf){
-        b <- sd*1.618128043
-        const <- 1.263094656
-        a1 <- 1
-        a3 <- 1/const
-        A <- diag(c(a1, a3))
-        a <- c(0, -0.6277527697/const/sd)
-        mse <- Inf
-        bias <- Inf
-        ## fun1 <- function(x) {x^2 / (x^2 + (1/1.263094656*(x^2-1) + 0.6277527697/1.263094656)^2)*dnorm(x) }
-        ## print(2*integrate(fun1, lower = 0, upper = Inf, rel.tol = 1e-14)$value, digits = 10)
-        V1 <- 0.6347635562
-        ## fun2 <- function(x) {(1/1.263094656*(x^2-1) + 0.6277527697/1.263094656)^2 / (x^2 + (1/1.263094656*(x^2-1) + 0.6277527697/1.263094656)^2)*dnorm(x) }
-        ## print(2*integrate(fun2, lower = 0, upper = Inf, rel.tol = 1e-14)$value, digits = 10)
-        V2 <- 0.3652364438
-        asVar <- b^2*diag(c(V1, V2))
-        rownames(asVar) <- c("mean", "sd")
-        colnames(asVar) <- c("mean", "sd")
-        
-        param <- c(mean, sd)
-        names(param) <- c("mean", "sd")
-        IFun <- function(x){}
-        body(IFun) <- substitute({ 
-                z <- (x-AM)/sigma
-                w <- 1/sqrt(z^2 + (a3*(z^2-1) - a2*sigma)^2)
-                Y <- b*cbind(z, a3*(z^2-1)-a2*sigma)
-                res <- Y*w
-                colnames(res) <- c("IF for mean", "IF for sd") 
-                res 
-            }, list(AM = mean, sigma = sd, a2 = a[2], a3 = a3, b = b))
-        range <- function(alpha, n = 501){} 
-        body(range) <- substitute({
-            rg <- qnorm(c(alpha/2, 1-alpha/2), mean = AM, sd = sigma)
-            seq(from = rg[1], to = rg[2], length.out = n)
-        }, list(AM = mean, sigma = sd))
-        
-        IF <- list(model = "norm", modelName = "normal location and scale", 
-                   parameter = param, A = A, a = a, b = b, IFun = IFun,
-                   range = range, asMSE = mse, asVar = asVar, asBias = bias)
-        class(IF) <- "optIF"
+        IF <- .getMBIF.norm(mean = mean, sd = sd)
         return(IF)
     }
     r <- radius
@@ -109,72 +63,15 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0
     }
 
     if(check){
-        integrand1 <- function(x, b, a1, a2, a3){
-            x^2*.getw.norm(x, b, a1, a2, a3)*dnorm(x)
-        }
-        Int1 <- 2*integrate(integrand1, lower = 0, upper = Inf, 
-                        rel.tol = .Machine$double.eps^0.5, b = b, a1 = a1, 
-                        a2 = a2, a3 = a3)$value
-        ch1 <- a1*Int1
+        chs <- .checkIF.norm(r = r, b = b, a1 = a1, a2 = a2, a3 = a3)
 
-        integrand2 <- function(x, b, a1, a2, a3){
-            (x^2 - a2)^2*.getw.norm(x, b, a1, a2, a3)*dnorm(x)
-        }
-        Int2 <- 2*integrate(integrand2, lower = 0, upper = Inf, 
-                        rel.tol = .Machine$double.eps^0.5, b = b, a1 = a1, 
-                        a2 = a2, a3 = a3)$value
-        ch2 <- a3*Int2
-
-        integrand3 <- function(x, b, a1, a2, a3){
-            (x^2 - a2)*.getw.norm(x, b, a1, a2, a3)*dnorm(x)
-        }
-        Int3 <- 2*integrate(integrand3, lower=0, upper=Inf, 
-                        rel.tol = .Machine$double.eps^0.5, b = b, a1 = a1, 
-                        a2 = a2, a3 = a3)$value
-        ch3 <- a3*Int3
-
-        ch4 <- .getr.norm(b = b, r = r, a1 = a1, a2 = a2, a3 = a3)
-
-        message("Fisher consistency of eta.loc:\t", ch1-1)
-        message("Fisher consistency of eta.sc:\t", ch2-1)
-        message("centering of eta.sc:\t", ch3)
-        message("MSE equation:\t", ch4)
+        message("Fisher consistency of eta.loc:\t", chs$ch1-1)
+        message("Fisher consistency of eta.sc:\t", chs$ch2-1)
+        message("centering of eta.sc:\t", chs$ch3)
+        message("MSE equation:\t", chs$ch4)
     }
 
-    asVar <- sd^2*.getAsVar.norm(b = b, a1 = a1, a2 = a2, a3 = a3)
-    rownames(asVar) <- c("mean", "sd")
-    colnames(asVar) <- c("mean", "sd")
-    A <- sd^2*diag(c(a1, a3))
-    a <- sd*c(0, a3*(a2-1))
-    b <- sd*b
-    mse <- sd^2*(a1 + a3)
-    names(mse) <- NULL
-    bias <- sqrt(mse - sum(diag(asVar)))
-    names(bias) <- NULL
-    param <- c(mean, sd)
-    names(param) <- c("mean", "sd")
-    IFun <- function(x){}
-    body(IFun) <- substitute({ 
-        z <- (x-AM)/sigma
-        hvkt <- sqrt(a1^2*z^2/sigma^2 + (a3*(z^2-1)/sigma - a2)^2)
-        ind1 <- (hvkt < b)
-        w <- ind1 + (1-ind1)*b/hvkt 
-        Y <- cbind(a1*z/sigma, a3*(z^2-1)/sigma-a2)
-        res <- Y*w
-        colnames(res) <- c("IF for mean", "IF for sd") 
-        res 
-        }, list(AM = mean, sigma = sd, 
-                a1 = A[1,1], a2 = a[2], a3 = A[2,2], b = b))
-    range <- function(alpha, n = 501){} 
-    body(range) <- substitute({
-        rg <- qnorm(c(alpha/2, 1-alpha/2), mean = AM, sd = sigma)
-        seq(from = rg[1], to = rg[2], length.out = n)
-    }, list(AM = mean, sigma = sd))
-    
-    IF <- list(model = "norm", modelName = "normal location and scale", 
-               parameter = param, A = A, a = a, b = b, IFun = IFun,
-               range = range, asMSE = mse, asVar = asVar, asBias = bias)
-    class(IF) <- "optIF"
+    IF <- .getOptIF.norm(mean = mean, sd = sd, b = b, a1 = a1, a2 = a2, a3 = a3)
     IF
 }
 
@@ -185,7 +82,7 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0
     hvkt <- sqrt(a3^2*x^4 + (a1^2 - 2*a2*a3^2)*x^2 + a2^2*a3^2)
     ind1 <- (hvkt < b)
     
-    return(ind1 + (1-ind1)*b/hvkt)
+    ind1 + (1-ind1)*b/hvkt
 }
 
 ###############################################################################
@@ -200,7 +97,7 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0
                      rel.tol = .Machine$double.eps^0.5, a1 = a1, a2 = a2, 
                      a3 = a3, b = b)$value
     
-    return(r-sqrt(2*Int))
+    r-sqrt(2*Int)
 }
 
 
@@ -232,7 +129,7 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0
                         a2 = a2, a3 = a3)$value
     a3 <- 1/Int3
     
-    return(list(a1=a1, a2=a2, a3=a3))
+    list(a1=a1, a2=a2, a3=a3)
 }
 
 ###############################################################################
@@ -255,5 +152,145 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, a.sc.start = 0
                         a2 = a2, a3 = a3)$value
     V2 <- a3^2*Int2
     
-    return(diag(c(V1, V2)))
+    diag(c(V1, V2))
+}
+.getMLIF.norm <- function(mean, sd){
+    asVar <- sd^2*diag(c(1, 0.5))
+    rownames(asVar) <- c("mean", "sd")
+    colnames(asVar) <- c("mean", "sd")
+    A <- sd^2*diag(c(1, 0.5))
+    a <- c(0, 0)
+    b <- Inf
+    mse <- sd^2*(1 + 0.5)
+    names(mse) <- NULL
+    bias <- sqrt(mse - sum(diag(asVar)))
+    names(bias) <- NULL
+    param <- c(mean, sd)
+    names(param) <- c("mean", "sd")
+    IFun <- function(x){}
+    body(IFun) <- substitute({ 
+        z <- (x-AM)/sigma
+        res <- sigma*cbind(z, 0.5*(z^2 - 1)) 
+        colnames(res) <- c("IF for mean", "IF for sd") 
+        res 
+    }, list(AM = mean, sigma = sd))
+    range <- function(alpha, n = 501){} 
+    body(range) <- substitute({
+        rg <- qnorm(c(alpha/2, 1-alpha/2), mean = AM, sd = sigma)
+        seq(from = rg[1], to = rg[2], length.out = n)
+    }, list(AM = mean, sigma = sd))
+    
+    IF <- list(model = "norm", modelName = "normal location and scale", 
+               parameter = param, A = A, a = a, b = b, IFun = IFun,
+               range = range, asMSE = mse, asVar = asVar, asBias = bias)
+    class(IF) <- "optIF"
+    IF
+}
+.getMBIF.norm <- function(mean, sd){
+    b <- sd*1.618128043
+    const <- 1.263094656
+    a1 <- 1
+    a3 <- 1/const
+    A <- diag(c(a1, a3))
+    a <- c(0, -0.6277527697/const/sd)
+    mse <- Inf
+    bias <- Inf
+    ## fun1 <- function(x) {x^2 / (x^2 + (1/1.263094656*(x^2-1) + 0.6277527697/1.263094656)^2)*dnorm(x) }
+    ## print(2*integrate(fun1, lower = 0, upper = Inf, rel.tol = 1e-14)$value, digits = 10)
+    V1 <- 0.6347635562
+    ## fun2 <- function(x) {(1/1.263094656*(x^2-1) + 0.6277527697/1.263094656)^2 / (x^2 + (1/1.263094656*(x^2-1) + 0.6277527697/1.263094656)^2)*dnorm(x) }
+    ## print(2*integrate(fun2, lower = 0, upper = Inf, rel.tol = 1e-14)$value, digits = 10)
+    V2 <- 0.3652364438
+    asVar <- b^2*diag(c(V1, V2))
+    rownames(asVar) <- c("mean", "sd")
+    colnames(asVar) <- c("mean", "sd")
+    
+    param <- c(mean, sd)
+    names(param) <- c("mean", "sd")
+    IFun <- function(x){}
+    body(IFun) <- substitute({ 
+        z <- (x-AM)/sigma
+        w <- 1/sqrt(z^2 + (a3*(z^2-1) - a2*sigma)^2)
+        Y <- b*cbind(z, a3*(z^2-1)-a2*sigma)
+        res <- Y*w
+        colnames(res) <- c("IF for mean", "IF for sd") 
+        res 
+    }, list(AM = mean, sigma = sd, a2 = a[2], a3 = a3, b = b))
+    range <- function(alpha, n = 501){} 
+    body(range) <- substitute({
+        rg <- qnorm(c(alpha/2, 1-alpha/2), mean = AM, sd = sigma)
+        seq(from = rg[1], to = rg[2], length.out = n)
+    }, list(AM = mean, sigma = sd))
+    
+    IF <- list(model = "norm", modelName = "normal location and scale", 
+               parameter = param, A = A, a = a, b = b, IFun = IFun,
+               range = range, asMSE = mse, asVar = asVar, asBias = bias)
+    class(IF) <- "optIF"
+    IF
+}
+.getOptIF.norm <- function(mean, sd, b, a1, a2, a3){
+    asVar <- sd^2*.getAsVar.norm(b = b, a1 = a1, a2 = a2, a3 = a3)
+    rownames(asVar) <- c("mean", "sd")
+    colnames(asVar) <- c("mean", "sd")
+    A <- sd^2*diag(c(a1, a3))
+    a <- sd*c(0, a3*(a2-1))
+    b <- sd*b
+    mse <- sd^2*(a1 + a3)
+    names(mse) <- NULL
+    bias <- sqrt(mse - sum(diag(asVar)))
+    names(bias) <- NULL
+    param <- c(mean, sd)
+    names(param) <- c("mean", "sd")
+    IFun <- function(x){}
+    body(IFun) <- substitute({ 
+        z <- (x-AM)/sigma
+        hvkt <- sqrt(a1^2*z^2/sigma^2 + (a3*(z^2-1)/sigma - a2)^2)
+        ind1 <- (hvkt < b)
+        w <- ind1 + (1-ind1)*b/hvkt 
+        Y <- cbind(a1*z/sigma, a3*(z^2-1)/sigma-a2)
+        res <- Y*w
+        colnames(res) <- c("IF for mean", "IF for sd") 
+        res 
+    }, list(AM = mean, sigma = sd, 
+            a1 = A[1,1], a2 = a[2], a3 = A[2,2], b = b))
+    range <- function(alpha, n = 501){} 
+    body(range) <- substitute({
+        rg <- qnorm(c(alpha/2, 1-alpha/2), mean = AM, sd = sigma)
+        seq(from = rg[1], to = rg[2], length.out = n)
+    }, list(AM = mean, sigma = sd))
+    
+    IF <- list(model = "norm", modelName = "normal location and scale", 
+               parameter = param, A = A, a = a, b = b, IFun = IFun,
+               range = range, asMSE = mse, asVar = asVar, asBias = bias)
+    class(IF) <- "optIF"
+    IF
+}
+.checkIF.norm <- function(r, b, a1, a2, a3){
+    integrand1 <- function(x, b, a1, a2, a3){
+        x^2*.getw.norm(x, b, a1, a2, a3)*dnorm(x)
+    }
+    Int1 <- 2*integrate(integrand1, lower = 0, upper = Inf, 
+                        rel.tol = .Machine$double.eps^0.5, b = b, a1 = a1, 
+                        a2 = a2, a3 = a3)$value
+    ch1 <- a1*Int1
+    
+    integrand2 <- function(x, b, a1, a2, a3){
+        (x^2 - a2)^2*.getw.norm(x, b, a1, a2, a3)*dnorm(x)
+    }
+    Int2 <- 2*integrate(integrand2, lower = 0, upper = Inf, 
+                        rel.tol = .Machine$double.eps^0.5, b = b, a1 = a1, 
+                        a2 = a2, a3 = a3)$value
+    ch2 <- a3*Int2
+    
+    integrand3 <- function(x, b, a1, a2, a3){
+        (x^2 - a2)*.getw.norm(x, b, a1, a2, a3)*dnorm(x)
+    }
+    Int3 <- 2*integrate(integrand3, lower=0, upper=Inf, 
+                        rel.tol = .Machine$double.eps^0.5, b = b, a1 = a1, 
+                        a2 = a2, a3 = a3)$value
+    ch3 <- a3*Int3
+    
+    ch4 <- .getr.norm(b = b, r = r, a1 = a1, a2 = a2, a3 = a3)
+    
+    list(ch1 = ch1, ch2 = ch2, ch3 = ch3, ch4 = ch4)
 }
