@@ -13,4 +13,10 @@
 .getb.norm <- function(r){
     approx(x = .radius.gitter.norm, y = .b.norm, xout = r, yleft = Inf)$y
 }
-
+.getAsVar.norm.approx <- function(r){
+  asVar.mean <- approx(x = .radius.gitter.norm, y = .asVar.mean.norm, xout = r, 
+                     yleft = 1.0)$y
+  asVar.sd <- approx(x = .radius.gitter.norm, y = .asVar.sd.norm, xout = r, 
+                     yleft = 0.5)$y
+  diag(c(asVar.mean, asVar.sd))
+}
