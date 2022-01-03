@@ -19,8 +19,8 @@ optIF <- function(model = "norm", radius = NULL, check = FALSE, ...){
   stopifnot(length(check) == 1)
   stopifnot(is.logical(check))
 
+  listDots <- list(...)
   if(model == "norm"){ # normal distribution
-    listDots <- list(...)
     mean <- ifelse("mean" %in% names(listDots), listDots$mean, 0)
     sd <- ifelse("sd" %in% names(listDots), listDots$sd, 1)
     A.loc.start <- ifelse("A.loc.start" %in% names(listDots), 
@@ -38,7 +38,6 @@ optIF <- function(model = "norm", radius = NULL, check = FALSE, ...){
                      delta = delta, itmax = itmax, check = check)
   }
   if(model == "binom"){# binomial distribution
-    listDots <- list(...)
     size <- ifelse("size" %in% names(listDots), listDots$size, 1)
     prob <- ifelse("prob" %in% names(listDots), listDots$prob, 0.5) 
     aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 100*size)
