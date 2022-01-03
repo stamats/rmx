@@ -6,7 +6,11 @@
 ## Version 0.8
 ###########################################################
 - new function cvm for computing Cramer von Mises minimum distance estimates
-  as starting estimates for rmx.
+  as starting estimates for rmx (models: norm, binom and pois)
+- added binomial model; i.e., optIF and rmx estimation of binomial probability 
+  for known size.
+- restructered code (new helper functions)
+- more exported functions for better documentation
 
 
 ###########################################################
