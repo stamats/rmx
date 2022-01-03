@@ -89,22 +89,6 @@ optIF.binom <- function(radius, size = 1, prob = 0.5, aUp = 100*size, cUp = 1e4,
     rad
 }
 
-.rowLCR.binom <- function(prob, size, parallel, ncores = NULL){
-    if(parallel){
-        if(is.null(ncores)){
-            cores <- detectCores()
-            cl <- makeCluster(cores[1]-1)
-        }else{
-            cl <- makeCluster(ncores)
-        }
-        res <- parSapply(cl = cl, X = prob, FUN = .lcr.binom, size = size)
-        stopCluster(cl)
-    }else{
-        res <- sapply(prob, .lcr.binom, size = size)
-    }
-    res
-}
-
 ##################################################################
 ## centering
 ##################################################################
