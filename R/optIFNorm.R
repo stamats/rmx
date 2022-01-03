@@ -26,10 +26,12 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, A.sc.start = 0
     
     if(radius == 0){
         IF <- .getMLIF.norm(mean = mean, sd = sd)
+        IF$radius <- 0
         return(IF)
     }
     if(radius == Inf){
         IF <- .getMBIF.norm(mean = mean, sd = sd)
+        IF$radius <- Inf
         return(IF)
     }
     r <- radius
@@ -72,6 +74,7 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, A.sc.start = 0
     }
 
     IF <- .getOptIF.norm(mean = mean, sd = sd, b = b, a1 = a1, a2 = a2, a3 = a3)
+    IF$radius <- radius
     IF
 }
 
