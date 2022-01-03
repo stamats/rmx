@@ -218,8 +218,9 @@ r.finit2[12,2] <- 1.67
 
 r.finit2 <- round(r.finit2, 4)
 
-#load("sysdata.rda")
-#.fsRadius.norm <- r.finit2
-#save(.fsRadius.norm, .radius.gitter.norm, .A1.norm, .A2.norm, 
-#     .a.norm, .b.norm, file = "sysdata.rda")
+load("sysdata.rda")
+.fsRadius.norm <- r.finit2
+save(.fsRadius.norm, .radius.gitter.norm, .A1.norm, .A2.norm, 
+     .a.norm, .b.norm, .asVar.mean.norm, .asVar.sd.norm, 
+     file = "sysdata.rda")
 ```

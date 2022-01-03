@@ -11,7 +11,6 @@ fun <- function(radius){
   optIF.norm(radius, delta = 1e-9)
 }
 locationScale <- sapply(radius, fun)
-#locationScale <- sapply(radius, rlsOptIC.AL, computeIC = FALSE)
 
 ## location and scale
 n <- length(radius)
@@ -21,19 +20,23 @@ n <- length(radius)
 .a.norm <- unlist(locationScale[5,])[seq(2, 2*n, by = 2)]
 .b.norm <- unlist(locationScale[6,])
 .radius.gitter.norm <- radius
+.asVar.mean.norm <- sapply(locationScale[10,], function(x) x[1,1])
+.asVar.sd.norm <- sapply(locationScale[10,], function(x) x[2,2])
 
 
 plot(radius, .A1.norm, type = "l")
 plot(radius, .A2.norm, type = "l")
 plot(radius, .a.norm, type = "l")
 plot(radius, .b.norm, type = "l")
+plot(radius, .asVar.mean.norm, type = "l")
+plot(radius, .asVar.sd.norm, type = "l")
 
 radius[radius > 1.62 & radius < 1.8]
 print(.b.norm[radius > 1.62 & radius < 1.8], digits = 10)
 
 ## Saving the results in sysdata.rda
 #load("sysdata.rda")
-save(.radius.gitter.norm, .A1.norm, .A2.norm, .a.norm, .b.norm,
-     file = "sysdata.rda")
+save(.radius.gitter.norm, .A1.norm, .A2.norm, .a.norm, .b.norm, 
+     .asVar.mean.norm, .asVar.sd.norm, file = "sysdata.rda")
 
 ## and proceed with FiniteSampleCorrectionFactorNorm.R
