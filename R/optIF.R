@@ -1,13 +1,9 @@
-optIF <- function(model = "norm", radius = NULL, check = FALSE, 
-                  delta = 1e-6, itmax = 100L, ...){
+optIF <- function(model = "norm", radius = NULL, check = FALSE, ...){
   es.call <- match.call()
   
   stopifnot(is.character(model))
   stopifnot(length(model) == 1)
-  if(!is.na(pmatch(model, "norm")))  model <- "norm"
-  MODELS <- c("norm", "binom", "pois", "gamma", "weibull")
-  model <- pmatch(model, MODELS)
-  
+
   if(is.null(radius))
     stop("Please specify 'radius'")
   if(length(radius) != 1)
@@ -22,28 +18,39 @@ optIF <- function(model = "norm", radius = NULL, check = FALSE,
   
   stopifnot(length(check) == 1)
   stopifnot(is.logical(check))
-  
-  stopifnot(length(delta) == 1)
-  stopifnot(is.numeric(delta))
-  if(delta <= 0)
-    stop("'delta' must be positive")
-  if(delta > 0.1)
-    warning("'delta' is expected to be small or very small.")
-  
-  stopifnot(is.numeric(itmax))
-  if(!is.integer(itmax))  itmax <- as.integer(itmax)
-  if(itmax < 1){
-    stop("'itmax' has to be some positive integer value")
+
+  if(model == "norm"){ # normal distribution
+    listDots <- list(...)
+    mean <- ifelse("mean" %in% names(listDots), listDots$mean, 0)
+    sd <- ifelse("sd" %in% names(listDots), listDots$sd, 1)
+    A.loc.start <- ifelse("A.loc.start" %in% names(listDots), 
+                          listDots$A.loc.start, 1)
+    A.sc.start <- ifelse("A.sc.start" %in% names(listDots), 
+                          listDots$A.sc.start, 0.5)
+    a.sc.start <- ifelse("a.sc.start" %in% names(listDots), 
+                         listDots$a.sc.start, 0)
+    bUp <- ifelse("bUp" %in% names(listDots), listDots$bUp, 1000)
+    delta <- ifelse("delta" %in% names(listDots), listDots$delta, 1e-6)
+    itmax <- ifelse("itmax" %in% names(listDots), listDots$itmax, 100L)
+    check <- ifelse("check" %in% names(listDots), listDots$itmax, FALSE)
+    IF <- optIF.norm(radius = radius, mean = mean, sd = sd, A.loc.start = A.loc.start, 
+                     A.sc.start = A.sc.start, a.sc.start = a.sc.start, bUp = bUp, 
+                     delta = delta, itmax = itmax, check = check)
   }
-  
-  if(model == 1){ # normal distribution
-    IF <- optIF.norm(radius, check = check, delta = delta, itmax = itmax, ...)
+  if(model == "binom"){# binomial distribution
+    listDots <- list(...)
+    size <- ifelse("size" %in% names(listDots), listDots$size, 1)
+    prob <- ifelse("prob" %in% names(listDots), listDots$prob, 0.5) 
+    aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 100*size)
+    cUp <- ifelse("cUp" %in% names(listDots), listDots$cUp, 1e4)
+    delta <- ifelse("delta" %in% names(listDots), listDots$delta, 1e-9)
+    IF <- optIF.binom(radius = radius, size = size, prob = prob, 
+                      aUp = aUp, cUp = cUp, delta = delta, check = check)
   }
-  if(model != 1){
+  if(!model %in% c("norm", "binom")){
     stop("Given 'model' not yet implemented")
   }
   
-  IF$radius <- radius
   IF$call <- es.call
   IF
 }
@@ -77,6 +84,10 @@ print.optIF <- function(x, digits = getOption("digits"), prefix = " ", ...){
   cat("\n")
   cat(format("Standardising matrix:", width = 20L, justify = "right"), "\n")
   print(x$A, digits = digits, ...)
+  if("lowerCase" %in% names(x)){
+    cat(format("Lower case beta:", width = 20L, justify = "right"), "\n")
+    print(x$lowerCase, digits = digits, ...)
+  }
   cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"), 
       "\n\n", sep = "")
 }
@@ -112,14 +123,14 @@ summary.optIF <- function(object, digits = getOption("digits"), prefix = " ", ..
       "\n\n", sep = "")
 }
 
-plot.optIF <- function(x, alpha = 1e-6, digits = 2, ...){
-  y <- x$range(alpha, ...)
-  IF <- x$IFun(y)
-  IFmin <- min(IF)
-  IFmax <- max(IF)
-  IFnames <- colnames(IF)
-  DF <- data.frame(y, IF)
+plot.optIF <- function(x, alpha = 1e-6, digits = 2, plot = TRUE, ...){
   if(x$model %in% c("norm", "gamma")){
+    y <- x$range(alpha, ...)
+    IF <- x$IFun(y)
+    IFmin <- min(IF)
+    IFmax <- max(IF)
+    IFnames <- colnames(IF)
+    DF <- data.frame(y, IF)
     if(ncol(DF) > 2){
       gg <- vector(mode = "list", length = ncol(DF)-1)
       Param <- paste(paste(names(x$parameter), signif(x$parameter, digits), 
@@ -129,15 +140,31 @@ plot.optIF <- function(x, alpha = 1e-6, digits = 2, ...){
           geom_line() + xlab("x") + ylab("IF(x)") + ylim(c(IFmin, IFmax)) +
           ggtitle(paste0(IFnames[i], " (", Param, ")"))
       }
-      grid.draw(arrangeGrob(grobs = gg, ncol = ncol(DF)-1, nrow = 1))
+      if(plot){
+        grid.newpage()
+        grid.draw(arrangeGrob(grobs = gg, ncol = ncol(DF)-1, nrow = 1))
+      }
     }else{
       Param <- paste(names(x$parameter), signif(x$parameter, digits), 
                      sep = " = ")
       gg <- ggplot(DF, aes_string(x = "y", y = names(DF)[2])) +
         geom_line() + xlab("x") + ylab("IF(x)") + ylim(c(IFmin, IFmax)) +
-        ggtitle(paste0(names(DF)[2], " (", Param, ")"))
-      print(gg)
+        ggtitle(paste0(IFnames, " (", Param, ")"))
     }
+  }
+  if(x$model == "binom"){
+    y <- x$range(alpha = 0, ...)
+    IF <- x$IFun(y)
+    IFmin <- min(IF)
+    IFmax <- max(IF)
+    IFnames <- colnames(IF)
+    DF <- data.frame(y, IF)
+    Param <- paste(names(x$parameter), signif(x$parameter, digits), 
+                   sep = " = ")
+    gg <- ggplot(DF, aes_string(x = "y", y = names(DF)[2])) +
+      geom_point() + geom_line() + xlab("x") + ylab("IF(x)") + 
+      ylim(c(IFmin, IFmax)) + ggtitle(paste0(IFnames, " (", Param, ")"))
+    if(plot) print(gg)
   }
   invisible(gg)
 }
