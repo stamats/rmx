@@ -1,20 +1,44 @@
 \name{cniper}
 \alias{cniper}
 \alias{cniper.rmx}
+\alias{print.cniper}
+\alias{plot.cniper}
 \title{Cniper Region}
 \description{
   The function \code{cniper} computes cniper regions by comparing the 
-  risk of two estimators under contaminations by Dirac point measures.
+  maximum asymptotic MSE of ML and RMX estimators under contaminations by 
+  Dirac point measures.
 }
 \usage{
 cniper(x, \dots)
 
-\method{cniper}{rmx}(x, range.alpha = 1e-6, \dots)
+\method{cniper}{rmx}(x, range.alpha = 1e-6)
+
+\method{print}{cniper}(x, digits = 3)
+
+\method{plot}{cniper}(x, add.data = TRUE, color.data = "#0072B5",
+                      alpha.data = 0.4, range.alpha = 1e-6, range.n = 501, 
+                      color.vline = "#E18727", 
+                      ggplot.ggtitle = "Cniper Contamination", 
+                      ggplot.xlab = "contamination point", 
+                      ggplot.ylab = "asMSE(ML) - asMSE(RMX)")
 }
 \arguments{
   \item{x}{ object of S3 class \code{rmx}. }
   \item{range.alpha}{ alpha-quantile used to determine the search region for
                       cniper points. }
+  \item{digits}{ minimal number of significant digits. }
+  \item{add.data}{ logical: add data points to the plot. }
+  \item{color.data}{ character: color used for plotting the data points. }
+  \item{alpha.data}{ numeric: amount of alpha shading used for plotting the 
+  data points. }
+  \item{range.n}{ numeric: number of points used for plotting the curve 
+  of the MSE differences. }
+  \item{color.vline}{ character: color used for plotting the boundaries
+  of the cniper region. }
+  \item{ggplot.ggtitle}{ character: title of the plot. }
+  \item{ggplot.xlab}{ character: label of x-axis. }
+  \item{ggplot.ylab}{ character: label of y-axis. }
   \item{\dots}{ further arguments passed through. }
 }
 \details{
