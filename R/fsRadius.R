@@ -27,9 +27,9 @@ fsRadius <- function(r, n, model = "norm", ...){
         ifelse("M" %in% names(listDots), listDots$M, 1e4)
         ifelse("parallel" %in% names(listDots), listDots$parallel, FALSE)
         if("ncores" %in% names(listDots)){
-            parallel <- listDots$parallel
+            ncores <- listDots$ncores
         }else{
-            parallel <- NULL
+            ncores <- NULL
         }
         r <- fsRadius.binom(r = r, n = n, prob = prob, size = size, M = M,
                             parallel = parallel, ncores = ncores)

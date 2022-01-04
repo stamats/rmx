@@ -12,6 +12,7 @@ optIF.binom <- function(radius, size = 1, prob = 0.5, aUp = 100*size, cUp = 1e4,
     if(radius >= lcr){ # IF of minimum bias estimator
         IF <- .getMBIF.binom(size = size, prob = prob)
         IF$radius <- radius
+        
         return(IF)
     }
     
@@ -216,6 +217,7 @@ optIF.binom <- function(radius, size = 1, prob = 0.5, aUp = 100*size, cUp = 1e4,
     
     inte <- m0*(2*p1 - 1) + size*prob*(1-2*p2)
     b <- prob*(1-prob)/inte
+    names(b) <- NULL
     
     p3 <- pbinom(m0-1, size = size, prob = prob)
     p4 <- pbinom(m0, size = size, prob = prob, lower.tail = FALSE)
@@ -224,6 +226,7 @@ optIF.binom <- function(radius, size = 1, prob = 0.5, aUp = 100*size, cUp = 1e4,
     
     A <- 1
     a <- -size*prob/(prob*(1-prob))
+    names(a) <- NULL
     mse <- Inf
     bias <- Inf
     asVar <- b^2
