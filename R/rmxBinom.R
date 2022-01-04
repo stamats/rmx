@@ -209,6 +209,9 @@ rmx.binom <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
         IF <- .getMBIF.binom(size = IF$parameter["size (known)"],
                              prob = prob)
         IF$radius <- r
+        if(r != Inf){
+            IF$asMSE <- IF$asVar + r^2*IF$b^2
+        }
         return(IF)
     }
     

@@ -19,7 +19,7 @@ rmx <- function(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L
   if(is.null(eps) && is.null(eps.upper)){
     res0 <- rmx(x = x, model = model, eps.upper = 0.5, k = k, 
                 initial.est = initial.est, fsCor = fsCor, na.rm = na.rm,
-                message = message)
+                message = message, ...)
     eps.lower <- 0
     eps.upper <- outlier(res0)$prop.outlier
     if(eps.upper == 0){
@@ -50,8 +50,10 @@ rmx <- function(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L
     stop("'k' has to be some positive integer value")
   }
   stopifnot(length(k) == 1)
-  stopifnot(length(fsCor) == 1)
-  stopifnot(is.logical(fsCor))
+  if(!is.null(fsCor)){
+    stopifnot(length(fsCor) == 1)
+    stopifnot(is.logical(fsCor))
+  }
   stopifnot(length(na.rm) == 1)
   stopifnot(is.logical(na.rm))
   
