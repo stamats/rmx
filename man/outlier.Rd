@@ -1,6 +1,7 @@
 \name{outlier}
 \alias{outlier}
 \alias{outlier.rmx}
+\alias{print.outlier}
 \title{Outlier Region}
 \description{
   The function \code{outlier} computes outlier regions.
@@ -8,11 +9,14 @@
 \usage{
 outlier(x, \dots)
 
-\method{outlier}{rmx}(x, prob = 0.001, \dots)
+\method{outlier}{rmx}(x, prob = 0.001)
+
+\method{print}{outlier}(x, digits = 3)
 }
 \arguments{
   \item{x}{ object of S3 class \code{rmx}. }
   \item{prob}{ probability used to define outliers.}
+  \item{digits}{ minimal number of significant digits. }
   \item{\dots}{ further arguments passed through. }
 }
 \details{
