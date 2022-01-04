@@ -92,7 +92,7 @@ fsRadius.binom <- function(r, n, prob, size, M = 10000, parallel = FALSE,
         }else{
             cl <- makeCluster(ncores)
         }
-        clusterExport(cl, list("rmx.binom", "cvm", ".cvmdist", 
+        clusterExport(cl, list("rmx.binom", "cvm.binom", ".cvmdist", 
                                ".lcr.binom", ".getMBIF.binom", 
                                ".getLM.binom", ".getc.binom", 
                                ".geta.binom", ".getOptIF.binom",

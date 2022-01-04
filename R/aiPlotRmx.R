@@ -12,10 +12,17 @@ aiPlot.rmx <- function(x, range.alpha = 1e-6, range.n = 501,
   stopifnot(length(ggplot.xlab) == 1)
   stopifnot(length(ggplot.ylab) == 1)
   
-  rg <- x$rmxIF$range(alpha = range.alpha, n = 2)
-  y <- c(seq(from = min(rg[1], x$x), to = max(rg[2], x$x), 
-             length.out = range.n), x$x)
-  y <- sort(unique(y))
+  if(x$rmxIF$model %in% c("norm", "gamma")){
+    rg <- x$rmxIF$range(alpha = range.alpha, n = 2)
+    y <- c(seq(from = min(rg[1], x$x), to = max(rg[2], x$x), length.out = range.n), 
+           x$x)
+    y <- sort(unique(y))
+  }
+  
+  if(x$rmxIF$model %in% c("binom", "pois")){
+    y <- x$rmxIF$range(alpha = 0)
+  }
+  
   IF <- x$rmxIF$IFun(y)
   IFx <- x$rmxIF$IFun(x$x)
   if(ncol(IFx) == 1){
@@ -27,9 +34,11 @@ aiPlot.rmx <- function(x, range.alpha = 1e-6, range.n = 501,
   }
   IFmin <- min(info)
   IFmax <- max(info)
-  DF <- data.frame(y, info = info)
-  DFx <- data.frame(x = x$x, info = info.x)
-  if(length(x$rmxIF$parameter > 1)){
+  DF <- data.frame(y, info)
+  names(DF) <- c("y", "info")
+  DFx <- data.frame(x$x, info.x)
+  names(DFx) <- c("x", "info")
+  if(length(x$rmxEst) > 1){
     Param <- paste(paste(names(x$rmxIF$parameter), 
                          signif(x$rmxIF$parameter, param.digits), 
                          sep = " = "), collapse = ", ")

@@ -10,8 +10,11 @@ ppPlot.rmx <- function(x, param.digits = 3,
   stopifnot(length(ggplot.ylab) == 1)
   
   Dname <- x$rmxIF$model
-  param <- sapply(as.list(x$rmxIF$parameter), signif, digits = param.digits)
-  
+  if(Dname %in% c("binom", "pois"))
+    stop("'ppPlot' is only implemented for continous models.")
+    
+  param <- sapply(as.list(x$rmxIF$parameter), signif, digits = param.digits) 
+
   if(is.null(ggplot.ggtitle)){
     Param <- paste(paste(names(param), param, sep = " = "), collapse = ", ")
     ggt <- ggtitle(paste0("pp-Plot for ", Dname, "(", Param, ")"))

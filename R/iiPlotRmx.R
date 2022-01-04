@@ -9,7 +9,14 @@ iiPlot.rmx <- function(x, param.digits = 2, ggplot.ylim = NULL,
   stopifnot(length(ggplot.xlab) == 1)
   stopifnot(length(ggplot.ylab) == 1)
   
-  ML <- rmx(x$x, model = x$rmxIF$model, eps = 0, message = FALSE)
+  if(x$rmxIF$model == "norm"){
+    ML <- rmx(x$x, model = x$rmxIF$model, eps = 0, message = FALSE)
+  }
+  if(x$rmxIF$model == "binom"){
+    ML <- rmx(x$x, model = x$rmxIF$model, eps = 0, message = FALSE,
+              size = x$rmxIF$parameter["size (known)"])
+  }
+  
   IFx.ML <- ML$rmxIF$IFun(x$x)
   IFx <- x$rmxIF$IFun(x$x)
   if(ncol(IFx) == 1){
@@ -20,7 +27,8 @@ iiPlot.rmx <- function(x, param.digits = 2, ggplot.ylim = NULL,
     info.ML <- rowSums(IFx.ML^2)
   }
   DF <- data.frame(info.RMX = info, info.ML = info.ML)
-  if(length(x$rmxIF$parameter > 1)){
+  names(DF) <- c("info.RMX", "info.ML")
+  if(length(x$rmxEst) > 1){
     Param <- paste(paste(names(x$rmxIF$parameter), 
                          signif(x$rmxIF$parameter, param.digits), 
                          sep = " = "), collapse = ", ")
@@ -44,4 +52,3 @@ iiPlot.rmx <- function(x, param.digits = 2, ggplot.ylim = NULL,
   if(!is.null(ggplot.ylim)) gg <- gg + ylim(ggplot.ylim)
   gg
 }
-

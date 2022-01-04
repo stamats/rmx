@@ -52,8 +52,8 @@ cniper.rmx <- function(x, range.alpha = 1e-6){
   supp <- seq(from = 0, to = size, by = 1)
   Diff <- abs(supp/size - prob) - Delta
   if(all(Diff < 0)){
-    pt.lo <- -1
-    pt.up <- size + 1
+    pt.lo <- -0.5
+    pt.up <- size + 0.5
     names(pt.up) <- NULL
     prop.lo <- 0
     prop.up <- 0
@@ -65,13 +65,13 @@ cniper.rmx <- function(x, range.alpha = 1e-6){
       ind.up <- min(which(Diff[supp >= M] > 0))
       pt.up <- supp[supp >= M][ind.up]
     }else{
-      pt.up <- size + 1
+      pt.up <- size + 0.5
     }
     if(any(Diff[supp < M] > 0)){
       ind.lo <- max(which(Diff[supp < M] > 0))
       pt.lo <- supp[supp < M][ind.lo]
     }else{
-      pt.lo <- -1
+      pt.lo <- -0.5
     }
   }
   

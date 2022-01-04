@@ -8,8 +8,10 @@ qqPlot.rmx <- function(x, param.digits = 3, ggplot.xlab = "Theoretical Quantiles
   stopifnot(length(ggplot.ylab) == 1)
   
   Dname <- x$rmxIF$model
+  if(Dname %in% c("binom", "pois"))
+    stop("'qqPlot' is only implemented for continous models.")
   param <- sapply(as.list(x$rmxIF$parameter), signif, digits = param.digits)
-  
+
   if(is.null(ggplot.ggtitle)){
     Param <- paste(paste(names(param), param, sep = " = "), collapse = ", ")
     ggt <- ggtitle(paste0("qq-Plot for ", Dname, "(", Param, ")"))

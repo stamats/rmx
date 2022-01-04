@@ -18,7 +18,7 @@ rmx <- function(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L
   
   if(is.null(eps) && is.null(eps.upper)){
     res0 <- rmx(x = x, model = model, eps.upper = 0.5, k = k, 
-                initial.est = initial.est, fsCor = fsCor, na.rm = na.rm,
+                initial.est = initial.est, fsCor = NULL, na.rm = na.rm,
                 message = message, ...)
     eps.lower <- 0
     eps.upper <- outlier(res0)$prop.outlier
@@ -69,8 +69,8 @@ rmx <- function(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L
       stop("Parameter 'size' is assumed to be known and must be given.")
     size <- listDots$size
     
-    ifelse("M" %in% names(listDots), listDots$M, 10000)
-    ifelse("parallel" %in% names(listDots), listDots$parallel, FALSE)
+    M <- ifelse("M" %in% names(listDots), listDots$M, 10000)
+    parallel <- ifelse("parallel" %in% names(listDots), listDots$parallel, FALSE)
     if("ncores" %in% names(listDots)){
       ncores <- listDots$ncores
     }else{

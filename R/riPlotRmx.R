@@ -8,14 +8,17 @@ riPlot.rmx <- function(x, range.alpha = 1e-6, range.n = 501,
                        point.col = "#0072B5", point.alpha = 0.4, 
                        point.length.out = 5, point.range = c(1,7), 
                        plot = TRUE, ...){
-  if(length(x$rmxIF$parameter) == 1)
-    stop("Relative Information is only usefull for models with at least two parameters.")
-  
+  if(length(x$rmxEst) == 1)
+    stop(paste0("Relative Information is only useful for models, ", 
+                "where at least two parameters have to be estimated."))
+
   stopifnot(length(range.alpha) == 1)
   stopifnot(is.numeric(range.alpha))
   stopifnot(range.alpha > 0 & range.alpha < 0.5)
 
-  rg <- x$rmxIF$range(alpha = range.alpha, n = 2)
+  if(x$rmxIF$model %in% c("norm", "gamma")){
+    rg <- x$rmxIF$range(alpha = range.alpha, n = 2) 
+  }
   y <- c(seq(from = min(rg[1], x$x), to = max(rg[2], x$x), 
              length.out = range.n), x$x)
   y <- sort(unique(y))
@@ -74,8 +77,10 @@ riPlot.rmx <- function(x, range.alpha = 1e-6, range.n = 501,
                                 length.out = point.length.out), range = point.range) +
         ggt
     }
-    grid.newpage()
-    if(plot) grid.draw(arrangeGrob(grobs = gg, ncol = ncol(DF)-1, nrow = 1))
+    if(plot){
+      grid.newpage()
+      grid.draw(arrangeGrob(grobs = gg, ncol = ncol(DF)-1, nrow = 1)) 
+    }
   }
   invisible(gg)
 }

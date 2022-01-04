@@ -13,8 +13,21 @@ outlier.rmx <- function(x, prob = 0.001){
     p.lower <- p.upper <- prob
   }
   if(x$rmxIF$model %in% c("binom", "pois")){
-    pt.out <- x$rmxIF$range(alpha = prob)
-    pt.out <- pt.out[c(1, length(pt.out))]
+    size <- x$rmxIF$parameter["size (known)"]
+    supp <- seq(from = 0, to = size, by = 1)
+    d.supp <- dbinom(supp, size = size, prob = x$rmxEst)
+    p.supp <- cumsum(d.supp)
+    p.supp.rev <- cumsum(rev(d.supp))
+    pt.out <- numeric(2)
+    if(any(p.supp < prob))
+      pt.out[1] <- supp[max(which(p.supp < prob))]
+    else
+      pt.out[1] <- -1
+    if(any(p.supp.rev < prob))
+      pt.out[2] <- size - supp[max(which(p.supp.rev < prob))]
+    else
+      pt.out[2] <- size + 1
+    names(pt.out) <- NULL
     prop.lo <- sum(x$x <= pt.out[1])/x$n
     prop.up <- sum(x$x >= pt.out[2])/x$n
     p.lower <- pbinom(pt.out[1], size = x$rmxIF$parameter["size (known)"],
