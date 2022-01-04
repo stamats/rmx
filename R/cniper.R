@@ -88,7 +88,7 @@ cniper.rmx <- function(x, range.alpha = 1e-6){
 }
 getCnipers <- function(x, ...){
   if(!inherits(x, "cniper")) x <- cniper(x, ...)
-  out <- c(which(x$rmx$x < x$lower), which(x$rmx$x > x$upper))
+  out <- c(which(x$rmx$x <= x$lower), which(x$rmx$x >= x$upper))
   val <- x$rmx$x[out]
   ind <- order(val)
   list(values = val[ind], indices = out[ind])
