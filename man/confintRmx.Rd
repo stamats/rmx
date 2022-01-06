@@ -5,8 +5,7 @@
   The function \code{confint} computes confindence interval for rmx estimates.
 }
 \usage{
-\method{confint}{rmx}(object, parm, level = 0.95, method = "as", R = 9999, 
-        parallel = FALSE, ncores = NULL, ...)
+\method{confint}{rmx}(object, parm, level = 0.95, method = "as", R = 9999, ...)
 }
 \arguments{
   \item{object}{ object of S3 class \code{rmx}. }
@@ -16,11 +15,7 @@
   \item{level}{ see \code{\link[stats]{confint}}, the confidence level required. }
   \item{method}{ see details.}
   \item{R}{ number of bootstrap replicates.}
-  \item{parallel}{ logical, whether to use parallel computations; 
-                   see \code{\link{rowRmx}}. }
-  \item{ncores}{ number of cores to be used for parallel computations; 
-                 see \code{\link{rowRmx}}.}
-  \item{\dots}{ further arguments passed through. }
+  \item{\dots}{ further arguments passed through especially to \code{rowRmx}. }
 }
 \details{
   The function is inspired by the respective function of the RobASt-family of 
@@ -62,6 +57,6 @@ x <- rnorm(100, mean=ind*3, sd=(1-ind) + ind*9)
 res <- rmx(x, eps.lower = 0.01, eps.upper = 0.1)
 confint(res)
 confint(res, method = "as.bias")
-confint(res, method = "boot", R = 999)
+#confint(res, method = "boot", R = 999)
 }
 \keyword{robust}

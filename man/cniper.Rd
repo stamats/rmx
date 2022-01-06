@@ -12,16 +12,16 @@
 \usage{
 cniper(x, \dots)
 
-\method{cniper}{rmx}(x, range.alpha = 1e-6)
+\method{cniper}{rmx}(x, range.alpha = 1e-6, \dots)
 
-\method{print}{cniper}(x, digits = 3)
+\method{print}{cniper}(x, digits = 3, \dots)
 
 \method{plot}{cniper}(x, add.data = TRUE, color.data = "#0072B5",
                       alpha.data = 0.4, range.alpha = 1e-6, range.n = 501, 
                       color.vline = "#E18727", 
                       ggplot.ggtitle = "Cniper Contamination", 
                       ggplot.xlab = "contamination point", 
-                      ggplot.ylab = "asMSE(ML) - asMSE(RMX)")
+                      ggplot.ylab = "asMSE(ML) - asMSE(RMX)", \dots)
 }
 \arguments{
   \item{x}{ object of S3 class \code{rmx}. }

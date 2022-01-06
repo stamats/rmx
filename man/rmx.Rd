@@ -2,6 +2,11 @@
 \alias{rmx}
 \alias{rmx.norm}
 \alias{rmx.binom}
+\alias{print.rmx}
+\alias{summary.rmx}
+\alias{coef.rmx}
+\alias{vcov.rmx}
+\alias{plot.rmx}
 \title{Optimally Robust RMX Estimator}
 \description{
   The function \code{rmx} computes optimally robust rmx estimators. 
@@ -11,18 +16,34 @@
 }
 \usage{
 rmx(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
-    initial.est=NULL, fsCor = TRUE, na.rm = TRUE, message = TRUE, \dots)
+    initial.est=NULL, fsCor = NULL, na.rm = TRUE, message = TRUE, \dots)
     
 rmx.norm(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
          initial.est=NULL, fsCor = TRUE, na.rm = TRUE, mad0 = 1e-4)
 
 rmx.binom(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
-          initial.est=NULL, fsCor = TRUE, na.rm = TRUE, 
+          initial.est=NULL, fsCor = FALSE, na.rm = TRUE, 
           size, M = 10000, parallel = FALSE, ncores = NULL, 
           aUp = 100*size, cUp = 1e4, delta = 1e-9)
+          
+\method{print}{rmx}(x, digits = getOption("digits"), \dots)
+
+\method{summary}{rmx}(object, digits = getOption("digits"), \dots)
+
+\method{coef}{rmx}(object, complete = TRUE, \dots)
+
+\method{vcov}{rmx}(object, \dots)
+
+\method{plot}{rmx}(x, which = 1, 
+              control = list(ifPlot = NULL, qqPlot = NULL,
+                             ppPlot = NULL, dPlot = NULL,
+                             aiPlot = NULL, riPlot = NULL,
+                             iiPlot = NULL, plot = TRUE), \dots)
 }
 \arguments{
-  \item{x}{ numeric vector \code{x} of data values. }
+  \item{x}{ numeric vector \code{x} of data values. Object of class \code{rmx}
+  in case of \code{print} and \code{plot} method. }
+  \item{object}{ object of class \code{rmx}. }
   \item{model}{ character: short name of the model/distribution 
                 (default = \code{"norm"}); see also details. }
   \item{eps.lower}{ positive real (0 <= \code{eps.lower} <= \code{eps.upper}): 
@@ -34,7 +55,8 @@ rmx.binom(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
   \item{k}{ positive integer: k-step is used to compute the optimally robust estimator. }
   \item{initial.est}{ initial estimate for \code{mean} and \code{sd}. If missing 
         median and MAD are used. }
-  \item{fsCor}{ logical: perform finite-sample correction; see function \code{\link{fsRadius}}. }
+  \item{fsCor}{ \code{NULL} or logical: perform finite-sample correction; see 
+  function \code{\link{fsRadius}}. }
   \item{na.rm}{ logical: if \code{TRUE}, \code{NA} values are removed before the estimator is evaluated.}
   \item{message}{ logical: if \code{FALSE}, messages are suppressed.}
   \item{mad0}{ if \code{mad(x)} equal to 0, it is replaced by \code{mad0}. }
@@ -46,6 +68,12 @@ rmx.binom(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
   \item{aUp}{ numeric: upper limit for centering constant a. }
   \item{cUp}{ postive real: upper limit for clipping constant c. }
   \item{delta}{ positive real: desired accuracy (convergence tolerance). }
+  \item{digits}{ minimal number of significant digits. }
+  \item{complete}{ logical indicating if the full coefficient vector should
+  be returned; see \code{\link[stats]{coef}}. }
+  \item{which}{ numeric number from 1 to 7 indicating the plot that shall be
+  generated; see details below. }
+  \item{control}{ list of parameters passed through to the respective plot. }
   \item{\dots}{ further arguments passed through; e.g., known parameters such as 
                 \code{size} in case of the binomial model. }
 }
@@ -67,6 +95,21 @@ rmx.binom(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
   \enumerate{
     \item \code{"norm"}: normal location (mean) and scale (sd).
     \item \code{"binom"}: binomial probability (size known!).
+  }
+  
+  As plots we have implemented:
+  \enumerate{
+    \item \code{\link{ifPlot}}: plot of IF.
+    \item \code{\link{qqPlot}}: qq-plot for fitted model, only implemented
+    for continuous models.
+    \item \code{\link{ppPlot}}: pp-plot for fitted model, only implemented
+    for continuous models.
+    \item \code{\link{dPlot}}: density plot for fitted model.
+    \item \code{\link{aiPlot}}: plot of absolute information.
+    \item \code{\link{riPlot}}: plot of relative information, only implemented
+    for models where at least two parameters have to be estimated.
+    \item \code{\link{iiPlot}}: compare absolute information of RMX estimator
+    with absolute information of ML estimator.
   }
 }
 \value{
@@ -129,6 +172,6 @@ summary(res2)
 confint(res2) # method = "as"
 confint(res2, method = "as.bias")
 plot(res2, which = 1)
-plot(res2, which = 2)
+plot(res2, which = 4)
 }
 \keyword{robust}

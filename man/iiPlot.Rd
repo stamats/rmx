@@ -4,7 +4,7 @@
 \title{Compare Absolute Information of Estimators}
 \description{
   The function \code{iiPlot} compares the absolute information (AI) of 
-  estimators.
+  RMX estimators with AI of ML estimators.
 }
 \usage{
 iiPlot(x, \dots)

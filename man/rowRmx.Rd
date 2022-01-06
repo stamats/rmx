@@ -1,6 +1,8 @@
 \name{rowRmx and colRmx}
 \alias{rowRmx}
 \alias{colRmx}
+\alias{rowRmx.norm}
+\alias{rowRmx.binom}
 \title{Optimally robust estimation for location and/or scale}
 \description{
   The functions \code{rowRmx} and \code{colRmx} compute 
@@ -10,11 +12,20 @@
 }
 \usage{
 rowRmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L, 
-       initial.est=NULL, fsCor = TRUE, na.rm = TRUE, computeSE = FALSE,
-       parallel = FALSE, ncores = NULL, message = TRUE)
+       initial.est=NULL, fsCor = NULL, na.rm = TRUE, message = TRUE, 
+       computeSE = NULL, \dots)
+
 colRmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L, 
-       initial.est=NULL, fsCor = TRUE, na.rm = TRUE, computeSE = FALSE,
-       parallel = FALSE, ncores = NULL, message = TRUE)
+       initial.est=NULL, fsCor = NULL, na.rm = TRUE, message = TRUE, 
+       computeSE = NULL, \dots)
+
+rowRmx.norm(x, eps.lower=0, eps.upper, eps = NULL, initial.est = NULL, k = 3L, 
+            fsCor = TRUE, na.rm = TRUE, computeSE = TRUE)
+            
+rowRmx.binom(x, eps.lower=0, eps.upper, eps = NULL, initial.est = NULL, k = 3L, 
+             fsCor = FALSE, na.rm = TRUE, size, computeSE = FALSE, 
+             parallel = FALSE, ncores = NULL, aUp = 100*size, 
+             cUp = 1e4, delta = 1e-9)
 }
 \arguments{
   \item{x}{ matrix or data.frame of (numeric) data values. }
@@ -31,10 +42,17 @@ colRmx(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, k = 3L,
         median and MAD are used. }
   \item{fsCor}{ logical: perform finite-sample correction; see function \code{\link{fsRadius}}. }
   \item{na.rm}{logical: if \code{TRUE}, \code{NA} values are removed before the estimator is evaluated.}
+  \item{message}{logical: if \code{FALSE}, messages are suppressed.}
+  \item{size}{ size parameter (known!); see \code{\link[stats]{dbinom}}. }
   \item{computeSE}{ logical: compute asymptotic standard errors. }
   \item{parallel}{ if \code{computeSE = TRUE}: logical: use package parallel for the computation. }
-  \item{ncores}{ if \code{parallel = TRUE}: number of cores used for the computation. }
-  \item{message}{logical: if \code{FALSE}, messages are suppressed.}
+  \item{ncores}{ if \code{parallel = TRUE}: number of cores used for the computation.
+                 If missing, the maximum number of cores - 1 is used. }
+  \item{aUp}{ numeric: upper limit for centering constant a. }
+  \item{cUp}{ postive real: upper limit for clipping constant c. }
+  \item{delta}{ positive real: desired accuracy (convergence tolerance). }
+  \item{\dots}{ further arguments passed through; e.g., known parameters such as 
+                \code{size} in case of the binomial model. }
 }
 \details{
   These functions are optimized for the situation where one has a matrix 

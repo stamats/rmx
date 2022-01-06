@@ -9,9 +9,9 @@
 \usage{
 outlier(x, \dots)
 
-\method{outlier}{rmx}(x, prob = 0.001)
+\method{outlier}{rmx}(x, prob = 0.001, \dots)
 
-\method{print}{outlier}(x, digits = 3)
+\method{print}{outlier}(x, digits = 3, \dots)
 }
 \arguments{
   \item{x}{ object of S3 class \code{rmx}. }

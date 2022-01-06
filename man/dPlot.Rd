@@ -9,7 +9,7 @@
 dPlot(x, \dots)
 
 \method{dPlot}{rmx}(x, param.digits = 3, ggplot.xlab = "x", 
-        ggplot.ylab = "Density", ggplot.ggtitle = NULL, 
+        ggplot.ylab = NULL, ggplot.ggtitle = NULL, 
         density.col = "#0072B5", density.lwd = 1, 
         density.n = 501, \dots)
 }

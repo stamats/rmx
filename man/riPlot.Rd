@@ -4,7 +4,8 @@
 \title{Plot Relative Information of Estimators}
 \description{
   The function \code{riPlot} plots the relative information (RI) of estimators.
-  It is only implemented for models with at least two parameters.
+  It is only usefull and implemented for models where at least two parameters
+  have to be estimated.
 }
 \usage{
 riPlot(x, \dots)

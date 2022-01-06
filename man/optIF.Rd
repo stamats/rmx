@@ -17,7 +17,7 @@ optIF(model = "norm", radius = NULL, check = FALSE, \dots)
 
 \method{summary}{optIF}(object, digits = getOption("digits"), prefix = " ", \dots)
 
-\method{plot}{optIF}(x, alpha = 1e-6, digits = 2, plot = TRUE, \dots)
+\method{plot}{optIF}(x, alpha = 1e-6, digits = 2, plot = TRUE, n = 501, \dots)
 }
 \arguments{
   \item{model}{ character: short name of the model/distribution (default = \code{"norm"});
@@ -30,6 +30,9 @@ optIF(model = "norm", radius = NULL, check = FALSE, \dots)
   \code{alpha}-quantile to 1-\code{alpha}-quantile of the fitted model.}
   \item{digits}{ minimal number of significant digits. }
   \item{prefix}{ string, passed to \code{\link[base]{strwrap}}. }
+  \item{plot}{ logical: generate plot, sometimes usefull to suppress plotting
+  and modify the returned \code{ggplot} object. }
+  \item{n}{ number of points to evaluate the IF in case of continuous models. }
   \item{\dots}{ further arguments passed through sucha as model parameter(s); 
   see details. }
 }
