@@ -2,9 +2,8 @@
 ## Evaluate rmx on rows of a matrix
 ###############################################################################
 rowRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, 
-                   k = 3L, initial.est=NULL, fsCor = TRUE, na.rm = TRUE, 
-                   computeSE = FALSE, parallel = FALSE, ncores = NULL,
-                   message = TRUE){
+                   k = 3L, initial.est = NULL, fsCor = NULL, na.rm = TRUE, 
+                   message = TRUE, computeSE = NULL, ...){
     es.call <- match.call()
     if(missing(x))
         stop("'x' is missing with no default")
@@ -18,10 +17,7 @@ rowRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL,
     
     stopifnot(is.character(model))
     stopifnot(length(model) == 1)
-    if(!is.na(pmatch(model, "norm")))  model <- "norm"
-    MODELS <- c("norm", "binom", "pois", "gamma")
-    model <- pmatch(model, MODELS)
-    
+
     if(is.null(eps)){
         if(length(eps.lower) != 1 || length(eps.upper) != 1)
             stop("'eps.lower' and 'eps.upper' have to be of length 1")
@@ -45,18 +41,47 @@ rowRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL,
         stop("'k' has to be some positive integer value")
     }
     stopifnot(length(k) == 1)
-    stopifnot(length(fsCor) == 1)
-    stopifnot(is.logical(fsCor))
+    if(!is.null(fsCor)){ 
+        stopifnot(length(fsCor) == 1)
+        stopifnot(is.logical(fsCor))
+    }
     stopifnot(length(na.rm) == 1)
     stopifnot(is.logical(na.rm))
     
-    if(model == 1){ # normal distribution
+    if(model == "norm"){ # normal distribution
+        if(is.null(fsCor)) fsCor <- TRUE
+        if(is.null(computeSE)) computeSE <- TRUE
         RMXest <- rowRmx.norm(x, eps.lower = eps.lower, eps.upper = eps.upper, 
-                              eps = eps, k = k, initial.est=initial.est, 
-                              fsCor = fsCor, na.rm = na.rm, computeSE = computeSE, 
-                              parallel = parallel, ncores = ncores)
+                              eps = eps, k = k, initial.est = initial.est, 
+                              fsCor = fsCor, na.rm = na.rm, computeSE = computeSE)
     }
-    if(model != 1){
+    if(model == "binom"){ # binomial distribution
+        if(is.null(fsCor)) fsCor <- FALSE
+        if(is.null(computeSE)) computeSE <- TRUE
+        
+        listDots <- list(...)
+        if(!"size" %in% names(listDots))
+            stop("Parameter 'size' is assumed to be known and must be given.")
+        size <- listDots$size
+        
+        parallel <- ifelse("parallel" %in% names(listDots), listDots$parallel, FALSE)
+        if("ncores" %in% names(listDots)){
+            ncores <- listDots$ncores
+        }else{
+            ncores <- NULL
+        }
+        
+        aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 100*size)
+        cUp <- ifelse("cUp" %in% names(listDots), listDots$cUp, 1e4)
+        delta <- ifelse("delta" %in% names(listDots), listDots$delta, 1e-9)
+        
+        RMXest <- rowRmx.binom(x, eps.lower = eps.lower, eps.upper = eps.upper, 
+                               eps = eps, k = k, initial.est=initial.est, 
+                               fsCor = fsCor, na.rm = na.rm, size = size, 
+                               computeSE = computeSE, parallel = parallel, 
+                               ncores = ncores, aUp = aUp, cUp = cUp, delta = delta)
+    }
+    if(!model %in% c("norm", "binom")){
         stop("Given 'model' not yet implemented")
     }
     completecases <- rowSums(!is.na(x))

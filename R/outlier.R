@@ -1,7 +1,7 @@
 outlier <- function(x, ...){
   UseMethod("outlier")
 }
-outlier.rmx <- function(x, prob = 0.001){
+outlier.rmx <- function(x, prob = 0.001, ...){
   stopifnot(length(prob) == 1)
   stopifnot(is.numeric(prob))
   stopifnot((prob > 0) && (prob < 0.5))
@@ -51,7 +51,7 @@ getOutliers <- function(x, ...){
   ind <- order(val)
   list(values = val[ind], indices = out[ind])
 }
-print.outlier <- function(x, digits = 3){
+print.outlier <- function(x, digits = 3, ...){
   cat("\n")
   cat("     ", strwrap(paste0("Outlier region for ", x$rmx$rmxIF$modelName), 
                        prefix = " "), "\n")

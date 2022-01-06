@@ -122,9 +122,9 @@ summary.optIF <- function(object, digits = getOption("digits"), prefix = " ", ..
       "\n\n", sep = "")
 }
 
-plot.optIF <- function(x, alpha = 1e-6, digits = 2, plot = TRUE, ...){
+plot.optIF <- function(x, alpha = 1e-6, digits = 2, plot = TRUE, n = 501, ...){
   if(x$model %in% c("norm", "gamma")){
-    y <- x$range(alpha, ...)
+    y <- x$range(alpha, n = n)
     IF <- x$IFun(y)
     IFmin <- min(IF)
     IFmax <- max(IF)
@@ -152,7 +152,7 @@ plot.optIF <- function(x, alpha = 1e-6, digits = 2, plot = TRUE, ...){
     }
   }
   if(x$model == "binom"){
-    y <- x$range(alpha = 0, ...)
+    y <- x$range(alpha = 0)
     IF <- x$IFun(y)
     IFmin <- min(IF)
     IFmax <- max(IF)

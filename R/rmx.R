@@ -189,7 +189,9 @@ coef.rmx <- function(object, complete = TRUE, ...){
   else cf[!is.na(cf)]
 }
 vcov.rmx <- function(object, ...){
-    object$rmxIF$asVar/object$n
+  Var <- as.matrix(object$rmxIF$asVar/object$n)
+  rownames(Var) <- colnames(Var) <- names(object$rmxEst)
+  Var
 }
 bias <- function(object, ...){
   UseMethod("bias")
@@ -208,8 +210,7 @@ mse.rmx <- function(object, ...){
 .format.perc <- function(probs, digits){
   paste(format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits), "%")
 }
-confint.rmx <- function(object, parm, level = 0.95, method = "as", R = 9999, 
-                        parallel = FALSE, ncores = NULL, ...){
+confint.rmx <- function(object, parm, level = 0.95, method = "as", R = 9999, ...){
   if(method == "as"){
     Method <- "Asymptotic (LAN-based) confidence interval"
     ci <- confint.default(object)
@@ -233,11 +234,18 @@ confint.rmx <- function(object, parm, level = 0.95, method = "as", R = 9999,
   if(method == "boot"){
     Method <- "Bootstrap confidence interval"
     n <- length(object$x)
-    t0 <- c(object$rmxEst, diag(object$rmxIF$asVar))
     seed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
     X <- matrix(sample(object$x, size = R*n, replace = TRUE), nrow = R)
-    boot.res <- rowRmx(X, model = object$rmxIF$model, computeSE = TRUE,
-                       parallel = parallel, ncores = ncores)
+    if(object$rmxIF$model == "binom"){
+      t0 <- c(object$rmxEst, object$rmxIF$asVar)
+      boot.res <- rowRmx(X, model = object$rmxIF$model, computeSE = TRUE, 
+                         size = object$rmxIF$parameter["size (known)"], 
+                         eps = object$rmxIF$radius/n, ...)
+    }else{
+      t0 <- c(object$rmxEst, diag(object$rmxIF$asVar))
+      boot.res <- rowRmx(X, model = object$rmxIF$model, computeSE = TRUE, 
+                         eps = object$rmxIF$radius/n, ...)
+    }
     t <- cbind(boot.res$rmxEst, n*boot.res$asSE^2)
     boot.out <- list(t0 = t0, t = t, R = R, data = object$x, seed = seed, 
                      statistic = function(x, i){}, sim = "ordinary", 
@@ -246,10 +254,13 @@ confint.rmx <- function(object, parm, level = 0.95, method = "as", R = 9999,
                      weights = rep(1/length(object$x), length(object$x)))
     class(boot.out) <- "boot"
     attr(boot.out, "boot_type") <- "boot"
-    if(object$rmxIF$model %in% c("norm", "gamma")){
+    if(object$rmxIF$model == "norm"){
       ci <- list(boot.ci(boot.out, index = c(1,3)),
                  boot.ci(boot.out, index = c(2,4)))
       names(ci) <- names(object$rmxIF$parameter)
+    }
+    if(object$rmxIF$model == "binom"){
+      ci <- boot.ci(boot.out)
     }
   }
   attr(ci, "conf.level") <- level

@@ -140,7 +140,8 @@ rowCVM <- function(x, model, mu = "model", na.rm = TRUE, parallel = FALSE,
     }else{
       cl <- makeCluster(ncores)
     }
-    clusterExport(cl, list(".cvmdist", "cvm.norm", "cvm.binom", "cvm.pois"))
+    clusterExport(cl, list(".cvmdist", "cvm.norm", "cvm.binom", "cvm.pois"), 
+                  envir = environment(fun = rowCVM))
     res <- parApply(cl = cl, X = x, MARGIN = 1, FUN = cvm, model = model, 
                      mu = mu, na.rm = na.rm, ...)
     stopCluster(cl)

@@ -1,7 +1,7 @@
 cniper <- function(x, ...){
   UseMethod("cniper")
 }
-cniper.rmx <- function(x, range.alpha = 1e-6){
+cniper.rmx <- function(x, range.alpha = 1e-6, ...){
   stopifnot(length(range.alpha) == 1)
   stopifnot(is.numeric(range.alpha))
   stopifnot((range.alpha > 0) && (range.alpha < 0.5))
@@ -93,7 +93,7 @@ getCnipers <- function(x, ...){
   ind <- order(val)
   list(values = val[ind], indices = out[ind])
 }
-print.cniper <- function(x, digits = 3){
+print.cniper <- function(x, digits = 3, ...){
   cat("\n")
   cat("     ", strwrap(paste0("Cniper region for ", x$rmx$rmxIF$modelName), 
               prefix = " "), "\n")
@@ -188,7 +188,7 @@ plot.cniper <- function(x, add.data = TRUE, color.data = "#0072B5",
                         color.vline = "#E18727", 
                         ggplot.ggtitle = "Cniper Contamination", 
                         ggplot.xlab = "contamination point", 
-                        ggplot.ylab = "asMSE(ML) - asMSE(RMX)"){
+                        ggplot.ylab = "asMSE(ML) - asMSE(RMX)", ...){
   if(x$rmx$rmxIF$model == "norm"){
     SD <- x$rmx$rmxEst["sd"]
     tr.invF <- 1.5*SD^2

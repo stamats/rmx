@@ -2,14 +2,15 @@ dPlot <- function(x, ...){
   UseMethod("dPlot")
 }
 dPlot.rmx <- function(x, param.digits = 3, ggplot.xlab = "x", 
-                      ggplot.ylab = "Density", ggplot.ggtitle = NULL, 
+                      ggplot.ylab = NULL, ggplot.ggtitle = NULL, 
                       density.col = "#0072B5", density.lwd = 1, 
                       density.n = 501, ...){
   stopifnot(length(ggplot.xlab) == 1)
-  stopifnot(length(ggplot.ylab) == 1)
+  if(!is.null(ggplot.ylab)) stopifnot(length(ggplot.ylab) == 1)
   
   Dname <- x$rmxIF$model
   param <- sapply(as.list(x$rmxIF$parameter), signif, digits = param.digits)
+  if(x$rmxIF$model == "binom") names(param)[2] <- "size"
   
   if(is.null(ggplot.ggtitle)){
     Param <- paste(paste(names(param), param, sep = " = "), collapse = ", ")
@@ -19,17 +20,31 @@ dPlot.rmx <- function(x, param.digits = 3, ggplot.xlab = "x",
     ggt <- ggtitle(ggplot.ggtitle)
   }
   if(x$rmxIF$model == "norm"){
+    if(is.null(ggplot.ylab)) ggplot.ylab <- "Density"
     ggd <- stat_function(fun = dnorm, args = param, lwd = density.lwd,
                          n = density.n)
-  }
-  if(x$rmxIF$model %in% c("norm", "gamma")){
     ggempD <- geom_density(color = density.col, lwd = density.lwd, bw = "SJ")
-      
+    DF <- data.frame(x = x$x)
+    gg <- ggplot(DF, aes(x = x)) + geom_rug() + ggd + ggempD + 
+      xlab(ggplot.xlab) + ylab(ggplot.ylab) + ggt
   }
-  
-  DF <- data.frame(x = x$x)
-  gg <- ggplot(DF, aes(x = x)) + 
-    geom_rug() + ggd + ggempD + 
-    xlab(ggplot.xlab) + ylab(ggplot.ylab) + ggt
+  if(x$rmxIF$model == "binom"){
+    if(is.null(ggplot.ylab)) ggplot.ylab <- "Relative Frequency / Probability"
+    size <- x$rmxIF$parameter["size (known)"]
+    supp <- seq(from = 0, to = size, by = 1)
+    y <- NULL
+    DFsupp <- data.frame(x = supp, 
+                         y = dbinom(supp, prob = x$rmxEst, size = size))
+    ggd <- geom_bar(data = DFsupp, aes(x = x, y = y), inherit.aes = FALSE, 
+                    stat = "identity")
+    ggempD <- geom_point(color = density.col)
+    DF <- data.frame(x = sort(unique(x$x)), 
+                     y = as.vector(table(x$x)/length(x$x)))
+    gg <- ggplot(DF, aes(x = x, y = y)) + ggd + ggempD + 
+      geom_segment(aes(x=x, xend=x, y=0, yend=y), 
+                   color = density.col, lwd = density.lwd) +
+      xlab(ggplot.xlab) + ylab(ggplot.ylab) + ggt
+  }
+
   gg
 }

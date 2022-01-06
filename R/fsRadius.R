@@ -24,8 +24,8 @@ fsRadius <- function(r, n, model = "norm", ...){
         if(!"size" %in% names(listDots))
             stop("Parameter 'size' must be specified!")
         size <- listDots$size
-        ifelse("M" %in% names(listDots), listDots$M, 1e4)
-        ifelse("parallel" %in% names(listDots), listDots$parallel, FALSE)
+        M <- ifelse("M" %in% names(listDots), listDots$M, 1e4)
+        parallel <- ifelse("parallel" %in% names(listDots), listDots$parallel, FALSE)
         if("ncores" %in% names(listDots)){
             ncores <- listDots$ncores
         }else{
@@ -97,7 +97,8 @@ fsRadius.binom <- function(r, n, prob, size, M = 10000, parallel = FALSE,
                                ".getLM.binom", ".getc.binom", 
                                ".geta.binom", ".getOptIF.binom",
                                ".kstep.binom", ".onestep.binom",
-                               ".updateIF.binom"))
+                               ".updateIF.binom"),
+                      envir = environment(fun = fsRadius.binom))
     }
     for(i in seq_along(eps)){
         ind <- rbinom(n*M, size = 1, prob = eps[i])

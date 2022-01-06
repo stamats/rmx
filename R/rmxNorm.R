@@ -33,7 +33,7 @@ rmx.norm <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
         Info.matrix <- matrix(c("rmx", "median and MAD"), ncol = 2, 
                               dimnames = list(NULL, c("method", "message")))
         
-        IF <- .getMedMADIF(AM = rmxEst[1], SD = rmxEst[2])
+        IF <- .getMedMADIF(AM = rmxEst[1], SD = rmxEst[2], r = r)
         
         RMX <- list(rmxEst = rmxEst, rmxIF = IF, initial.est = NULL, 
                     Infos = Info.matrix)
@@ -52,7 +52,7 @@ rmx.norm <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
             IF$radius <- 0
 
             RMX <- list(rmxEst = rmxEst, rmxIF = IF, initial.est = NULL, 
-                        Infos = Info.matrix)
+                        Infos = Info.matrix, n = length(x))
             class(RMX) <- "rmx"
             return(RMX)
         }
@@ -239,7 +239,7 @@ rmx.norm <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
     
     list(est = est, A1 = A1, A2 = A2, a = a, b = b)
 }
-.getMedMADIF <- function(AM, SD){
+.getMedMADIF <- function(AM, SD, r){
     b1 <- SD*sqrt(pi/2)
     A1 <- 1
     a1 <- 0

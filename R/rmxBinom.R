@@ -2,7 +2,7 @@
 ## RMX estimator for probability of success of a binomial model
 ###############################################################################
 rmx.binom <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
-                      initial.est=NULL, fsCor = TRUE, na.rm = TRUE, 
+                      initial.est=NULL, fsCor = FALSE, na.rm = TRUE, 
                       size, M = 10000, parallel = FALSE, ncores = NULL, 
                       aUp = 100*size, cUp = 1e4, delta = 1e-9){
     if(length(x) <= 2){
@@ -63,7 +63,7 @@ rmx.binom <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
                                   dimnames = list(NULL, c("method", "message")))
 
             RMX <- list(rmxEst = rmxEst, rmxIF = IF, initial.est = NULL, 
-                        Infos = Info.matrix)
+                        Infos = Info.matrix, n = length(x))
             class(RMX) <- "rmx"
             return(RMX)
         }
@@ -72,6 +72,8 @@ rmx.binom <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
         if(r >= lcr){
             IF <- .getMBIF.binom(size = size, prob = prob)
             IF$radius <- r
+            IF$asBias <- r^2*IF$b^2
+            IF$asMSE <- IF$asVar + IF$asBias
         }else{
             LM <- .getLM.binom(r0 = r, prob = prob, size = size, 
                                aUp = aUp, cUp = cUp, delta = delta)
@@ -100,6 +102,8 @@ rmx.binom <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
         if(r >= lcr){
             IF <- .getMBIF.binom(size = size, prob = prob)
             IF$radius <- r
+            IF$asBias <- r^2*IF$b^2
+            IF$asMSE <- IF$asVar + IF$asBias
         }else{
             LM <- .getLM.binom(r0 = r, prob = prob, size = size, 
                                aUp = aUp, cUp = cUp, delta = delta)
@@ -155,35 +159,39 @@ rmx.binom <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
 ## using predefined functions included in "sysdata.rda"
 ###############################################################################
 .getInterval.binom <- function(r, rlo, rup, prob, size, aUp, cUp, delta){
+    lcr <- .lcr.binom(prob = prob, size = size)
+
     LM <- .getLM.binom(r0 = r, prob = prob, size = size, aUp = aUp, 
                        cUp = cUp, delta = delta)
     A <- LM$A
     c0 <- LM$c0
     b <- A*c0
     
-    lcr <- .lcr.binom(prob = prob, size = size)
-    
-    if(rup >= lcr){
-        m0 <- qbinom(.5, size=size, prob=prob)
-        p1 <- pbinom(m0, size=size, prob=prob)
-        p2 <- pbinom(m0-1, size=size-1, prob=prob)
-        
-        inte <- m0*(2*p1 - 1) + size*prob*(1-2*p2)
-        bmin <- prob*(1-prob)/inte
-        
-        effre <- b^2/bmin^2
-    }
-    else{
-        LMre <- .getLM.binom(r0 = rup, prob = prob, size = size, aUp = 100*size, 
-                             cUp = 1e4, delta = delta)
-        effre <- (A - b^2*(r^2 - rup^2))/LMre$A
+    if(r >= lcr){
+        effre <- 1
+    }else{
+        if(rup >= lcr){
+            m0 <- qbinom(.5, size=size, prob=prob)
+            p1 <- pbinom(m0, size=size, prob=prob)
+            p2 <- pbinom(m0-1, size=size-1, prob=prob)
+            
+            inte <- m0*(2*p1 - 1) + size*prob*(1-2*p2)
+            bmin <- prob*(1-prob)/inte
+            
+            effre <- b^2/bmin^2
+        }
+        else{
+            LMre <- .getLM.binom(r0 = rup, prob = prob, size = size, aUp = aUp, 
+                                 cUp = cUp, delta = delta)
+            effre <- (A - b^2*(r^2 - rup^2))/LMre$A
+        }
     }
     
     if(identical(all.equal(rlo, 0), TRUE))
         effli <- (A - b^2*r^2)/(prob*(1-prob))*size
     else{
-        LMli <- .getLM.binom(r0 = rlo, prob = prob, size = size, aUp = 100*size, 
-                             cUp = 1e4, delta = delta)
+        LMli <- .getLM.binom(r0 = rlo, prob = prob, size = size, aUp = aUp, 
+                             cUp = cUp, delta = delta)
         effli <- (A - b^2*(r^2 - rlo^2))/LMli$A
     }
     
@@ -211,6 +219,7 @@ rmx.binom <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
         IF$radius <- r
         if(r != Inf){
             IF$asMSE <- IF$asVar + r^2*IF$b^2
+            IF$asBias <- r^2*IF$b^2
         }
         return(IF)
     }

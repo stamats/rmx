@@ -2,9 +2,8 @@
 ## Evaluate rmx on columns of a matrix
 ###############################################################################
 colRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL, 
-                   k = 3L, initial.est=NULL, fsCor = TRUE, na.rm = TRUE, 
-                   computeSE = FALSE, parallel = FALSE, ncores = NULL, 
-                   message = TRUE){
+                   k = 3L, initial.est=NULL, fsCor = NULL, na.rm = TRUE, 
+                   message = TRUE, computeSE = NULL, ...){
     es.call <- match.call()
     if(missing(x))
         stop("'x' is missing with no default")
@@ -19,8 +18,7 @@ colRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL,
     res <- rowRmx(x = t(x), model = model, 
                   eps.lower = eps.lower, eps.upper = eps.upper, eps = eps, 
                   k = k, initial.est = initial.est, fsCor = fsCor, 
-                  na.rm = na.rm, computeSE = computeSE, parallel = parallel,
-                  ncores = ncores, message = message)
+                  na.rm = na.rm, message = message, computeSE = computeSE, ...)
     res$call <- es.call
     res
 }

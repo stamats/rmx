@@ -1,14 +1,14 @@
 ###############################################################################
 ## Evaluate roblox on rows of a matrix
 ###############################################################################
-rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
-                        na.rm, computeSE, parallel, ncores){
+rowRmx.norm <- function(x, eps.lower = 0, eps.upper, eps = NULL, initial.est = NULL, 
+                        k = 3L, fsCor = TRUE, na.rm = TRUE, computeSE = TRUE){
     mad0 <- 1e-4
     if(!is.null(eps)){
         r <- sqrt(ncol(x))*eps # missing values per row are not considered!
         if(fsCor){ 
             r.as <- r
-            r <- fsRadius(r = r, n = ncol(x), model = "norm")
+            r <- fsRadius.norm(r = r, n = ncol(x))
         }
     }else{
         sqrtn <- sqrt(ncol(x))
@@ -24,7 +24,7 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
         }
         if(fsCor){
             r.as <- r
-            r <- fsRadius(r = r, n = ncol(x), model = "norm")
+            r <- fsRadius.norm(r = r, n = ncol(x))
         }
     }
     if(ncol(x) <= 2){
@@ -122,10 +122,9 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
             b <- SD*.getb.norm(r)
             mse <- A1 + A2
         }
-        rmxEst.all <- .kstep.norm.matrix(x = x, initial.est = cbind(MEAN, SD), 
+        rmxEst <- .kstep.norm.matrix(x = x, initial.est = cbind(MEAN, SD), 
                                          A1 = A1, A2 = A2, a = a, b = b, k = k,
                                          na.rm = na.rm)
-        rmxEst <- rmxEst.all$est
         colnames(rmxEst) <- c("mean", "sd")
         if(fsCor){
             Info.matrix <- matrix(c("rowRmx", 
@@ -140,43 +139,10 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
         }
 
         if(computeSE){
-            asVar <- matrix(NA, nrow = nrow(x), ncol = 2)
-            if(parallel){
-                if(is.null(ncores)){
-                    cores <- detectCores()
-                    cl <- makeCluster(cores[1]-1)
-                }else{
-                    cl <- makeCluster(ncores)
-                }
-                rmxMat <- cbind(rmxEst[,2], rmxEst.all$b, rmxEst.all$A1, 
-                                rmxEst.all$A2, rmxEst.all$a)
-                asVarFun <- function(x){
-                    SD <- x[1]
-                    b <- x[2]/SD
-                    a1 <- x[3]/SD^2
-                    a3 <- x[4]/SD^2
-                    a2 <- x[5]/SD/a3 + 1
-                    
-                    tmp <- SD^2*.getAsVar.norm(b = b, a1 = a1, a2 = a2, a3 = a3)    
-                    c(tmp[1,1], tmp[2,2])
-                }
-                asVar <- parApply(cl = cl, X = rmxMat, MARGIN = 1, FUN = asVarFun)
-                stopCluster(cl)
-                asSE <- sqrt(t(asVar)/ncol(x))
-                colnames(asSE) <- c("SE.mean", "SE.sd")
-            }else{
-                for(i in 1:nrow(x)){
-                    b <- rmxEst.all$b[i]/rmxEst[i,2]
-                    a1 <- rmxEst.all$A1[i]/rmxEst[i,2]^2
-                    a3 <- rmxEst.all$A2[i]/rmxEst[i,2]^2
-                    a2 <- rmxEst.all$a[i]/rmxEst[i,2]/a3 + 1
-                    
-                    tmp <- rmxEst[i,2]^2*.getAsVar.norm(b = b, a1 = a1, a2 = a2, a3 = a3)    
-                    asVar[i,] <- c(tmp[1,1], tmp[2,2])
-                }
-                asSE <- sqrt(asVar/ncol(x))
-                colnames(asSE) <- c("SE.mean", "SE.sd")
-            }
+            asVar <- cbind(rmxEst[,2]^2 * .getAsVar.norm.approx(r)[1,1],
+                           rmxEst[,2]^2 * .getAsVar.norm.approx(r)[2,2])
+            asSE <- sqrt(asVar/ncol(x))
+            colnames(asSE) <- c("SE.mean", "SE.sd")
         }else{
             asSE <- NA
         }
@@ -211,10 +177,9 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
                 ineff <- (A1 + A2 - b^2*(r.as^2 - rlo^2))/(A1lo + A2lo)
             }
         }
-        rmxEst.all <- .kstep.norm.matrix(x = x, initial.est = cbind(MEAN, SD), 
+        rmxEst <- .kstep.norm.matrix(x = x, initial.est = cbind(MEAN, SD), 
                                      A1 = A1, A2 = A2, a = a, b = b, k = k,
                                      na.rm = na.rm)
-        rmxEst <- rmxEst.all$est
         colnames(rmxEst) <- c("mean", "sd")
         if(fsCor){
             Info.matrix <- matrix(c(rep("rowRmx", 2), 
@@ -230,43 +195,10 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
                                   ncol = 2, dimnames = list(NULL, c("method", "message")))
         }
         if(computeSE){
-            asVar <- matrix(NA, nrow = nrow(x), ncol = 2)
-            if(parallel){
-                if(is.null(ncores)){
-                    cores <- detectCores()
-                    cl <- makeCluster(cores[1]-1)
-                }else{
-                    cl <- makeCluster(ncores)
-                }
-                rmxMat <- cbind(rmxEst[,2], rmxEst.all$b, rmxEst.all$A1, 
-                                rmxEst.all$A2, rmxEst.all$a)
-                asVarFun <- function(x){
-                    SD <- x[1]
-                    b <- x[2]/SD
-                    a1 <- x[3]/SD^2
-                    a3 <- x[4]/SD^2
-                    a2 <- x[5]/SD/a3 + 1
-                    
-                    tmp <- SD^2*.getAsVar.norm(b = b, a1 = a1, a2 = a2, a3 = a3)    
-                    c(tmp[1,1], tmp[2,2])
-                }
-                asVar <- parApply(cl = cl, X = rmxMat, MARGIN = 1, FUN = asVarFun)
-                stopCluster(cl)
-                asSE <- sqrt(t(asVar)/ncol(x))
-                colnames(asSE) <- c("SE.mean", "SE.sd")
-            }else{
-                for(i in 1:nrow(x)){
-                    b <- rmxEst.all$b[i]/rmxEst[i,2]
-                    a1 <- rmxEst.all$A1[i]/rmxEst[i,2]^2
-                    a3 <- rmxEst.all$A2[i]/rmxEst[i,2]^2
-                    a2 <- rmxEst.all$a[i]/rmxEst[i,2]/a3 + 1
-                    
-                    tmp <- rmxEst[i,2]^2*.getAsVar.norm(b = b, a1 = a1, a2 = a2, a3 = a3)    
-                    asVar[i,] <- c(tmp[1,1], tmp[2,2])
-                }
-                asSE <- sqrt(asVar/ncol(x))
-                colnames(asSE) <- c("SE.mean", "SE.sd")
-            }
+            asVar <- cbind(rmxEst[,2]^2 * .getAsVar.norm.approx(r)[1,1],
+                           rmxEst[,2]^2 * .getAsVar.norm.approx(r)[2,2])
+            asSE <- sqrt(asVar/ncol(x))
+            colnames(asSE) <- c("SE.mean", "SE.sd")
         }else{
             asSE <- NA
         }
@@ -291,7 +223,7 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
     IC1 <- rowMeans(u*(ind*b/sqrt(u^2 + v^2) + !ind), na.rm = na.rm)
     IC2 <- rowMeans(v*(ind*b/sqrt(u^2 + v^2) + !ind), na.rm = na.rm)
     IC <- cbind(IC1, IC2)
-    return(initial.est + IC)
+    initial.est + IC
 }
 .kstep.norm.matrix <- function(x, initial.est, A1, A2, a, b, k, na.rm){
     est <- .onestep.norm.matrix(x = x, initial.est = initial.est, 
@@ -308,12 +240,13 @@ rowRmx.norm <- function(x, eps.lower, eps.upper, eps, initial.est, k, fsCor,
                                         b = b, na.rm = na.rm)
         }
     }
-    A1 <- est[,2]^2*A1/initial.est[,2]^2
-    A2 <- est[,2]^2*A2/initial.est[,2]^2
-    a <- est[,2]*a/initial.est[,2]
-    b <- est[,2]*b/initial.est[,2]
+#    A1 <- est[,2]^2*A1/initial.est[,2]^2
+#    A2 <- est[,2]^2*A2/initial.est[,2]^2
+#    a <- est[,2]*a/initial.est[,2]
+#    b <- est[,2]*b/initial.est[,2]
     
-    return(list(est = est, A1 = A1, A2 = A2, a = a, b = b))
+#    list(est = est, A1 = A1, A2 = A2, a = a, b = b)
+    est
 }
 
 
