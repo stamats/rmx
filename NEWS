@@ -11,6 +11,7 @@
   for known size.
 - restructered code (new helper functions)
 - more exported functions for better documentation
+- added binomial model to vignette
 
 
 ###########################################################

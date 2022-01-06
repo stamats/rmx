@@ -2,13 +2,15 @@ import("stats")
 importFrom("utils", "head")
 importFrom("grid", "grid.newpage", "grid.draw")
 importFrom("boot", "boot.ci")
-importFrom("parallel", "detectCores", "makeCluster", "parApply", "stopCluster")
+importFrom("parallel", "detectCores", "makeCluster", "parApply", "stopCluster",
+                       "clusterExport", "parSapply")
 importFrom("robustbase", "rowMedians")
 importFrom("gridExtra", "arrangeGrob")
 importFrom("ggplot2", "ggplot", "aes", "aes_string", "geom_line", "xlab", 
                       "ylab", "ylim", "ggtitle", "geom_point", "scale_size",
                       "geom_vline", "geom_hline", "annotate", "geom_rug",
-                      "stat_function", "geom_density", "geom_abline", "xlim")
+                      "stat_function", "geom_density", "geom_abline", "xlim",
+                      "geom_bar", "geom_segment")
 importFrom("qqplotr", "stat_qq_band", "stat_qq_point", "stat_qq_line",
                       "stat_pp_band", "stat_pp_point", "stat_pp_line")
 
@@ -27,6 +29,8 @@ export("optIF",
        "cvm.pois",
        "rowCVM",
        "rowRmx",
+       "rowRmx.norm",
+       "rowRmx.binom",
        "colRmx",
        "cniper",
        "getCnipers",
