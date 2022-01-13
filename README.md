@@ -14,8 +14,8 @@ asymptotically linear estimators where infinitesimal (shrinking) neighborhoods
 around parametric models are assumed (Rieder (1994), ISBN:978-1-4684-0624-5; 
 Ruckdeschel (2006), <doi:10.1007/s00184-005-0020-0>; 
 Kohl et al. (2010), <doi:10.1007/s10260-010-0133-0>; 
-Kohl (2012), <doi:10.1080/02331888.2010.540668>). In addition, various diagnostic
-plots are included.
+Kohl (2012), <doi:10.1080/02331888.2010.540668>). In addition, various diagnostic 
+plots and finite-sample corrections are included.
 
 
 ## Motivation
