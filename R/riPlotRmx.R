@@ -2,8 +2,8 @@ riPlot <- function(x, ...){
   UseMethod("riPlot")
 }
 riPlot.rmx <- function(x, range.alpha = 1e-6, range.n = 501, 
-                       param.digits = 2, ggplot.xlab = "x", 
-                       ggplot.ylab = NULL, 
+                       info.digits = 2, param.digits = 2, 
+                       ggplot.xlab = "x", ggplot.ylab = NULL, 
                        ggplot.ggtitle = NULL,
                        point.col = "#0072B5", point.alpha = 0.4, 
                        point.length.out = 5, point.range = c(1,7), 
@@ -31,7 +31,8 @@ riPlot.rmx <- function(x, range.alpha = 1e-6, range.n = 501,
   IFmin <- min(relInfo)
   IFmax <- max(relInfo)
   DF <- data.frame(y, relInfo)
-  DFx <- data.frame(x = x$x, relInfo.x, info = info.x)
+  DFx <- data.frame(x = x$x, relInfo.x, 
+                    info = signif(x = info.x, digits = info.digits))
   if(x$rmxIF$model %in% c("norm", "gamma")){
     gg <- vector(mode = "list", length = ncol(DF)-1)
     Param <- paste(paste(names(x$rmxIF$parameter), 

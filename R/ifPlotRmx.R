@@ -38,8 +38,9 @@ ifPlot.rmx <- function(x, add.cniper = TRUE, color.cniper = "#E18727",
   }else{
     info <- rowSums(IFx^2)
   }
-  DFx <- data.frame(x = x$x, IFx, info = signif(info, info.digits))
-  names(DFx) <- c("x", "IFx", "info")
+  DFx <- data.frame(x = x$x, IFx, 
+                    info = signif(x = info, digits = info.digits))
+  names(DFx) <- c("x", make.names(IFnames), "info")
   if(x$rmxIF$model %in% c("norm", "binom")){
     if(ncol(DF) > 2){
       gg <- vector(mode = "list", length = ncol(DF)-1)

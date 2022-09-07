@@ -25,8 +25,10 @@ dPlot.rmx <- function(x, param.digits = 3, ggplot.xlab = "x",
                          n = density.n)
     ggempD <- geom_density(color = density.col, lwd = density.lwd, bw = "SJ")
     DF <- data.frame(x = x$x)
-    gg <- ggplot(DF, aes(x = x)) + geom_rug() + ggd + ggempD + 
-      xlab(ggplot.xlab) + ylab(ggplot.ylab) + ggt
+    gg <- ggplot(DF, aes(x = x)) + geom_rug(color = density.col) + 
+      ggempD + ggd + xlab(ggplot.xlab) + ylab(ggplot.ylab) + ggt +
+      labs(caption = "Empirical density with rug plot") +
+      theme(plot.caption = element_text(face = "bold", color = density.col))
   }
   if(x$rmxIF$model == "binom"){
     if(is.null(ggplot.ylab)) ggplot.ylab <- "Relative Frequency / Probability"
@@ -43,7 +45,10 @@ dPlot.rmx <- function(x, param.digits = 3, ggplot.xlab = "x",
     gg <- ggplot(DF, aes(x = x, y = y)) + ggd + ggempD + 
       geom_segment(aes(x=x, xend=x, y=0, yend=y), 
                    color = density.col, lwd = density.lwd) +
-      xlab(ggplot.xlab) + ylab(ggplot.ylab) + ggt
+      xlab(ggplot.xlab) + ylab(ggplot.ylab) + ggt +
+      labs(caption = "Observed relative frequency") +
+      theme(plot.caption = element_text(face = "bold", color = density.col)) +
+      scale_x_continuous(breaks = supp)
   }
 
   gg

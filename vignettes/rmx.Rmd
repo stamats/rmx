@@ -43,7 +43,7 @@ We compute the influence function (IF) for estimating mean and standard deviatio
 of the model). We first compute and plot the IF of the maximum likelihood (ML) 
 estimator, which are arithmetic mean and sample standard deviation.
 
-```{r}
+```{r, fig.width=7, fig.height=4}
 IF.ML <- optIF(radius = 0)
 IF.ML
 summary(IF.ML)
@@ -61,7 +61,7 @@ a gross-error probability of 0.25/sqrt(n); see Chapter~8 of @Kohl2005. The IF
 can also be regarded as the IF of a radius-minimax (RMX) estimator with 
 minimax-radius 0.25 [@Rieder2008].
 
-```{r}
+```{r, fig.width=7, fig.height=4}
 IF.AL <- optIF(radius = 0.25)
 IF.AL
 summary(IF.AL)
@@ -92,7 +92,7 @@ solutions are for instance the use of M-equations or k-step (k >= 1) constructio
 For our RMX estimators we use k-step constructions [@Kohl2005, @Kohl2010]. For more 
 details on the construction of estimators we refer to Chapter 6 of @Rieder1994.
 
-```{r}
+```{r, fig.width=7, fig.height=4}
 IF.MB <- optIF(radius = Inf)
 IF.MB
 summary(IF.MB)
@@ -100,10 +100,10 @@ plot(IF.MB)
 ```
 
 The result particularly shows that the MB estimator for mean and sd is not
-identical to the combination of median and MAD, which have different IFs of
-different shapes as shown below.
+identical to the combination of median and MAD, which have IFs of different 
+shapes as shown below.
 
-```{r}
+```{r, fig.width=7, fig.height=4}
 library(ggplot2)
 library(gridExtra)
 IFmed <- function(x){
@@ -227,7 +227,7 @@ plot(cniper(rmx.chem))
 Since the plot function is based on package ggplot2 and returns a ggplot 
 object, we can modify the plot without interferring with the existing function.
 
-```{r, fig.width=7, fig.height=7}
+```{r, fig.width=7, fig.height=7, warning = FALSE}
 plot(cniper(rmx.chem)) + ylim(c(-1, 10)) + xlim(c(0.5, 5.5))
 ```
 
@@ -237,7 +237,7 @@ a quite strong effect, too.
 
 There are several more diagnostic plots. First, we plot the influence functions.
 
-```{r, fig.width=7, fig.height=7}
+```{r, fig.width=7, fig.height=4}
 ifPlot(rmx.chem)
 ```
 
@@ -255,7 +255,7 @@ function (invisibly) returns the respective plot object. Hence, we can also modi
 the plots afterwards by extending the plot objects. In our example, we want to 
 restrict the x-axis.
 
-```{r, fig.width=7, fig.height=7, warning = FALSE}
+```{r, fig.width=7, fig.height=4, warning = FALSE}
 gg <- ifPlot(rmx.chem, plot = FALSE)
 grid.arrange(gg[[1]] + xlim(0.5, 5.5), gg[[2]] + xlim(0.5, 5.5), nrow = 1)
 ```
@@ -269,13 +269,13 @@ aiPlot(rmx.chem)
 We can also plot the relative information, which shows how the information is
 distributed for estimation of mean and sd.
 
-```{r, fig.width=7, fig.height=7}
+```{r, fig.width=7, fig.height=4}
 riPlot(rmx.chem)
 ```
 
 We restrict the x-axis to get a better overview of the center region.
 
-```{r, fig.width=7, fig.height=7, warning = FALSE}
+```{r, fig.width=7, fig.height=4, warning = FALSE}
 gg <- riPlot(rmx.chem, plot = FALSE)
 grid.arrange(gg[[1]] + xlim(0.5, 5.5), gg[[2]] + xlim(0.5, 5.5), nrow = 1)
 ```
@@ -321,7 +321,7 @@ dPlot(rmx.chem)
 We can also add the density of the models estimated by mean and sd, respectively
 median and MAD.
 
-```{r}
+```{r, fig.width=7, fig.height=7}
 dPlot(rmx.chem) + 
   stat_function(fun = function(x) dnorm(x, mean = mean(chem), sd = sd(chem)),
                 color = "darkred", lwd = 1) +
@@ -404,7 +404,7 @@ We compute the influence function (IF) for estimating the probability. We first
 compute and plot the IF of the maximum likelihood (ML) estimator, which is the
 arithmetic mean divided by size. For this demonstration we use size = 10.
 
-```{r}
+```{r, fig.width=7, fig.height=7}
 IF.ML <- optIF(radius = 0, model = "binom", prob = 0.05, size = 10)
 IF.ML
 summary(IF.ML)
@@ -424,7 +424,7 @@ Next, we compute and plot an IF of our optimally robust asymptotically linear
 a gross-error probability of 0.1/sqrt(n). The IF can also be regarded as the
 IF of a radius-minimax (RMX) estimator with minimax-radius 0.1.
 
-```{r}
+```{r, fig.width=7, fig.height=7}
 IF.AL <- optIF(radius = 0.1, model = "binom", prob = 0.05, size = 10)
 IF.AL
 summary(IF.AL)
@@ -437,7 +437,7 @@ downweighted to have less influence on the estimations.
 Finally, we plot the IF of the minimum bias (MB) estimator, which represents
 the most conservative estimate in our class of AL estimators. 
 
-```{r}
+```{r, fig.width=7, fig.height=7}
 IF.MB <- optIF(radius = Inf, model = "binom", prob = 0.05, size = 10)
 IF.MB
 summary(IF.MB)
@@ -452,7 +452,7 @@ Consequently, in the Bernoulli model, the ML estimator (relative frequency) is
 also optimally robust for all radii. An example showing the IFs is given in the 
 following plot.
 
-```{r}
+```{r, fig.width=7, fig.height=7}
 IF.ML <- optIF(radius = 0, model = "binom", prob = 0.1, size = 1)
 IF.MB <- optIF(radius = 1e-10, model = "binom", prob = 0.1, size = 1)
 ggML <- plot(IF.ML, plot = FALSE) + 
@@ -615,11 +615,9 @@ empirical density.
 dPlot(rmx.x)
 ```
 
-
-
-Based on the diagnostic plot, the normal distribution seems to fit well to 
-the data, if we ignore at least the obvious outlier; that is, our inference
-with the RMX approach should be reliable. Hence, we finally compute confidence 
+Based on the diagnostic plot, the binomial distribution seems to fit well to 
+the data except for the observed frequency of 4; that is, our inference with the 
+RMX approach should be reliable. Hence, we finally compute confidence 
 intervals for the estimates.
 
 ```{r}
@@ -667,9 +665,7 @@ confint(rmx.x.MB, method = "boot", R = 599)
 
 For high-dimensional datasets such as omics-data there are also functions for
 row- and column-wise computation of RMX estimators as developed for @Kohl2010a.
-By using the equivariance of the model in combination with saved results and 
-interpolations. The computations for thousands of samples takes less than a second.
-We use some simulated data (10000 samples of sample size 20). 
+We use some simulated data (100 samples of sample size 20). 
 
 ```{r}
 M <- matrix(rbinom(2000, size = 10, prob = 0.3), ncol = 20)
