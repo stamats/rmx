@@ -65,7 +65,7 @@ print.outlier <- function(x, digits = 3, ...){
               paste0("(-Inf, ", signif(x$lower, digits = digits), 
                      ") or (", signif(x$upper, digits = digits), ", Inf)")), 
         "\n")
-    cat(paste(format("Data in oulier region:", width = 30L, justify = "right"),
+    cat(paste(format("Data in outlier region:", width = 30L, justify = "right"),
               paste0(100*signif(x$prop.lower, digits = digits), " % + ",
                      100*signif(x$prop.upper, digits = digits), " % = ",
                      100*signif(x$prop.lower+x$prop.upper, digits = digits), " %")), 
