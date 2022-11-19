@@ -1,4 +1,4 @@
-# <img src="https://github.com/stamats/MKinfer/raw/master/hex-rmx.png" alt="rmx" width="120"/> &emsp; rmx
+# <img src="https://github.com/stamats/rmx/raw/main/hex-rmx.png" alt="rmx" width="120"/> &emsp; rmx
 # rmx: Radius-minimax Estimators
 
 The repository includes the development version of R package rmx
