@@ -134,7 +134,7 @@ fsRadius.binom <- function(r, n, prob, size, M = 10000, parallel = FALSE,
 }
 fsRadius.pois <- function(r, n, lambda, M = 10000, parallel = FALSE, 
                            ncores = NULL){
-    D <- 1e4
+    D <- 100*lambda
     
     lcr <- .lcr.pois(lambda = lambda)
     rs <- seq(from = r, to = lcr, length.out = 10)
