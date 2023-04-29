@@ -3,6 +3,7 @@
 \alias{colRmx}
 \alias{rowRmx.norm}
 \alias{rowRmx.binom}
+\alias{rowRmx.pois}
 \title{Optimally robust estimation for location and/or scale}
 \description{
   The functions \code{rowRmx} and \code{colRmx} compute 
@@ -26,6 +27,11 @@ rowRmx.binom(x, eps.lower=0, eps.upper, eps = NULL, initial.est = NULL, k = 3L,
              fsCor = FALSE, na.rm = TRUE, size, computeSE = FALSE, 
              parallel = FALSE, ncores = NULL, aUp = 100*size, 
              cUp = 1e4, delta = 1e-9)
+             
+rowRmx.pois(x, eps.lower=0, eps.upper, eps = NULL, initial.est = NULL, k = 3L, 
+            fsCor = FALSE, na.rm = TRUE, computeSE = FALSE, 
+            parallel = FALSE, ncores = NULL, aUp = 100*max(x), 
+            cUp = 1e4, delta = 1e-9)
 }
 \arguments{
   \item{x}{ matrix or data.frame of (numeric) data values. }
@@ -73,6 +79,8 @@ rowRmx.binom(x, eps.lower=0, eps.upper, eps = NULL, initial.est = NULL, k = 3L,
   \enumerate{
     \item \code{"norm"}: normal location and scale. Parameters can be set 
     via argument \code{mean} and \code{sd}; see examples.
+    \item \code{"binom"}: binomial probability (size known).
+    \item \code{"pois"}: Poisson mean.
   }
 }
 \value{

@@ -2,6 +2,7 @@
 \alias{fsRadius}
 \alias{fsRadius.norm}
 \alias{fsRadius.binom}
+\alias{fsRadius.pois}
 \title{Finite-sample Corrected Radius}
 \description{
 Given some radius and some sample size the function computes
@@ -16,7 +17,7 @@ fsRadius.norm(r, n)
 
 fsRadius.binom(r, n, prob, size, M = 10000, parallel = FALSE, ncores = NULL)
 
-fsRadius.binom(r, n, lambda, M = 10000, parallel = FALSE, ncores = NULL)
+fsRadius.pois(r, n, lambda, M = 10000, parallel = FALSE, ncores = NULL)
 }
 \arguments{
   \item{r}{ asymptotic radius (non-negative numeric) }
