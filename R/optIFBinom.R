@@ -11,8 +11,8 @@ optIF.binom <- function(radius, size = 1, prob = 0.5, aUp = 100*size, cUp = 1e4,
     lcr <- .lcr.binom(prob = prob, size = size)
     if(radius >= lcr){ # IF of minimum bias estimator
         IF <- .getMBIF.binom(size = size, prob = prob)
-        IF$asBias <- radius^2*IF$b^2
-        IF$asMSE <- IF$asVar + IF$asBias
+        IF$asBias <- radius*IF$b
+        IF$asMSE <- IF$asVar + IF$asBias^2
         IF$radius <- radius
         
         return(IF)

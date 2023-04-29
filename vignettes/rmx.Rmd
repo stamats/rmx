@@ -734,8 +734,8 @@ in 3% of the cases 20 is observed.
 
 ```{r}
 set.seed(123)
-ind <- rbinom(25, size = 1, prob = 0.03)
-x <- (1-ind)*rpois(25, lambda = 7) + ind*20
+ind <- rbinom(50, size = 1, prob = 0.03)
+x <- (1-ind)*rpois(50, lambda = 7) + ind*20
 ```
 
 We compare the observed relative frequencies with the theoretical probabilities
@@ -743,8 +743,8 @@ of Pois(lambda = 7).
 
 ```{r}
 table(x)/length(x)
-ds <- signif(dpois(0:15, lambda = 7), 2)
-names(ds) <- 0:15
+ds <- signif(dpois(0:20, lambda = 7), 2)
+names(ds) <- 0:20
 ds
 ```
 
@@ -814,10 +814,10 @@ cniper(rmx.x)
 outlier(rmx.x)
 ```
 
-That is, observations of 0 as well as of 13 or larger can be considered as cniper points. 
-If such points exist, the rmx estimator can be expected to be (asymptotically) more 
-precise than the respective maximum-likelihood (ML) estimator; see @Kohl2005 or
-@Kohl2010.
+That is, observations of 0 and 1 as well as of 13 or larger can be considered as 
+cniper points. If such points exist, the rmx estimator can be expected to be 
+(asymptotically) more precise than the respective maximum-likelihood (ML) estimator; 
+see @Kohl2005 or @Kohl2010.
 
 Any observation of 17 or larger is very unlikely from the assumed model and should 
 be considered as an outlier. The probability to get a value of 17 or larger is 
@@ -828,7 +828,7 @@ getCnipers(rmx.x)
 getOutliers(rmx.x)
 ```
 
-The dataset includes one cniper and one outlier points. We can also plot the
+The dataset includes two cniper and one outlier points. We can also plot the
 cniper region including the data points.
 
 ```{r, fig.width=7, fig.height=7}
@@ -898,8 +898,8 @@ confint(rmx.x, method = "boot", R = 599) # low R to reduce computation time
 #confint(rmx.x, method = "boot", parallel = TRUE)
 ```
 
-The bootstrap results are similar to the results of the asymptotic intervals with 
-and without considering bias. 
+The bootstrap results are similar to the results of the asymptotic intervals 
+without considering bias. 
 
 We can use rmx also to compute ML estimates.
 

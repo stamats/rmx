@@ -72,8 +72,8 @@ rmx.binom <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
         if(r >= lcr){
             IF <- .getMBIF.binom(size = size, prob = prob)
             IF$radius <- r
-            IF$asBias <- r^2*IF$b^2
-            IF$asMSE <- IF$asVar + IF$asBias
+            IF$asBias <- r*IF$b
+            IF$asMSE <- IF$asVar + IF$asBias^2
         }else{
             LM <- .getLM.binom(r0 = r, prob = prob, size = size, 
                                aUp = aUp, cUp = cUp, delta = delta)
@@ -102,8 +102,8 @@ rmx.binom <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
         if(r >= lcr){
             IF <- .getMBIF.binom(size = size, prob = prob)
             IF$radius <- r
-            IF$asBias <- r^2*IF$b^2
-            IF$asMSE <- IF$asVar + IF$asBias
+            IF$asBias <- r*IF$b
+            IF$asMSE <- IF$asVar + IF$asBias^2
         }else{
             LM <- .getLM.binom(r0 = r, prob = prob, size = size, 
                                aUp = aUp, cUp = cUp, delta = delta)
@@ -218,7 +218,7 @@ rmx.binom <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
         IF$radius <- r
         if(r != Inf){
             IF$asMSE <- IF$asVar + r^2*IF$b^2
-            IF$asBias <- r^2*IF$b^2
+            IF$asBias <- r*IF$b
         }
         return(IF)
     }

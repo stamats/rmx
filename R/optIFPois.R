@@ -11,8 +11,8 @@ optIF.pois <- function(radius, lambda = 1, aUp = 100*lambda, cUp = 1e4,
     lcr <- .lcr.pois(lambda = lambda)
     if(radius >= lcr){ # IF of minimum bias estimator
         IF <- .getMBIF.pois(lambda = lambda)
-        IF$asBias <- radius^2*IF$b^2
-        IF$asMSE <- IF$asVar + IF$asBias
+        IF$asBias <- radius*IF$b
+        IF$asMSE <- IF$asVar + IF$asBias^2
         IF$radius <- radius
         
         return(IF)

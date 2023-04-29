@@ -70,8 +70,8 @@ rmx.pois <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
         if(r >= lcr){
             IF <- .getMBIF.pois(lambda = lambda)
             IF$radius <- r
-            IF$asBias <- r^2*IF$b^2
-            IF$asMSE <- IF$asVar + IF$asBias
+            IF$asBias <- r*IF$b
+            IF$asMSE <- IF$asVar + IF$asBias^2
         }else{
             LM <- .getLM.pois(r0 = r, lambda = lambda, 
                               aUp = aUp, cUp = cUp, delta = delta)
@@ -100,8 +100,8 @@ rmx.pois <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
         if(r >= lcr){
             IF <- .getMBIF.pois(lambda = lambda)
             IF$radius <- r
-            IF$asBias <- r^2*IF$b^2
-            IF$asMSE <- IF$asVar + IF$asBias
+            IF$asBias <- r*IF$b
+            IF$asMSE <- IF$asVar + IF$asBias^2
         }else{
             LM <- .getLM.pois(r0 = r, lambda = lambda, 
                               aUp = aUp, cUp = cUp, delta = delta)
@@ -220,7 +220,7 @@ rmx.pois <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
         IF$radius <- r
         if(r != Inf){
             IF$asMSE <- IF$asVar + r^2*IF$b^2
-            IF$asBias <- r^2*IF$b^2
+            IF$asBias <- r*IF$b
         }
         return(IF)
     }
