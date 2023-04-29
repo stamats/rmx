@@ -76,7 +76,7 @@ rowRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL,
         if(model == "binom"){
             aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 100*size)
         }
-        if(model == "binom"){
+        if(model == "pois"){
             aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 100*max(x))
         }
         cUp <- ifelse("cUp" %in% names(listDots), listDots$cUp, 1e4)

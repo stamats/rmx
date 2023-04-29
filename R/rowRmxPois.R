@@ -33,8 +33,7 @@ rowRmx.pois <- function(x, eps.lower = 0, eps.upper, eps = NULL, initial.est = N
     }
     
     if(is.null(initial.est)){
-        lambda <- rowCVM(x, model = "pois", size = size, 
-                         parallel = parallel, ncores = ncores)
+        lambda <- rowCVM(x, model = "pois", parallel = parallel, ncores = ncores)
     }else{
         stopifnot(is.numeric(initial.est))
         if(is.matrix(initial.est)){
@@ -240,7 +239,7 @@ rowRmx.pois <- function(x, eps.lower = 0, eps.upper, eps = NULL, initial.est = N
         IFx <- rowMeans(Y*(ind*LM$b/abs(Y) + !ind), na.rm = na.rm)
     }
         
-    pmax(.Machine$double.eps, prob + IFx)
+    pmax(.Machine$double.eps, lambda + IFx)
 }
 .updateLM.pois.matrix <- function(lambda, LM, r, parallel, ncores, 
                                   aUp = 100*max(lambda), cUp = 1e4, delta = 1e-9){
@@ -269,7 +268,7 @@ rowRmx.pois <- function(x, eps.lower = 0, eps.upper, eps = NULL, initial.est = N
             LM <- .updateLM.pois.matrix(lambda = lambda, LM = LM, r = r,
                                         parallel = parallel, ncores = ncores, 
                                         aUp = aUp, cUp = cUp, delta = delta)
-            prob <- .onestep.pois.matrix(x = x, LM = LM, lambda = lambda,
+            lambda <- .onestep.pois.matrix(x = x, LM = LM, lambda = lambda,
                                           na.rm = na.rm)
         }
     }
