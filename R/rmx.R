@@ -255,11 +255,11 @@ confint.rmx <- function(object, parm, level = 0.95, method = "as", R = 9999, ...
       t0 <- c(object$rmxEst, object$rmxIF$asVar)
       boot.res <- rowRmx(X, model = object$rmxIF$model, computeSE = TRUE, 
                          size = object$rmxIF$parameter["size (known)"], 
-                         eps = object$rmxIF$radius/n, ...)
+                         eps = object$rmxIF$radius/sqrt(n), ...)
     }else{
-      t0 <- c(object$rmxEst, diag(object$rmxIF$asVar))
+      t0 <- c(object$rmxEst, diag(as.matrix(object$rmxIF$asVar)))
       boot.res <- rowRmx(X, model = object$rmxIF$model, computeSE = TRUE, 
-                         eps = object$rmxIF$radius/n, ...)
+                         eps = object$rmxIF$radius/sqrt(n), ...)
     }
     t <- cbind(boot.res$rmxEst, n*boot.res$asSE^2)
     boot.out <- list(t0 = t0, t = t, R = R, data = object$x, seed = seed, 

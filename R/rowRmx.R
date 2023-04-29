@@ -142,7 +142,7 @@ print.RMXlist <- function (x, digits = getOption("digits"), prefix = " ", head.n
     }
     cat("\n Estimates:\n")
     print(head(x$rmxEst, n = head.n), digits = digits, ...)
-    if(head.n > nrow(x$rmxEst)) cat(paste0("[", head.n+1, ",]  ...", collapse = ""), "\n")
+    if(head.n < nrow(x$rmxEst)) cat(paste0("[", head.n+1, ",]  ...", collapse = ""), "\n")
     if(any(!is.na(x$asSE))) {
         cat("\n Asymptotic standard errors:\n")
         print(head(x$asSE, n = head.n), digits = digits, ...)

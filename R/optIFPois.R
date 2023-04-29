@@ -155,7 +155,7 @@ optIF.pois <- function(radius, lambda = 1, aUp = 100*lambda, cUp = 1e4,
 ## IF of ML estimator
 ##################################################################
 .getMLIF.pois <- function(lambda){
-    asVar <- 1/lambda
+    asVar <- lambda
     A <- asVar
     names(asVar) <- "lambda"
     a <- 0

@@ -814,7 +814,7 @@ cniper(rmx.x)
 outlier(rmx.x)
 ```
 
-That is, observation of 0 as well as of 13 or larger can be considered as cniper points. 
+That is, observations of 0 as well as of 13 or larger can be considered as cniper points. 
 If such points exist, the rmx estimator can be expected to be (asymptotically) more 
 precise than the respective maximum-likelihood (ML) estimator; see @Kohl2005 or
 @Kohl2010.
@@ -898,7 +898,7 @@ confint(rmx.x, method = "boot", R = 599) # low R to reduce computation time
 #confint(rmx.x, method = "boot", parallel = TRUE)
 ```
 
-The bootstrap results are between the results of the asymptotic intervals with 
+The bootstrap results are similar to the results of the asymptotic intervals with 
 and without considering bias. 
 
 We can use rmx also to compute ML estimates.
