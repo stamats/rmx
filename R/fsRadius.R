@@ -93,6 +93,7 @@ fsRadius.binom <- function(r, n, prob, size, M = 10000, parallel = FALSE,
     }
     
     lcr <- .lcr.binom(prob = prob, size = size)
+    if(r > lcr) return(r)
     rs <- seq(from = r, to = lcr, length.out = 10)
     eps <- rs/sqrt(n)
     res <- numeric(M)
@@ -137,6 +138,7 @@ fsRadius.pois <- function(r, n, lambda, M = 10000, parallel = FALSE,
     D <- 100*lambda
     
     lcr <- .lcr.pois(lambda = lambda)
+    if(r > lcr) return(r)
     rs <- seq(from = r, to = lcr, length.out = 10)
     eps <- rs/sqrt(n)
     res <- numeric(M)
