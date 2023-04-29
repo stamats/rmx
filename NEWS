@@ -5,9 +5,10 @@
 ###########################################################
 ## Version 0.9
 ###########################################################
-- added Poisson model
+- added functions for Poisson model (Poisson mean)
 - change aes_string to aes using .data from package rlang 
   (as recommended by ggplot2)
+- added Poisson model to vignette
 
 
 ###########################################################
