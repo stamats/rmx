@@ -50,6 +50,25 @@ dPlot.rmx <- function(x, param.digits = 3, ggplot.xlab = "x",
       theme(plot.caption = element_text(face = "bold", color = density.col)) +
       scale_x_continuous(breaks = supp)
   }
-
+  if(x$rmxIF$model == "pois"){
+    if(is.null(ggplot.ylab)) ggplot.ylab <- "Relative Frequency / Probability"
+    size <- qpois(1-1e-15, lambda = x$rmxEst)
+    supp <- seq(from = 0, to = size, by = 1)
+    y <- NULL
+    DFsupp <- data.frame(x = supp, y = dpois(supp, lambda = x$rmxEst))
+    ggd <- geom_bar(data = DFsupp, aes(x = x, y = y), inherit.aes = FALSE, 
+                    stat = "identity")
+    ggempD <- geom_point(color = density.col)
+    DF <- data.frame(x = sort(unique(x$x)), 
+                     y = as.vector(table(x$x)/length(x$x)))
+    gg <- ggplot(DF, aes(x = x, y = y)) + ggd + ggempD + 
+      geom_segment(aes(x=x, xend=x, y=0, yend=y), 
+                   color = density.col, lwd = density.lwd) +
+      xlab(ggplot.xlab) + ylab(ggplot.ylab) + ggt +
+      labs(caption = "Observed relative frequency") +
+      theme(plot.caption = element_text(face = "bold", color = density.col)) +
+      scale_x_continuous(breaks = supp)
+  }
+  
   gg
 }

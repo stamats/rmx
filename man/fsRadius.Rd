@@ -15,6 +15,8 @@ fsRadius(r, n, model = "norm", \dots)
 fsRadius.norm(r, n)
 
 fsRadius.binom(r, n, prob, size, M = 10000, parallel = FALSE, ncores = NULL)
+
+fsRadius.binom(r, n, lambda, M = 10000, parallel = FALSE, ncores = NULL)
 }
 \arguments{
   \item{r}{ asymptotic radius (non-negative numeric) }
@@ -23,6 +25,7 @@ fsRadius.binom(r, n, prob, size, M = 10000, parallel = FALSE, ncores = NULL)
   see also details. }
   \item{prob}{ prob parameter; see \code{\link[stats]{dbinom}}. }
   \item{size}{ size parameter (known!); see \code{\link[stats]{dbinom}}. }
+  \item{lambda}{ lambda parameter; see \code{\link[stats]{dpois}}. }
   \item{M}{ number of Monte-Carlo simulations; see details below.}
   \item{parallel}{ logical: use package \pkg{parallel} for computations. }
   \item{ncores}{ if \code{parallel = TRUE}: number of cores used for computations.
@@ -41,14 +44,15 @@ fsRadius.binom(r, n, prob, size, M = 10000, parallel = FALSE, ncores = NULL)
   radius determined. 
   
   For some models (\code{"norm"}) the computation is based on the saved results 
-  of the Monte-Carlo simulations, whereas for other models (\code{"binom"}) the 
-  results are computed inside of the function based on \code{M} Monte-Carlo
-  simulations.
+  of the Monte-Carlo simulations, whereas for other models (\code{"binom"}, 
+  \code{"pois"}) the results are computed inside of the function based on 
+  \code{M} Monte-Carlo simulations.
   
   As models we have implemented so far:
   \enumerate{
     \item \code{"norm"}: normal location (mean) and scale (sd)
     \item \code{"binom"}: probability of success (prob)
+    \item \code{"pois"}: Poisson mean (lambda)
   }
 }
 \value{Finite-sample corrected radius.}

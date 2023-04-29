@@ -11,7 +11,10 @@ cniper.rmx <- function(x, range.alpha = 1e-6, ...){
   if(x$rmxIF$model == "binom"){
     res <- .cniper.binom(x = x)
   }
-  if(!x$rmxIF$model %in% c("norm", "binom"))
+  if(x$rmxIF$model == "pois"){
+    res <- .cniper.pois(x = x)
+  }
+  if(!x$rmxIF$model %in% c("norm", "binom", "pois"))
     stop("'cniper' not yet implemented for given model.")
   res
 }
@@ -86,6 +89,50 @@ cniper.rmx <- function(x, range.alpha = 1e-6, ...){
   class(res) <- "cniper"
   res
 }
+.cniper.pois <- function(x){
+  lambda <- x$rmxEst["lambda"]
+  tr.invF <- lambda
+  maxMSE <- x$rmxIF$asMSE
+  
+  Delta <- sqrt(maxMSE - tr.invF)/x$rmxIF$radius
+  size <- qpois(1-1e-15, lambda = lambda)
+  supp <- seq(from = 0, to = size, by = 1)
+  Diff <- abs(supp - lambda) - Delta
+  if(all(Diff < 0)){
+    pt.lo <- -0.5
+    pt.up <- size + 0.5
+    names(pt.up) <- NULL
+    prop.lo <- 0
+    prop.up <- 0
+    p.lo <- 0
+    p.up <- 0
+  }else{
+    M <- trunc(lambda)
+    if(any(Diff[supp >= M] > 0)){
+      ind.up <- min(which(Diff[supp >= M] > 0))
+      pt.up <- supp[supp >= M][ind.up]
+    }else{
+      pt.up <- size + 0.5
+    }
+    if(any(Diff[supp < M] > 0)){
+      ind.lo <- max(which(Diff[supp < M] > 0))
+      pt.lo <- supp[supp < M][ind.lo]
+    }else{
+      pt.lo <- -0.5
+    }
+  }
+  
+  prop.lo <- sum(x$x <= pt.lo)/x$n
+  prop.up <- sum(x$x >= pt.up)/x$n
+  p.lo <- ppois(pt.lo, lambda = lambda)
+  p.up <- ppois(pt.up-1, lambda = lambda, lower.tail = FALSE)
+  res <- list(rmx = x,
+              lower = pt.lo, upper = pt.up, prop.cniper = prop.lo+prop.up, 
+              p.cniper = p.lo+p.up, prop.lower = prop.lo, prop.upper = prop.up, 
+              p.lower = p.lo, p.upper = p.up)
+  class(res) <- "cniper"
+  res
+}
 getCnipers <- function(x, ...){
   if(!inherits(x, "cniper")) x <- cniper(x, ...)
   out <- c(which(x$rmx$x <= x$lower), which(x$rmx$x >= x$upper))
@@ -118,8 +165,13 @@ print.cniper <- function(x, digits = 3, ...){
                      100*signif(x$p.lower+x$p.upper, digits = digits), " %")), 
         "\n\n")
   }
-  if(x$rmx$rmxIF$model == "binom"){
-    supp <- seq(from = 0, to = x$rmx$rmxIF$parameter["size (known)"], by = 1)
+  if(x$rmx$rmxIF$model %in% c("binom", "pois")){
+    if(x$rmx$rmxIF$model == "binom"){
+      supp <- seq(from = 0, to = x$rmx$rmxIF$parameter["size (known)"], by = 1)
+    }
+    if(x$rmx$rmxIF$model == "pois"){
+      supp <- seq(from = 0, to = qpois(1-1e-15, lambda = x$rmx$rmxEst), by = 1)
+    }
     cniper.lo <- supp[supp <= x$lower] 
     cniper.up <- supp[supp >= x$upper]
     if(length(cniper.lo) > 5){
@@ -134,14 +186,29 @@ print.cniper <- function(x, digits = 3, ...){
       }
     }
       
-    if(length(cniper.up) > 5){
-      text.up <- paste0("{", paste0(cniper.up[1:3], collapse = ", "), 
-                        ", ..., ", cniper.up[length(cniper.up)], "}")
-    }else{
-      if(length(cniper.up) > 0){
-        text.up <- paste0("{", paste0(cniper.up, collapse = ", "), "}")
+    if(x$rmx$rmxIF$model == "binom"){
+      if(length(cniper.up) > 5){
+        text.up <- paste0("{", paste0(cniper.up[1:3], collapse = ", "), 
+                          ", ..., ", cniper.up[length(cniper.up)], "}")
       }else{
-        text.up <- NULL
+        if(length(cniper.up) > 0){
+          text.up <- paste0("{", paste0(cniper.up, collapse = ", "), "}")
+        }else{
+          text.up <- NULL
+        }
+      }
+    }
+    if(x$rmx$rmxIF$model == "pois"){
+      if(length(cniper.up) > 5){
+        text.up <- paste0("{", paste0(cniper.up[1:3], collapse = ", "), 
+                          ", ..., ", Inf, "}")
+      }else{
+        if(length(cniper.up) > 0){
+          text.up <- paste0("{", paste0(cniper.up, collapse = ", "), 
+                            ", ..., ", Inf, "}")
+        }else{
+          text.up <- NULL
+        }
       }
     }
     if(is.null(text.lo) && is.null(text.up)){
@@ -263,7 +330,41 @@ plot.cniper <- function(x, add.data = TRUE, color.data = "#0072B5",
                             alpha = alpha.data, inherit.aes = FALSE)
     }
   }
-  if(!x$rmx$rmxIF$model %in% c("norm", "binom"))
+  if(x$rmx$rmxIF$model == "pois"){
+    lambda <- x$rmx$rmxEst["lambda"]
+    tr.invF <- lambda
+    maxMSE <- x$rmx$rmxIF$asMSE
+    r <- x$rmx$rmxIF$radius
+    
+    size <- qpois(1-1e-15, lambda = lambda)
+    supp <- seq(from = 0, to = size, by = 1)
+    Risk.delta <- tr.invF + r^2*(supp - lambda)^2 - maxMSE
+    DF <- data.frame(x = supp, y = Risk.delta)
+    gg <- ggplot(DF, aes(x = x, y = y)) +
+      geom_line() + geom_hline(yintercept = 0) + 
+      xlab(ggplot.xlab) + ylab(ggplot.ylab) +
+      geom_vline(xintercept = c(x$lower, x$upper), color = color.vline) +
+      ggtitle(ggplot.ggtitle)
+    if(x$rmx$rmxEst["lambda"] >= max(supp)-x$rmx$rmxEst["lambda"]){
+      gg <- gg + 
+        annotate(geom = "text", x = -2, y = 0, hjust = 0, vjust = -1, 
+                 label = "RMX better") +
+        annotate(geom = "text", x = -2, y = 0, hjust = 0, vjust = 2, 
+                 label = "ML better")
+    }else{
+      gg <- gg + 
+        annotate(geom = "text", x = size+2, y = 0, hjust = 1, vjust = -1, 
+                 label = "RMX better") +
+        annotate(geom = "text", x = size+2, y = 0, hjust = 1, vjust = 2, 
+                 label = "ML better")
+    }
+    if(add.data){
+      DFx <- data.frame(x = x$rmx$x, y = tr.invF + r^2*(x$rmx$x - lambda)^2 - maxMSE)
+      gg <- gg + geom_point(data = DFx, aes(x = x, y = y), color = color.data,
+                            alpha = alpha.data, inherit.aes = FALSE)
+    }
+  }
+  if(!x$rmx$rmxIF$model %in% c("norm", "binom", "pois"))
     stop("'plot' not yet implemented for given model.")
   gg
 }

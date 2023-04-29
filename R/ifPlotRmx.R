@@ -22,10 +22,13 @@ ifPlot.rmx <- function(x, add.cniper = TRUE, color.cniper = "#E18727",
     y <- sort(unique(y))
   }
     
-  if(x$rmxIF$model %in% c("binom", "pois")){
+  if(x$rmxIF$model == "binom"){
     y <- x$rmxIF$range(alpha = 0)
   }
-    
+  if(x$rmxIF$model == "pois"){
+    y <- x$rmxIF$range(alpha = 1e-15)
+  }
+  
   IF <- x$rmxIF$IFun(y)
   IFmin <- min(IF)
   IFmax <- max(IF)
@@ -41,7 +44,7 @@ ifPlot.rmx <- function(x, add.cniper = TRUE, color.cniper = "#E18727",
   DFx <- data.frame(x = x$x, IFx, 
                     info = signif(x = info, digits = info.digits))
   names(DFx) <- c("x", make.names(IFnames), "info")
-  if(x$rmxIF$model %in% c("norm", "binom")){
+  if(x$rmxIF$model %in% c("norm", "binom", "pois")){
     if(ncol(DF) > 2){
       gg <- vector(mode = "list", length = ncol(DF)-1)
       Param <- paste(paste(names(x$rmxIF$parameter), 

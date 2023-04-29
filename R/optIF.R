@@ -46,7 +46,15 @@ optIF <- function(model = "norm", radius = NULL, check = FALSE, ...){
     IF <- optIF.binom(radius = radius, size = size, prob = prob, 
                       aUp = aUp, cUp = cUp, delta = delta, check = check)
   }
-  if(!model %in% c("norm", "binom")){
+  if(model == "pois"){# Poisson distribution
+    lambda <- ifelse("lambda" %in% names(listDots), listDots$lambda, 1) 
+    aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 100*lambda)
+    cUp <- ifelse("cUp" %in% names(listDots), listDots$cUp, 1e4)
+    delta <- ifelse("delta" %in% names(listDots), listDots$delta, 1e-9)
+    IF <- optIF.pois(radius = radius, lambda = lambda, aUp = aUp, cUp = cUp, 
+                     delta = delta, check = check)
+  }
+  if(!model %in% c("norm", "binom", "pois")){
     stop("Given 'model' not yet implemented")
   }
   
@@ -135,7 +143,7 @@ plot.optIF <- function(x, alpha = 1e-6, digits = 2, plot = TRUE, n = 501, ...){
       Param <- paste(paste(names(x$parameter), signif(x$parameter, digits), 
                            sep = " = "), collapse = ", ")
       for(i in 1:(ncol(DF)-1)){
-        gg[[i]] <- ggplot(DF, aes_string(x = "y", y = names(DF)[i+1])) +
+        gg[[i]] <- ggplot(DF, aes(x = y, y = .data[[names(DF)[i+1]]])) +
           geom_line() + xlab("x") + ylab("IF(x)") + ylim(c(IFmin, IFmax)) +
           ggtitle(paste0(IFnames[i], " (", Param, ")"))
       }
@@ -146,13 +154,18 @@ plot.optIF <- function(x, alpha = 1e-6, digits = 2, plot = TRUE, n = 501, ...){
     }else{
       Param <- paste(names(x$parameter), signif(x$parameter, digits), 
                      sep = " = ")
-      gg <- ggplot(DF, aes_string(x = "y", y = names(DF)[2])) +
+      gg <- ggplot(DF, aes(x = y, y = .data[[names(DF)[2]]])) +
         geom_line() + xlab("x") + ylab("IF(x)") + ylim(c(IFmin, IFmax)) +
         ggtitle(paste0(IFnames, " (", Param, ")"))
     }
   }
-  if(x$model == "binom"){
-    y <- x$range(alpha = 0)
+  if(x$model %in% c("binom", "pois")){
+    if(x$model == "binom"){
+      y <- x$range(alpha = 0)
+    }
+    if(x$model == "pois"){
+      y <- x$range(alpha = 1e-15)
+    }
     IF <- x$IFun(y)
     IFmin <- min(IF)
     IFmax <- max(IF)
@@ -160,7 +173,7 @@ plot.optIF <- function(x, alpha = 1e-6, digits = 2, plot = TRUE, n = 501, ...){
     DF <- data.frame(y, IF)
     Param <- paste(names(x$parameter), signif(x$parameter, digits), 
                    sep = " = ")
-    gg <- ggplot(DF, aes_string(x = "y", y = names(DF)[2])) +
+    gg <- ggplot(DF, aes(x = y, y = .data[[names(DF)[2]]])) +
       geom_point() + geom_line() + xlab("x") + ylab("IF(x)") + 
       ylim(c(IFmin, IFmax)) + ggtitle(paste0(IFnames, " (", Param, ")"))
     if(plot) print(gg)

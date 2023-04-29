@@ -35,6 +35,22 @@ fsRadius <- function(r, n, model = "norm", ...){
                             parallel = parallel, ncores = ncores)
         return(r)
     }
+    if(model == "pois"){
+        listDots <- list(...)
+        if(!"lambda" %in% names(listDots))
+            stop("Parameter 'lambda' must be specified!")
+        lambda <- listDots$lambda
+        M <- ifelse("M" %in% names(listDots), listDots$M, 1e4)
+        parallel <- ifelse("parallel" %in% names(listDots), listDots$parallel, FALSE)
+        if("ncores" %in% names(listDots)){
+            ncores <- listDots$ncores
+        }else{
+            ncores <- NULL
+        }
+        r <- fsRadius.pois(r = r, n = n, lambda = lambda, M = M,
+                           parallel = parallel, ncores = ncores)
+        return(r)
+    }
     warning("Finite-sample correction not yet implemented, asymptotic radius is used!")
     r
 }
@@ -111,6 +127,49 @@ fsRadius.binom <- function(r, n, prob, size, M = 10000, parallel = FALSE,
             res <- apply(Mat, 1, RMX, eps = eps[i], size = size)
         }
         mse[i] <- n*mean((res - prob)^2)
+    }
+    if(parallel) stopCluster(cl)
+    r <- rs[which.min(mse)]
+    r
+}
+fsRadius.pois <- function(r, n, lambda, M = 10000, parallel = FALSE, 
+                           ncores = NULL){
+    D <- qpois(1-1e-15, lambda = lambda)
+    
+    lcr <- .lcr.pois(lambda = lambda)
+    rs <- seq(from = r, to = lcr, length.out = 10)
+    eps <- rs/sqrt(n)
+    res <- numeric(M)
+    RMX <- function(x, eps, size){
+        rmx.pois(x, eps = eps, initial.est = NULL, k = 3, fsCor = FALSE)$rmxEst
+    }
+    mse <- numeric(length(eps))
+    if(parallel){
+        if(is.null(ncores)){
+            cores <- detectCores()
+            cl <- makeCluster(cores[1]-1)
+        }else{
+            cl <- makeCluster(ncores)
+        }
+        clusterExport(cl, list("rmx.pois", "cvm.pois", ".cvmdist", 
+                               ".lcr.pois", ".getMBIF.pois", 
+                               ".getLM.pois", ".getc.pois", 
+                               ".geta.pois", ".getOptIF.pois",
+                               ".kstep.pois", ".onestep.pois",
+                               ".updateIF.pois"),
+                      envir = environment(fun = fsRadius.pois))
+    }
+    for(i in seq_along(eps)){
+        ind <- rbinom(n*M, size = 1, prob = eps[i])
+        Mat <- matrix((1-ind)*rpois(n*M, lambda = lambda) + ind*D, 
+                      ncol = n)
+        if(parallel){
+            res <- parApply(cl = cl, X = Mat, MARGIN = 1, FUN = RMX, 
+                            eps = eps[i])
+        }else{
+            res <- apply(Mat, 1, RMX, eps = eps[i])
+        }
+        mse[i] <- n*mean((res - lambda)^2)
     }
     if(parallel) stopCluster(cl)
     r <- rs[which.min(mse)]

@@ -64,10 +64,12 @@ rmx <- function(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L
     RMXest <- rmx.norm(x, eps.lower=eps.lower, eps.upper=eps.upper, eps=eps, 
                        initial.est=initial.est, k = k, fsCor = fsCor, mad0 = mad0)
   }
-  if(model == "binom"){ # binomial distribution
-    if(!"size" %in% names(listDots))
-      stop("Parameter 'size' is assumed to be known and must be given.")
-    size <- listDots$size
+  if(model %in% c("binom", "pois")){ # binomial or Poisson distribution
+    if(model == "binom"){
+      if(!"size" %in% names(listDots))
+        stop("Parameter 'size' is assumed to be known and must be given.")
+      size <- listDots$size
+    }
     
     M <- ifelse("M" %in% names(listDots), listDots$M, 10000)
     parallel <- ifelse("parallel" %in% names(listDots), listDots$parallel, FALSE)
@@ -77,18 +79,31 @@ rmx <- function(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L
       ncores <- NULL
     }
     
-    aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 100*size)
+    if(model == "binom"){
+      aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 100*size)
+    }
+    if(model == "pois"){
+      aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 100*max(x))
+    }
     cUp <- ifelse("cUp" %in% names(listDots), listDots$cUp, 1e4)
     delta <- ifelse("delta" %in% names(listDots), listDots$delta, 1e-9)
     
     if(is.null(fsCor)) fsCor <- FALSE
     
-    RMXest <- rmx.binom(x, eps.lower=eps.lower, eps.upper=eps.upper, eps=eps, 
-                        initial.est=initial.est, k = k, fsCor = fsCor, 
-                        size = size, M = M, parallel = parallel, ncores = ncores,
-                        aUp = aUp, cUp = cUp, delta = delta)
+    if(model == "binom"){
+      RMXest <- rmx.binom(x, eps.lower=eps.lower, eps.upper=eps.upper, eps=eps, 
+                          initial.est=initial.est, k = k, fsCor = fsCor, 
+                          size = size, M = M, parallel = parallel, ncores = ncores,
+                          aUp = aUp, cUp = cUp, delta = delta)
+    }
+    if(model == "pois"){
+      RMXest <- rmx.pois(x, eps.lower=eps.lower, eps.upper=eps.upper, eps=eps, 
+                         initial.est=initial.est, k = k, fsCor = fsCor, 
+                         M = M, parallel = parallel, ncores = ncores,
+                         aUp = aUp, cUp = cUp, delta = delta)
+    }
   }
-  if(!model %in% c("norm", "binom")){
+  if(!model %in% c("norm", "binom", "pois")){
     stop("Given 'model' not yet implemented")
   }
   if(length(x) < length(x.org)){

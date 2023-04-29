@@ -125,8 +125,7 @@ cvm.pois <- function(x, mu){
                                          to = qpois(1-.Machine$double.eps, 
                                                     lambda = par)))
   }
-  est <- optimize(f = f, 
-                  interval = c(.Machine$double.eps, max(x)),
+  est <- optimize(f = f, interval = c(.Machine$double.eps, max(x)),
                   Data = x, mu = mu)$minimum
   names(est) <- "lambda"
   est

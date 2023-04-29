@@ -9,7 +9,7 @@ iiPlot.rmx <- function(x, param.digits = 2, ggplot.ylim = NULL,
   stopifnot(length(ggplot.xlab) == 1)
   stopifnot(length(ggplot.ylab) == 1)
   
-  if(x$rmxIF$model == "norm"){
+  if(x$rmxIF$model %in% c("norm", "pois")){
     ML <- rmx(x$x, model = x$rmxIF$model, eps = 0, message = FALSE)
   }
   if(x$rmxIF$model == "binom"){

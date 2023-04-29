@@ -156,7 +156,6 @@ rmx.binom <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
 
 ###############################################################################
 ## computation of radius-minimax IC
-## using predefined functions included in "sysdata.rda"
 ###############################################################################
 .getInterval.binom <- function(r, rlo, rup, prob, size, aUp, cUp, delta){
     lcr <- .lcr.binom(prob = prob, size = size)

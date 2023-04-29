@@ -13,9 +13,16 @@ outlier.rmx <- function(x, prob = 0.001, ...){
     p.lower <- p.upper <- prob
   }
   if(x$rmxIF$model %in% c("binom", "pois")){
-    size <- x$rmxIF$parameter["size (known)"]
-    supp <- seq(from = 0, to = size, by = 1)
-    d.supp <- dbinom(supp, size = size, prob = x$rmxEst)
+    if(x$rmxIF$model == "binom"){
+      size <- x$rmxIF$parameter["size (known)"]
+      supp <- seq(from = 0, to = size, by = 1)
+      d.supp <- dbinom(supp, size = size, prob = x$rmxEst)
+    }
+    if(x$rmxIF$model == "pois"){
+      supp <- seq(from = 0, to = qpois(1-1e-15, lambda = x$rmxEst), by = 1)
+      size <- max(supp)
+      d.supp <- dpois(supp, lambda = x$rmxEst)
+    }
     p.supp <- cumsum(d.supp)
     p.supp.rev <- cumsum(rev(d.supp))
     pt.out <- numeric(2)
@@ -30,10 +37,16 @@ outlier.rmx <- function(x, prob = 0.001, ...){
     names(pt.out) <- NULL
     prop.lo <- sum(x$x <= pt.out[1])/x$n
     prop.up <- sum(x$x >= pt.out[2])/x$n
-    p.lower <- pbinom(pt.out[1], size = x$rmxIF$parameter["size (known)"],
-                      prob = x$rmxEst)
-    p.upper <- pbinom(pt.out[2]-1, size = x$rmxIF$parameter["size (known)"],
-                      prob = x$rmxEst, lower.tail = FALSE)
+    if(x$rmxIF$model == "binom"){
+      p.lower <- pbinom(pt.out[1], size = x$rmxIF$parameter["size (known)"],
+                        prob = x$rmxEst)
+      p.upper <- pbinom(pt.out[2]-1, size = x$rmxIF$parameter["size (known)"],
+                        prob = x$rmxEst, lower.tail = FALSE)
+    }
+    if(x$rmxIF$model == "pois"){
+      p.lower <- ppois(pt.out[1], lambda = x$rmxEst)
+      p.upper <- ppois(pt.out[2]-1, lambda = x$rmxEst, lower.tail = FALSE)
+    }
   }
   
   res <- list(rmx = x,
@@ -76,8 +89,13 @@ print.outlier <- function(x, digits = 3, ...){
                      100*signif(x$p.lower+x$p.upper, digits = digits), " %")), 
         "\n\n")
   }
-  if(x$rmx$rmxIF$model == "binom"){
-    supp <- seq(from = 0, to = x$rmx$rmxIF$parameter["size (known)"], by = 1)
+  if(x$rmx$rmxIF$model %in% c("binom", "pois")){
+    if(x$rmx$rmxIF$model == "binom"){
+      supp <- seq(from = 0, to = x$rmx$rmxIF$parameter["size (known)"], by = 1)
+    }
+    if(x$rmx$rmxIF$model == "pois"){
+      supp <- seq(from = 0, to = qpois(1-1e-15, lambda = x$rmx$rmxEst), by = 1)
+    }
     outlier.lo <- supp[supp <= x$lower] 
     outlier.up <- supp[supp >= x$upper]
     if(length(outlier.lo) > 5){
@@ -92,14 +110,29 @@ print.outlier <- function(x, digits = 3, ...){
       }
     }
     
-    if(length(outlier.up) > 5){
-      text.up <- paste0("{", paste0(outlier.up[1:3], collapse = ", "), 
-                        ", ..., ", outlier.up[length(outlier.up)], "}")
-    }else{
-      if(length(outlier.up) > 0){
-        text.up <- paste0("{", paste0(outlier.up, collapse = ", "), "}")
+    if(x$rmx$rmxIF$model == "binom"){
+      if(length(outlier.up) > 5){
+        text.up <- paste0("{", paste0(outlier.up[1:3], collapse = ", "), 
+                          ", ..., ", outlier.up[length(outlier.up)], "}")
       }else{
-        text.up <- NULL
+        if(length(outlier.up) > 0){
+          text.up <- paste0("{", paste0(outlier.up, collapse = ", "), "}")
+        }else{
+          text.up <- NULL
+        }
+      }
+    }
+    if(x$rmx$rmxIF$model == "pois"){
+      if(length(outlier.up) > 5){
+        text.up <- paste0("{", paste0(outlier.up[1:3], collapse = ", "), 
+                          ", ..., ", Inf, "}")
+      }else{
+        if(length(outlier.up) > 0){
+          text.up <- paste0("{", paste0(outlier.up, collapse = ", "), 
+                            ", ..., ", Inf, "}")
+        }else{
+          text.up <- NULL
+        }
       }
     }
     if(is.null(text.lo) && is.null(text.up)){
