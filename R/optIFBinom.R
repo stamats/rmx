@@ -72,7 +72,7 @@ optIF.binom <- function(radius, size = 1, prob = 0.5, aUp = 100*size, cUp = 1e4,
             }else{
                 gam1 <- min(supp[supp > m0] - m0)/(prob*(1-prob))
                 gam2 <- max(supp[supp < m0] - m0)/(prob*(1-prob))
-                M <- max((1-beta)/gam1, (1-beta)/(-gam2))
+                M <- max((1-beta)/gam1, (1+beta)/(-gam2))
             }
             rad <- sqrt(max(M*Int - (1-wsm) - beta^2*wsm, 0))
         }else{
@@ -181,8 +181,8 @@ optIF.binom <- function(radius, size = 1, prob = 0.5, aUp = 100*size, cUp = 1e4,
 ##################################################################
 .getMLIF.binom <- function(size, prob){
     asVar <- (prob*(1-prob))/size
-    names(asVar) <- "prob"
     A <- asVar
+    names(asVar) <- "prob"
     a <- 0
     b <- Inf
     mse <- asVar
