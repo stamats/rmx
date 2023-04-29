@@ -3,6 +3,14 @@
 ###############################################################################
 
 ###########################################################
+## Version 0.9
+###########################################################
+- added Poisson model
+- change aes_string to aes using .data from package rlang 
+  (as recommended by ggplot2)
+
+
+###########################################################
 ## Version 0.8
 ###########################################################
 - new function cvm for computing Cramer von Mises minimum distance estimates
