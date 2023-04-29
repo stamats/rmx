@@ -274,7 +274,7 @@ confint.rmx <- function(object, parm, level = 0.95, method = "as", R = 9999, ...
                  boot.ci(boot.out, index = c(2,4)))
       names(ci) <- names(object$rmxIF$parameter)
     }
-    if(object$rmxIF$model == "binom"){
+    if(object$rmxIF$model %in% c("binom", "pois")){
       ci <- boot.ci(boot.out)
     }
   }
