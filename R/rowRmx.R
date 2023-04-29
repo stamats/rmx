@@ -55,14 +55,16 @@ rowRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL,
                               eps = eps, k = k, initial.est = initial.est, 
                               fsCor = fsCor, na.rm = na.rm, computeSE = computeSE)
     }
-    if(model == "binom"){ # binomial distribution
+    if(model %in% c("binom", "pois")){
         if(is.null(fsCor)) fsCor <- FALSE
         if(is.null(computeSE)) computeSE <- TRUE
         
         listDots <- list(...)
-        if(!"size" %in% names(listDots))
-            stop("Parameter 'size' is assumed to be known and must be given.")
-        size <- listDots$size
+        if(model == "binom"){
+            if(!"size" %in% names(listDots))
+                stop("Parameter 'size' is assumed to be known and must be given.")
+            size <- listDots$size
+        }
         
         parallel <- ifelse("parallel" %in% names(listDots), listDots$parallel, FALSE)
         if("ncores" %in% names(listDots)){
@@ -71,17 +73,31 @@ rowRmx <- function(x, model = "norm", eps.lower=0, eps.upper=0.5, eps=NULL,
             ncores <- NULL
         }
         
-        aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 100*size)
+        if(model == "binom"){
+            aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 100*size)
+        }
+        if(model == "binom"){
+            aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 100*max(x))
+        }
         cUp <- ifelse("cUp" %in% names(listDots), listDots$cUp, 1e4)
         delta <- ifelse("delta" %in% names(listDots), listDots$delta, 1e-9)
         
-        RMXest <- rowRmx.binom(x, eps.lower = eps.lower, eps.upper = eps.upper, 
-                               eps = eps, k = k, initial.est=initial.est, 
-                               fsCor = fsCor, na.rm = na.rm, size = size, 
-                               computeSE = computeSE, parallel = parallel, 
-                               ncores = ncores, aUp = aUp, cUp = cUp, delta = delta)
+        if(model == "binom"){
+            RMXest <- rowRmx.binom(x, eps.lower = eps.lower, eps.upper = eps.upper, 
+                                   eps = eps, k = k, initial.est=initial.est, 
+                                   fsCor = fsCor, na.rm = na.rm, size = size, 
+                                   computeSE = computeSE, parallel = parallel, 
+                                   ncores = ncores, aUp = aUp, cUp = cUp, delta = delta)
+        }
+        if(model == "pois"){
+            RMXest <- rowRmx.pois(x, eps.lower = eps.lower, eps.upper = eps.upper, 
+                                  eps = eps, k = k, initial.est=initial.est, 
+                                  fsCor = fsCor, na.rm = na.rm,
+                                  computeSE = computeSE, parallel = parallel, 
+                                  ncores = ncores, aUp = aUp, cUp = cUp, delta = delta)
+        }
     }
-    if(!model %in% c("norm", "binom")){
+    if(!model %in% c("norm", "binom", "pois")){
         stop("Given 'model' not yet implemented")
     }
     completecases <- rowSums(!is.na(x))

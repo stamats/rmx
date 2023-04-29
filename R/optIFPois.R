@@ -20,7 +20,7 @@ optIF.pois <- function(radius, lambda = 1, aUp = 100*lambda, cUp = 1e4,
     
     ## compute Lagrange multipliers
     LM <- .getLM.pois(r0 = radius, lambda = lambda, aUp = aUp, 
-                       cUp = cUp, delta = delta)
+                      cUp = cUp, delta = delta)
     A <- LM$A
     z <- LM$z
     a <- A*z

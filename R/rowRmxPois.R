@@ -33,8 +33,8 @@ rowRmx.pois <- function(x, eps.lower = 0, eps.upper, eps = NULL, initial.est = N
     }
     
     if(is.null(initial.est)){
-        prob <- rowCVM(x, model = "pois", size = size, 
-                       parallel = parallel, ncores = ncores)
+        lambda <- rowCVM(x, model = "pois", size = size, 
+                         parallel = parallel, ncores = ncores)
     }else{
         stopifnot(is.numeric(initial.est))
         if(is.matrix(initial.est)){
@@ -69,7 +69,7 @@ rowRmx.pois <- function(x, eps.lower = 0, eps.upper, eps = NULL, initial.est = N
         }else{
             r <- uniroot(.getInterval.pois, lower = rlo+1e-8, upper = rup, 
                          tol = .Machine$double.eps^0.25, rlo = rlo, 
-                         rup = rup, prob = median(prob),
+                         rup = rup, lambda = median(lambda),
                          aUp = aUp, cUp = cUp, delta = delta)$root
             r.as <- r
         }
