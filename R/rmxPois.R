@@ -4,7 +4,7 @@
 rmx.pois <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L, 
                      initial.est=NULL, fsCor = FALSE, na.rm = TRUE, 
                      M = 10000, parallel = FALSE, ncores = NULL, 
-                     aUp = 100*size, cUp = 1e4, delta = 1e-9){
+                     aUp = 100*max(x), cUp = 1e4, delta = 1e-9){
     if(length(x) <= 2){
         stop("A sample size of at least 3 is required!")
     }

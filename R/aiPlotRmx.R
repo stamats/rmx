@@ -19,8 +19,11 @@ aiPlot.rmx <- function(x, range.alpha = 1e-6, range.n = 501,
     y <- sort(unique(y))
   }
   
-  if(x$rmxIF$model %in% c("binom", "pois")){
+  if(x$rmxIF$model == "binom"){
     y <- x$rmxIF$range(alpha = 0)
+  }
+  if(x$rmxIF$model == "pois"){
+    y <- x$rmxIF$range(alpha = 1e-15)
   }
   
   IF <- x$rmxIF$IFun(y)
