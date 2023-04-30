@@ -94,14 +94,11 @@ fsRadius.binom <- function(r, n, prob, size, M = 10000, parallel = FALSE,
     
     lcr <- .lcr.binom(prob = prob, size = size)
     if(r > lcr) return(r)
-    rs <- seq(from = r, to = lcr, length.out = 10)
-    eps <- rs/sqrt(n)
-    res <- numeric(M)
     RMX <- function(x, eps, size){
         rmx.binom(x, eps = eps, initial.est = NULL, 
                   k = 3, fsCor = FALSE, size = size)$rmxEst
     }
-    mse <- numeric(length(eps))
+    
     if(parallel){
         if(is.null(ncores)){
             cores <- detectCores()
@@ -117,21 +114,24 @@ fsRadius.binom <- function(r, n, prob, size, M = 10000, parallel = FALSE,
                                ".updateIF.binom"),
                       envir = environment(fun = fsRadius.binom))
     }
-    for(i in seq_along(eps)){
-        ind <- rbinom(n*M, size = 1, prob = eps[i])
+    min.mse <- function(eps, n, M, prob, size, D, cl, RMX){
+        ind <- rbinom(n*M, size = 1, prob = eps)
         Mat <- matrix((1-ind)*rbinom(n*M, size = size, prob = prob) + ind*D, 
                       ncol = n)
         if(parallel){
             res <- parApply(cl = cl, X = Mat, MARGIN = 1, FUN = RMX, 
-                            eps = eps[i], size = size)
+                            eps = eps)
         }else{
-            res <- apply(Mat, 1, RMX, eps = eps[i], size = size)
+            res <- apply(Mat, 1, RMX, eps = eps)
         }
-        mse[i] <- n*mean((res - prob)^2)
+        n*mean((res - prob)^2)
     }
+    eps <- optimize(min.mse, lower = r/sqrt(n), upper = lcr/sqrt(n), n = n, 
+                    M = M, prob = prob, size = size, D = D, cl = cl, RMX = RMX, 
+                    tol = 1/sqrt(M))$minimum
+
     if(parallel) stopCluster(cl)
-    r <- rs[which.min(mse)]
-    r
+    eps*sqrt(n)
 }
 fsRadius.pois <- function(r, n, lambda, M = 10000, parallel = FALSE, 
                            ncores = NULL){
@@ -139,13 +139,10 @@ fsRadius.pois <- function(r, n, lambda, M = 10000, parallel = FALSE,
     
     lcr <- .lcr.pois(lambda = lambda)
     if(r > lcr) return(r)
-    rs <- seq(from = r, to = lcr, length.out = 10)
-    eps <- rs/sqrt(n)
-    res <- numeric(M)
     RMX <- function(x, eps, size){
         rmx.pois(x, eps = eps, initial.est = NULL, k = 3, fsCor = FALSE)$rmxEst
     }
-    mse <- numeric(length(eps))
+
     if(parallel){
         if(is.null(ncores)){
             cores <- detectCores()
@@ -161,19 +158,22 @@ fsRadius.pois <- function(r, n, lambda, M = 10000, parallel = FALSE,
                                ".updateIF.pois"),
                       envir = environment(fun = fsRadius.pois))
     }
-    for(i in seq_along(eps)){
-        ind <- rbinom(n*M, size = 1, prob = eps[i])
+    min.mse <- function(eps, n, M, lambda, D, cl, RMX){
+        ind <- rbinom(n*M, size = 1, prob = eps)
         Mat <- matrix((1-ind)*rpois(n*M, lambda = lambda) + ind*D, 
                       ncol = n)
         if(parallel){
             res <- parApply(cl = cl, X = Mat, MARGIN = 1, FUN = RMX, 
-                            eps = eps[i])
+                            eps = eps)
         }else{
-            res <- apply(Mat, 1, RMX, eps = eps[i])
+            res <- apply(Mat, 1, RMX, eps = eps)
         }
-        mse[i] <- n*mean((res - lambda)^2)
+        n*mean((res - lambda)^2)
     }
+    eps <- optimize(min.mse, lower = r/sqrt(n), upper = lcr/sqrt(n), n = n, 
+                  M = M, lambda = lambda, D = D, cl = cl, RMX = RMX, 
+                  tol = 1/sqrt(M))$minimum
+    
     if(parallel) stopCluster(cl)
-    r <- rs[which.min(mse)]
-    r
+    eps*sqrt(n)
 }
