@@ -5,7 +5,7 @@
   The function \code{confint} computes confindence interval for rmx estimates.
 }
 \usage{
-\method{confint}{rmx}(object, parm, level = 0.95, method = "as", R = 9999, ...)
+\method{confint}{rmx}(object, parm, level = 0.95, method = "as", R = 9999, type = "all", ...)
 }
 \arguments{
   \item{object}{ object of S3 class \code{rmx}. }
@@ -15,6 +15,10 @@
   \item{level}{ see \code{\link[stats]{confint}}, the confidence level required. }
   \item{method}{ see details.}
   \item{R}{ number of bootstrap replicates.}
+  \item{type}{ A vector of character strings representing the type of intervals required. 
+  The value should be any subset of the values c("norm","basic", "stud", "perc", "bca") 
+  or simply "all" which will compute all five types of intervals; see also 
+  \code{\link[boot]{boot.ci}}.}
   \item{\dots}{ further arguments passed through especially to \code{rowRmx}. }
 }
 \details{

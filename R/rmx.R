@@ -225,7 +225,8 @@ mse.rmx <- function(object, ...){
 .format.perc <- function(probs, digits){
   paste(format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits), "%")
 }
-confint.rmx <- function(object, parm, level = 0.95, method = "as", R = 9999, ...){
+confint.rmx <- function(object, parm, level = 0.95, method = "as", R = 9999, 
+                        type = "all", ...){
   if(method == "as"){
     Method <- "Asymptotic (LAN-based) confidence interval"
     ci <- confint.default(object)
@@ -270,12 +271,12 @@ confint.rmx <- function(object, parm, level = 0.95, method = "as", R = 9999, ...
     class(boot.out) <- "boot"
     attr(boot.out, "boot_type") <- "boot"
     if(object$rmxIF$model == "norm"){
-      ci <- list(boot.ci(boot.out, index = c(1,3)),
-                 boot.ci(boot.out, index = c(2,4)))
+      ci <- list(boot.ci(boot.out, index = c(1,3), type = type),
+                 boot.ci(boot.out, index = c(2,4), type = type))
       names(ci) <- names(object$rmxIF$parameter)
     }
     if(object$rmxIF$model %in% c("binom", "pois")){
-      ci <- boot.ci(boot.out)
+      ci <- boot.ci(boot.out, type = type)
     }
   }
   attr(ci, "conf.level") <- level
