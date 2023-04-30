@@ -534,11 +534,12 @@ summary(rmx.x)
 
 Now, in a second approach we could take the finite-sample correction into 
 consideration. For speeding up the computations, one can use parallel computing.
-The computation takes about 30-60 seconds on a reasonably well equipped computer.
+The computations may take up to a few minutes on a reasonably well equipped 
+computer.
 
 ```{r, eval = FALSE}
 rmx.x2 <- rmx(x, model = "binom", eps.lower = 0, eps.upper = 0.05, 
-             size = 10, fsCor = TRUE, parallel = TRUE)
+              size = 10, fsCor = TRUE, parallel = TRUE)
 rmx.x2
 summary(rmx.x2)
 ```
@@ -728,32 +729,26 @@ finite radius, the so-called lower-case radius [@Kohl2005].
 
 ### RMX estimates
 
-We consider the estimation of a Poisson mean and use some simulated
-data. Our ideal (undisturbed) model is Pois(lambda = 7), where
-in 3% of the cases 20 is observed.
+We consider the estimation of a Poisson mean and use the dataset by @Rutherford1910.
 
 ```{r}
-set.seed(123)
-ind <- rbinom(50, size = 1, prob = 0.03)
-x <- (1-ind)*rpois(50, lambda = 7) + ind*20
+data(rutherford)
 ```
 
-We compare the observed relative frequencies with the theoretical probabilities
-of Pois(lambda = 7).
+We compute the observed relative frequencies.
 
 ```{r}
-table(x)/length(x)
-ds <- signif(dpois(0:20, lambda = 7), 2)
-names(ds) <- 0:20
-ds
+signif(table(rutherford)/length(rutherford), 3)
 ```
 
 We compute the ML estimate.
 
 ```{r}
-mean(x)
+mean(rutherford)
 ## SE of ML estimate
-sqrt(mean(x)/length(x))
+sqrt(mean(rutherford)/length(rutherford))
+## for comparison
+fitdistr(rutherford, densfun = "Poisson")
 ```
 
 We now compute the rmx-estimator.
@@ -766,11 +761,12 @@ during the computation of the estimator. The computation time is quite high
 and we omit this step in our first approach. 
 
 ```{r}
-rmx.x <- rmx(x, model = "pois", eps.lower = 0, eps.upper = 0.05, fsCor = FALSE)
+rmx.x <- rmx(rutherford, model = "pois", eps.lower = 0, eps.upper = 0.05, 
+             fsCor = FALSE)
 rmx.x
 ```
 
-The estimated Poisson mean is smaller than in case of the ML estimator.
+The estimated Poisson mean is larger than in case of the ML estimator.
 We take a closer look at the result.
 
 ```{r}
@@ -792,10 +788,11 @@ summary(rmx.x)
 
 Now, in a second approach we could take the finite-sample correction into 
 consideration. For speeding up the computations, one can use parallel computing.
-The computation takes about 30-60 seconds on a reasonably well equipped computer.
+The computations may take up so a few minutes on a reasonably well equipped 
+computer.
 
 ```{r, eval = FALSE}
-rmx.x2 <- rmx(x, model = "pois", eps.lower = 0, eps.upper = 0.05, 
+rmx.x2 <- rmx(rutherford, model = "pois", eps.lower = 0, eps.upper = 0.05, 
               fsCor = TRUE, parallel = TRUE)
 rmx.x2
 summary(rmx.x2)
@@ -814,21 +811,21 @@ cniper(rmx.x)
 outlier(rmx.x)
 ```
 
-That is, observations of 0 and 1 as well as of 13 or larger can be considered as 
+That is, observations of 0 as well as of 7 or larger can be considered as 
 cniper points. If such points exist, the rmx estimator can be expected to be 
 (asymptotically) more precise than the respective maximum-likelihood (ML) estimator; 
 see @Kohl2005 or @Kohl2010.
 
-Any observation of 17 or larger is very unlikely from the assumed model and should 
-be considered as an outlier. The probability to get a value of 17 or larger is 
+Any observation of 12 or larger is very unlikely from the assumed model and should 
+be considered as an outlier. The probability to get a value of 12 or larger is 
 smaller than 0.1%.
 
 ```{r}
-getCnipers(rmx.x)
+table(getCnipers(rmx.x)$values)
 getOutliers(rmx.x)
 ```
 
-The dataset includes two cniper and one outlier points. We can also plot the
+The dataset includes 284 cniper and two outlier points. We can also plot the
 cniper region including the data points.
 
 ```{r, fig.width=7, fig.height=7}
@@ -874,9 +871,8 @@ dPlot(rmx.x)
 ```
 
 Based on the diagnostic plot, the Poisson distribution seems to fit quite well to 
-the data except for the observed frequency of 20; that is, our inference with the 
-RMX approach should be reliable. Hence, we finally compute confidence 
-intervals for the estimates.
+the data; that is, our inference with the RMX approach should be reliable. Hence, 
+we finally compute confidence intervals for the estimates.
 
 ```{r}
 confint(rmx.x)
@@ -893,7 +889,7 @@ As an alternative approach, we have also implemented a bootstrap option based on
 the functions of package boot.  
 
 ```{r}
-confint(rmx.x, method = "boot", R = 599) # low R to reduce computation time
+confint(rmx.x, method = "boot", R = 599, type = "stud") # low R to reduce computation time
 ## with package parallel
 #confint(rmx.x, method = "boot", parallel = TRUE)
 ```
@@ -901,23 +897,23 @@ confint(rmx.x, method = "boot", R = 599) # low R to reduce computation time
 The bootstrap results are similar to the results of the asymptotic intervals 
 without considering bias. 
 
-We can use rmx also to compute ML estimates.
+We can also use rmx to compute ML estimates.
 
 ```{r}
-rmx.x.ML <- rmx(x, model = "pois", eps = 0)
+rmx.x.ML <- rmx(rutherford, model = "pois", eps = 0)
 rmx.x.ML
 confint(rmx.x.ML)
-confint(rmx.x.ML, method = "boot")
+confint(rmx.x.ML, method = "boot", R = 599, type = "stud")
 ```
 
 In addition, we can compute the most robust estimator (for some given sample size).
 
 ```{r}
-rmx.x.MB <- rmx(x, model = "pois", eps = 0.5)
+rmx.x.MB <- rmx(rutherford, model = "pois", eps = 0.5)
 rmx.x.MB
 confint(rmx.x.MB)
 confint(rmx.x.MB, method = "as.bias")
-confint(rmx.x.MB, method = "boot", R = 599)
+confint(rmx.x.MB, method = "boot", R = 599, type = "stud")
 ```
 
 For high-dimensional datasets such as omics-data there are also functions for
