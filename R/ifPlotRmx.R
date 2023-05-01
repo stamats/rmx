@@ -74,11 +74,11 @@ ifPlot.rmx <- function(x, add.cniper = TRUE, color.cniper = "#E18727",
           }
           ggt <- ggtitle(ggplot.ggtitle[i])
         }
-        gg[[i]] <- ggplot(DF, aes_string(x = "y", y = names(DF)[i+1])) +
+        gg[[i]] <- ggplot(DF, aes(x = .data$y, y = .data[[names(DF)[i+1]]])) +
           geom_line() + xlab(ggplot.xlab[i]) + ylab(ggplot.ylab[i]) + 
           ylim(c(IFmin, IFmax)) +
-          geom_point(data = DFx, aes_string(x = "x", y = names(DFx)[i+1], 
-                                            size = "info"), 
+          geom_point(data = DFx, aes(x = .data$x, y = .data[[names(DFx)[i+1]]], 
+                                     size = .data$info), 
                      inherit.aes = FALSE, color = point.col, alpha = point.alpha) +
           scale_size(breaks = seq(from = min(DFx$info), to = max(DFx$info), 
                                   length.out = point.length.out), range = point.range) +
@@ -110,11 +110,11 @@ ifPlot.rmx <- function(x, add.cniper = TRUE, color.cniper = "#E18727",
         }
         ggt <- ggtitle(ggplot.ggtitle)
       }
-      gg <- ggplot(DF, aes_string(x = "y", y = names(DF)[2])) +
+      gg <- ggplot(DF, aes(x = .data$y, y = .data[[names(DF)[2]]])) +
         geom_line() + xlab(ggplot.xlab) + ylab(ggplot.ylab) + 
         ylim(c(IFmin, IFmax)) +
-        geom_point(data = DFx, aes_string(x = "x", y = names(DFx)[2], 
-                                          size = "info"), 
+        geom_point(data = DFx, aes(x = .data$x, y = .data[[names(DFx)[2]]], 
+                                   size = .data$info), 
                    inherit.aes = FALSE, color = point.col, alpha = point.alpha) +
         scale_size(breaks = seq(from = min(DFx$info), to = max(DFx$info), 
                                 length.out = point.length.out), range = point.range) +

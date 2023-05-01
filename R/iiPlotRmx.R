@@ -43,7 +43,7 @@ iiPlot.rmx <- function(x, param.digits = 2, ggplot.ylim = NULL,
     stopifnot(length(ggplot.ggtitle) == 1)
     ggt <- ggtitle(ggplot.ggtitle)
   }
-  gg <- ggplot(DF, aes_string(x = "info.RMX", y = "info.ML")) +
+  gg <- ggplot(DF, aes(x = .data$info.RMX, y = .data$info.ML)) +
     xlab(ggplot.xlab) + ylab(ggplot.ylab) + 
     geom_abline(slope = 1, intercept = 0) +
     geom_point(color = point.col, alpha = point.alpha) + 

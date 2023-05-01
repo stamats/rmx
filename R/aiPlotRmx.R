@@ -57,10 +57,10 @@ aiPlot.rmx <- function(x, range.alpha = 1e-6, range.n = 501,
     stopifnot(length(ggplot.ggtitle) == 1)
     ggt <- ggtitle(ggplot.ggtitle)
   }
-  gg <- ggplot(DF, aes_string(x = "y", y = "info")) +
+  gg <- ggplot(DF, aes(x = .data$y, y = .data$info)) +
     geom_line() + xlab(ggplot.xlab) + ylab(ggplot.ylab) + 
     ylim(c(IFmin, IFmax)) +
-    geom_point(data = DFx, aes_string(x = "x", y = "info"), 
+    geom_point(data = DFx, aes(x = .data$x, y = .data$info), 
                inherit.aes = FALSE, color = point.col, alpha = point.alpha) +
     ggt
   gg
