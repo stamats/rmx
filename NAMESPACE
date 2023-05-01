@@ -7,7 +7,7 @@ importFrom("parallel", "detectCores", "makeCluster", "parApply", "stopCluster",
 importFrom("robustbase", "rowMedians")
 importFrom("gridExtra", "arrangeGrob")
 importFrom("rlang", ".data")
-importFrom("ggplot2", "ggplot", "aes", "aes_string", "geom_line", "xlab", 
+importFrom("ggplot2", "ggplot", "aes", "geom_line", "xlab", 
                       "ylab", "ylim", "ggtitle", "geom_point", "scale_size",
                       "geom_vline", "geom_hline", "annotate", "geom_rug",
                       "stat_function", "geom_density", "geom_abline", "xlim",
@@ -20,6 +20,7 @@ export("optIF",
        "optIF.norm",
        "optIF.binom",
        "optIF.pois",
+       "checkIF",
        "fsRadius",
        "fsRadius.norm",
        "fsRadius.binom",
@@ -53,6 +54,7 @@ export("optIF",
 
 S3method(print, optIF)
 S3method(print, rmx)
+S3method(print, checkIF)
 S3method(print, rmxCI)
 S3method(print, RMXlist)
 S3method(print, cniper)
@@ -67,6 +69,8 @@ S3method(confint, rmx)
 S3method(plot, optIF)
 S3method(plot, rmx)
 S3method(plot, cniper)
+S3method(checkIF, optIF)
+S3method(checkIF, rmx)
 S3method(cniper, rmx)
 S3method(outlier, rmx)
 S3method(ifPlot, rmx)

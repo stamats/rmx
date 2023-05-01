@@ -6,10 +6,12 @@
 ## Version 0.9
 ###########################################################
 - added functions for Poisson model (Poisson mean)
-- change aes_string to aes using .data from package rlang 
+- changed aes_string to aes using .data from package rlang 
   (as recommended by ggplot2)
 - added Poisson model to vignette
 - added data from Rutherford-Geiger (1910); see Feller (1968), Section VI.7 (a).
+- introduced new function checkIF for checking IF properties (no longer 
+  included as additional option in function optIF).
 
 
 ###########################################################
