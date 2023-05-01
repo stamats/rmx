@@ -26,9 +26,9 @@ rmx.binom(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
           size, M = 10000, parallel = FALSE, ncores = NULL, 
           aUp = 100*size, cUp = 1e4, delta = 1e-9)
           
-\method{print}{rmx}(x, digits = getOption("digits"), \dots)
+\method{print}{rmx}(x, digits = getOption("digits"), prefix = " ", \dots)
 
-\method{summary}{rmx}(object, digits = getOption("digits"), \dots)
+\method{summary}{rmx}(object, digits = getOption("digits"), prefix = " ", \dots)
 
 \method{coef}{rmx}(object, complete = TRUE, \dots)
 
@@ -69,6 +69,7 @@ rmx.binom(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
   \item{cUp}{ postive real: upper limit for clipping constant c. }
   \item{delta}{ positive real: desired accuracy (convergence tolerance). }
   \item{digits}{ minimal number of significant digits. }
+  \item{prefix}{ string, passed to \code{\link[base]{strwrap}}. }
   \item{complete}{ logical indicating if the full coefficient vector should
   be returned; see \code{\link[stats]{coef}}. }
   \item{which}{ numeric number from 1 to 7 indicating the plot that shall be

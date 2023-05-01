@@ -46,6 +46,7 @@ estimator, which are arithmetic mean and sample standard deviation.
 ```{r, fig.width=7, fig.height=4}
 IF.ML <- optIF(radius = 0)
 IF.ML
+checkIF(IF.ML)
 summary(IF.ML)
 plot(IF.ML)
 ```
@@ -64,6 +65,7 @@ minimax-radius 0.25 [@Rieder2008].
 ```{r, fig.width=7, fig.height=4}
 IF.AL <- optIF(radius = 0.25)
 IF.AL
+checkIF(IF.AL)
 summary(IF.AL)
 plot(IF.AL)
 ```
@@ -95,6 +97,7 @@ details on the construction of estimators we refer to Chapter 6 of @Rieder1994.
 ```{r, fig.width=7, fig.height=4}
 IF.MB <- optIF(radius = Inf)
 IF.MB
+checkIF(IF.MB)
 summary(IF.MB)
 plot(IF.MB)
 ```
@@ -174,6 +177,7 @@ The results seem not to be affected by the clear outlier. We take a closer look
 at the result.
 
 ```{r}
+checkIF(rmx.chem)
 coef(rmx.chem)
 vcov(rmx.chem)
 sqrt(diag(vcov(rmx.chem)))
@@ -362,6 +366,7 @@ We can use rmx also to compute ML estimates.
 ```{r}
 rmx.chem.ML <- rmx(chem, model = "norm", eps = 0)
 rmx.chem.ML
+checkIF(rmx.chem.ML)
 ML <- fitdistr(chem, densfun = "normal")
 ML
 confint(rmx.chem.ML)
@@ -374,6 +379,7 @@ In addition, we can compute the most robust estimator (for some given sample siz
 ```{r}
 rmx.chem.MB <- rmx(chem, model = "norm", eps = 0.5)
 rmx.chem.MB
+checkIF(rmx.chem.MB)
 confint(rmx.chem.MB)
 confint(rmx.chem.MB, method = "as.bias")
 confint(rmx.chem.MB, method = "boot")
@@ -407,6 +413,7 @@ arithmetic mean divided by size. For this demonstration we use size = 10.
 ```{r, fig.width=7, fig.height=7}
 IF.ML <- optIF(radius = 0, model = "binom", prob = 0.05, size = 10)
 IF.ML
+checkIF(IF.ML)
 summary(IF.ML)
 gg <- plot(IF.ML)
 gg + ggtitle("IF of ML estimator for Binom(prob = 0.05, size = 10)")
@@ -427,6 +434,7 @@ IF of a radius-minimax (RMX) estimator with minimax-radius 0.1.
 ```{r, fig.width=7, fig.height=7}
 IF.AL <- optIF(radius = 0.1, model = "binom", prob = 0.05, size = 10)
 IF.AL
+checkIF(IF.AL)
 summary(IF.AL)
 plot(IF.AL)
 ```
@@ -440,6 +448,7 @@ the most conservative estimate in our class of AL estimators.
 ```{r, fig.width=7, fig.height=7}
 IF.MB <- optIF(radius = Inf, model = "binom", prob = 0.05, size = 10)
 IF.MB
+checkIF(IF.MB)
 summary(IF.MB)
 plot(IF.MB)
 ```
@@ -516,6 +525,7 @@ The estimated probability of success is smaller than in case of the ML estimator
 We take a closer look at the result.
 
 ```{r}
+checkIF(rmx.x)
 coef(rmx.x)
 vcov(rmx.x)
 sqrt(vcov(rmx.x))
@@ -649,6 +659,7 @@ We can use rmx also to compute ML estimates.
 ```{r}
 rmx.x.ML <- rmx(x, model = "binom", eps = 0, size = 10)
 rmx.x.ML
+checkIF(rmx.x.ML)
 confint(rmx.x.ML)
 confint(rmx.x.ML, method = "boot")
 ```
@@ -658,6 +669,7 @@ In addition, we can compute the most robust estimator (for some given sample siz
 ```{r}
 rmx.x.MB <- rmx(x, model = "binom", eps = 0.5, size = 10)
 rmx.x.MB
+checkIF(rmx.x.MB)
 confint(rmx.x.MB)
 confint(rmx.x.MB, method = "as.bias")
 confint(rmx.x.MB, method = "boot", R = 599)
@@ -691,6 +703,7 @@ arithmetic mean.
 ```{r, fig.width=7, fig.height=7}
 IF.ML <- optIF(radius = 0, model = "pois", lambda = 7)
 IF.ML
+checkIF(IF.ML)
 summary(IF.ML)
 gg <- plot(IF.ML)
 gg + ggtitle("IF of ML estimator for Poisson(lambda = 7)")
@@ -707,6 +720,7 @@ IF of a radius-minimax (RMX) estimator with minimax-radius 0.1.
 ```{r, fig.width=7, fig.height=7}
 IF.AL <- optIF(radius = 0.1, model = "pois", lambda = 7)
 IF.AL
+checkIF(IF.AL)
 summary(IF.AL)
 plot(IF.AL)
 ```
@@ -719,6 +733,7 @@ the most conservative estimate in our class of AL estimators.
 ```{r, fig.width=7, fig.height=7}
 IF.MB <- optIF(radius = Inf, model = "pois", lambda = 7)
 IF.MB
+checkIF(IF.MB)
 summary(IF.MB)
 plot(IF.MB)
 ```
@@ -770,6 +785,7 @@ The estimated Poisson mean is larger than in case of the ML estimator.
 We take a closer look at the result.
 
 ```{r}
+checkIF(rmx.x)
 coef(rmx.x)
 vcov(rmx.x)
 sqrt(vcov(rmx.x))
@@ -902,6 +918,7 @@ We can also use rmx to compute ML estimates.
 ```{r}
 rmx.x.ML <- rmx(rutherford, model = "pois", eps = 0)
 rmx.x.ML
+checkIF(rmx.x.ML)
 confint(rmx.x.ML)
 confint(rmx.x.ML, method = "boot", R = 599, type = "stud")
 ```
@@ -911,6 +928,7 @@ In addition, we can compute the most robust estimator (for some given sample siz
 ```{r}
 rmx.x.MB <- rmx(rutherford, model = "pois", eps = 0.5)
 rmx.x.MB
+checkIF(rmx.x.MB)
 confint(rmx.x.MB)
 confint(rmx.x.MB, method = "as.bias")
 confint(rmx.x.MB, method = "boot", R = 599, type = "stud")

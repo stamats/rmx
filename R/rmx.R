@@ -123,10 +123,20 @@ rmx <- function(x, model = "norm", eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L
 }
 
 ## adapted from MASS:::print.fitdistr
-print.rmx <- function(x, digits = getOption("digits"), ...){
+print.rmx <- function(x, digits = getOption("digits"), prefix = " ", ...){
   cat("\n")
-  cat(strwrap(paste0("RMX estimator for ", x$rmxIF$modelName), 
-              prefix = " "), sep = "\n")
+  if(x$rmxIF$radius == 0){
+    cat(strwrap(paste0("ML estimator for ", x$rmxIF$modelName), 
+                prefix = prefix), sep = "\n")
+  } 
+  if(x$rmxIF$radius == Inf){
+    cat(strwrap(paste0("Minimum bias estimator for ", x$rmxIF$modelName), 
+                prefix = prefix), sep = "\n")
+  }
+  if(x$rmxIF$radius > 0 && is.finite(x$rmxIF$radius)){
+    cat(strwrap(paste0("RMX estimator for ", x$rmxIF$modelName), 
+                prefix = " "), sep = "\n")
+  }
   cat("\n")
   if(is.matrix(x$rmxIF$asVar))
     SD <- sqrt(diag(x$rmxIF$asVar))/sqrt(x$n)
@@ -147,10 +157,20 @@ print.rmx <- function(x, digits = getOption("digits"), ...){
   invisible(x)
 }
 
-summary.rmx <- function(object, digits = getOption("digits"), ...){
+summary.rmx <- function(object, digits = getOption("digits"), prefix = " ", ...){
   cat("\n")
-  cat(strwrap(paste0("RMX estimator for ", object$rmxIF$modelName), 
-              prefix = " "), sep = "\n")
+  if(object$rmxIF$radius == 0){
+    cat(strwrap(paste0("ML estimator for ", object$rmxIF$modelName), 
+                prefix = prefix), sep = "\n")
+  } 
+  if(object$rmxIF$radius == Inf){
+    cat(strwrap(paste0("Minimum bias estimator for ", object$rmxIF$modelName), 
+                prefix = prefix), sep = "\n")
+  }
+  if(object$rmxIF$radius > 0 && is.finite(object$rmxIF$radius)){
+    cat(strwrap(paste0("RMX estimator for ", object$rmxIF$modelName), 
+                prefix = " "), sep = "\n")
+  }
   cat("\n")
   if(is.matrix(object$rmxIF$asVar))
     SD <- sqrt(diag(object$rmxIF$asVar))/sqrt(object$n)
