@@ -2,7 +2,7 @@
 ## optimal IF for normal location and scale
 ###############################################################################
 optIF.pois <- function(radius, lambda = 1, aUp = 100*lambda, cUp = 1e4, 
-                        delta = 1e-9, check = FALSE){
+                        delta = 1e-9){
     if(radius == 0){ # IF of ML estimator
         IF <- .getMLIF.pois(lambda = lambda)
         IF$radius <- 0
@@ -27,24 +27,6 @@ optIF.pois <- function(radius, lambda = 1, aUp = 100*lambda, cUp = 1e4,
     c0 <- LM$c0
     b <- A*c0
     
-    if(check){
-        supp <- seq(from = 0, to = qpois(1-1e-15, lambda = lambda), by = 1)
-        WS <- dpois(supp, lambda = lambda)
-        Y0 <- supp/lambda - 1
-        M <- pmin(abs(Y0 - z), c0)
-        ch1 <- sum(A*abs(Y0-z)*pmin(abs(Y0 - z), c0)*WS)
-        
-        ind2 <- abs(Y0-z) < c0
-        res <- ind2*(Y0-z) + (1-ind2)*c0*sign(Y0-z)
-        ch2 <- sum(res*WS)
-        
-        ch3 <- sum(pmax(abs(Y0-z)-c0, 0)*WS) - radius^2*c0
-
-        message("Fisher consistency of eta:\t", ch1-1)
-        message("centering of eta:\t", ch2)
-        message("MSE equation:\t", ch3)
-    }
-
     IF <- .getOptIF.pois(lambda = lambda, radius = radius, A = A, a = a, b = b)
     IF$radius <- radius
     IF

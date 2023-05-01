@@ -1,4 +1,4 @@
-optIF <- function(model = "norm", radius = NULL, check = FALSE, ...){
+optIF <- function(model = "norm", radius = NULL, ...){
   es.call <- match.call()
   
   stopifnot(is.character(model))
@@ -16,9 +16,6 @@ optIF <- function(model = "norm", radius = NULL, check = FALSE, ...){
   if(radius == Inf)
     message("'radius=Inf': IF of the minimum bias estimator is computed.")
   
-  stopifnot(length(check) == 1)
-  stopifnot(is.logical(check))
-
   listDots <- list(...)
   if(model == "norm"){ # normal distribution
     mean <- ifelse("mean" %in% names(listDots), listDots$mean, 0)
@@ -32,10 +29,9 @@ optIF <- function(model = "norm", radius = NULL, check = FALSE, ...){
     bUp <- ifelse("bUp" %in% names(listDots), listDots$bUp, 1000)
     delta <- ifelse("delta" %in% names(listDots), listDots$delta, 1e-6)
     itmax <- ifelse("itmax" %in% names(listDots), listDots$itmax, 100L)
-    check <- ifelse("check" %in% names(listDots), listDots$itmax, FALSE)
     IF <- optIF.norm(radius = radius, mean = mean, sd = sd, A.loc.start = A.loc.start, 
                      A.sc.start = A.sc.start, a.sc.start = a.sc.start, bUp = bUp, 
-                     delta = delta, itmax = itmax, check = check)
+                     delta = delta, itmax = itmax)
   }
   if(model == "binom"){# binomial distribution
     size <- ifelse("size" %in% names(listDots), listDots$size, 1)
@@ -44,7 +40,7 @@ optIF <- function(model = "norm", radius = NULL, check = FALSE, ...){
     cUp <- ifelse("cUp" %in% names(listDots), listDots$cUp, 1e4)
     delta <- ifelse("delta" %in% names(listDots), listDots$delta, 1e-9)
     IF <- optIF.binom(radius = radius, size = size, prob = prob, 
-                      aUp = aUp, cUp = cUp, delta = delta, check = check)
+                      aUp = aUp, cUp = cUp, delta = delta)
   }
   if(model == "pois"){# Poisson distribution
     lambda <- ifelse("lambda" %in% names(listDots), listDots$lambda, 1) 
@@ -52,7 +48,7 @@ optIF <- function(model = "norm", radius = NULL, check = FALSE, ...){
     cUp <- ifelse("cUp" %in% names(listDots), listDots$cUp, 1e4)
     delta <- ifelse("delta" %in% names(listDots), listDots$delta, 1e-9)
     IF <- optIF.pois(radius = radius, lambda = lambda, aUp = aUp, cUp = cUp, 
-                     delta = delta, check = check)
+                     delta = delta)
   }
   if(!model %in% c("norm", "binom", "pois")){
     stop("Given 'model' not yet implemented")

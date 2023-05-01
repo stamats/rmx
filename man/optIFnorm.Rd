@@ -8,7 +8,7 @@
 }
 \usage{
 optIF.norm(radius, mean = 0, sd = 1, A.loc.start = 1, A.sc.start = 0.5, 
-           a.sc.start = 0, bUp = 1000, delta = 1e-6, itmax = 100L, check = FALSE)
+           a.sc.start = 0, bUp = 1000, delta = 1e-6, itmax = 100L)
 }
 \arguments{
   \item{radius}{ non-negative real: neighborhood radius.}
@@ -23,8 +23,6 @@ optIF.norm(radius, mean = 0, sd = 1, A.loc.start = 1, A.sc.start = 0.5,
   \item{bUp}{ postive real: upper limit for clipping constant b. }
   \item{delta}{ positive real: desired accuracy (convergence tolerance). }
   \item{itmax}{ positive ingeger: maximum number of iterations. }
-  \item{check}{ logical: check accuracy of the computation (only for
-  0 < radius < Inf.}
 }
 \details{The Lagrange multipliers contained in the expression
   of the optimally robust IF are computed; i.e., clipping constant, centering
@@ -61,6 +59,6 @@ optIF.norm(radius = 0)
 ## IF of MB estimator
 optIF.norm(radius = Inf)
 ## IF of optimally robust AL estimator
-optIF.norm(radius = 0.5, check = TRUE)
+optIF.norm(radius = 0.5)
 }
 \keyword{robust}

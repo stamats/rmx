@@ -11,7 +11,7 @@
   Kohl (2005).
 }
 \usage{
-optIF(model = "norm", radius = NULL, check = FALSE, \dots)
+optIF(model = "norm", radius = NULL, \dots)
 
 \method{print}{optIF}(x, digits = getOption("digits"), prefix = " ", \dots)
 
@@ -23,7 +23,6 @@ optIF(model = "norm", radius = NULL, check = FALSE, \dots)
   \item{model}{ character: short name of the model/distribution (default = \code{"norm"});
   see also details. }
   \item{radius}{ non-negative real: neighborhood radius. }
-  \item{check}{ logical: check accuracy of the computation. }
   \item{x}{ an \code{optIF} object. }
   \item{object}{ an \code{optIF} object. }
   \item{alpha}{ alpha-quantile used to compute plot range, which is from
@@ -78,19 +77,19 @@ optIF(model = "norm", radius = NULL, check = FALSE, \dots)
 \seealso{\code{\link{rmx}}}
 \examples{
 ## normal location and scale
-IF1 <- optIF(model = "norm", radius = 0.5, mean = -2, sd = 3, check = TRUE)
+IF1 <- optIF(model = "norm", radius = 0.5, mean = -2, sd = 3)
 IF1
 summary(IF1)
 plot(IF1)
 
 ## binomial probability
-IF2 <- optIF(model = "binom", radius = 0.5, size = 10, check = TRUE)
+IF2 <- optIF(model = "binom", radius = 0.5, size = 10)
 IF2
 summary(IF2)
 plot(IF2)
 
 ## Poisson mean
-IF3 <- optIF(model = "pois", radius = 0.5, check = TRUE)
+IF3 <- optIF(model = "pois", radius = 0.5)
 IF3
 summary(IF3)
 plot(IF3)

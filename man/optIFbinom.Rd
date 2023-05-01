@@ -8,7 +8,7 @@
 }
 \usage{
 optIF.binom(radius, size = 1, prob = 0.5, aUp = 100*size, cUp = 1e4, 
-            delta = 1e-9, check = FALSE)
+            delta = 1e-9)
 }
 \arguments{
   \item{radius}{ non-negative real: neighborhood radius.}
@@ -17,8 +17,6 @@ optIF.binom(radius, size = 1, prob = 0.5, aUp = 100*size, cUp = 1e4,
   \item{aUp}{ numeric: upper limit for centering constant a. }
   \item{cUp}{ postive real: upper limit for clipping constant c. }
   \item{delta}{ positive real: desired accuracy (convergence tolerance). }
-  \item{check}{ logical: check accuracy of the computation (only for 
-  0 < radius < lower case radius.}
 }
 \details{The Lagrange multipliers contained in the expression
   of the optimally robust IF are computed; i.e., clipping, centering
@@ -55,6 +53,6 @@ optIF.binom(radius = 0, size = 5)
 ## IF of MB estimator
 optIF.binom(radius = Inf, size = 5)
 ## IF of optimally robust AL estimator
-optIF.binom(radius = 0.5, size = 5, check = TRUE)
+optIF.binom(radius = 0.5, size = 5)
 }
 \keyword{robust}

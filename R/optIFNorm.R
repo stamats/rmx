@@ -2,8 +2,7 @@
 ## optimal IF for normal location and scale
 ###############################################################################
 optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, A.sc.start = 0.5, 
-                       a.sc.start = 0, bUp = 1000, delta = 1e-6, itmax = 100L, 
-                       check = FALSE){
+                       a.sc.start = 0, bUp = 1000, delta = 1e-6, itmax = 100L){
     stopifnot(length(mean) == 1)
     stopifnot(length(sd) == 1)
     stopifnot(sd > 0)
@@ -64,15 +63,6 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, A.sc.start = 0
             break
     }
 
-    if(check){
-        chs <- .checkIF.norm(r = r, b = b, a1 = a1, a2 = a2, a3 = a3)
-
-        message("Fisher consistency of eta.loc:\t", chs$ch1-1)
-        message("Fisher consistency of eta.sc:\t", chs$ch2-1)
-        message("centering of eta.sc:\t", chs$ch3)
-        message("MSE equation:\t", chs$ch4)
-    }
-
     IF <- .getOptIF.norm(mean = mean, sd = sd, b = b, a1 = a1, a2 = a2, a3 = a3)
     IF$radius <- radius
     IF
@@ -102,7 +92,6 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, A.sc.start = 0
     
     r-sqrt(2*Int)
 }
-
 
 ###############################################################################
 ## computation of a1, a2 and a3
@@ -267,33 +256,4 @@ optIF.norm <- function(radius, mean = 0, sd = 1, A.loc.start = 1, A.sc.start = 0
                range = range, asMSE = mse, asVar = asVar, asBias = bias)
     class(IF) <- "optIF"
     IF
-}
-.checkIF.norm <- function(r, b, a1, a2, a3){
-    integrand1 <- function(x, b, a1, a2, a3){
-        x^2*.getw.norm(x, b, a1, a2, a3)*dnorm(x)
-    }
-    Int1 <- 2*integrate(integrand1, lower = 0, upper = Inf, 
-                        rel.tol = .Machine$double.eps^0.5, b = b, a1 = a1, 
-                        a2 = a2, a3 = a3)$value
-    ch1 <- a1*Int1
-    
-    integrand2 <- function(x, b, a1, a2, a3){
-        (x^2 - a2)^2*.getw.norm(x, b, a1, a2, a3)*dnorm(x)
-    }
-    Int2 <- 2*integrate(integrand2, lower = 0, upper = Inf, 
-                        rel.tol = .Machine$double.eps^0.5, b = b, a1 = a1, 
-                        a2 = a2, a3 = a3)$value
-    ch2 <- a3*Int2
-    
-    integrand3 <- function(x, b, a1, a2, a3){
-        (x^2 - a2)*.getw.norm(x, b, a1, a2, a3)*dnorm(x)
-    }
-    Int3 <- 2*integrate(integrand3, lower=0, upper=Inf, 
-                        rel.tol = .Machine$double.eps^0.5, b = b, a1 = a1, 
-                        a2 = a2, a3 = a3)$value
-    ch3 <- a3*Int3
-    
-    ch4 <- .getr.norm(b = b, r = r, a1 = a1, a2 = a2, a3 = a3)
-    
-    list(ch1 = ch1, ch2 = ch2, ch3 = ch3, ch4 = ch4)
 }
