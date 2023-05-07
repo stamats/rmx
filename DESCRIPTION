@@ -1,6 +1,6 @@
 Package: rmx
-Version: 0.9
-Date: 2023-05-01
+Version: 1.0
+Date: 2023-05-07
 Title: Radius-Minimax Estimators
 Authors@R: person("Matthias", "Kohl", role = c("aut", "cre"),
                   email = "Matthias.Kohl@stamats.de", 
