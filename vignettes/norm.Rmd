@@ -1,0 +1,397 @@
+---
+title: "Normal Location and Scale"
+author: "Matthias Kohl"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+bibliography: rmx.bib
+vignette: >
+  %\VignetteIndexEntry{Normal Location and Scale}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{utf8}
+---
+
+
+## Introduction
+
+We first consider one of the most important models in statistics, which is 
+normal location (mean) and scale (sd). For more details we refer to Chapter 8
+of @Kohl2005.
+
+We first load the package.
+```{r}
+library(rmx)
+```
+
+
+## Influence functions
+
+We compute the influence function (IF) for estimating mean and standard deviation 
+(sd). We can choose mean = 0 and sd = 1 without loss of generality (due to equivariance 
+of the model). We first compute and plot the IF of the maximum likelihood (ML) 
+estimator, which are arithmetic mean and sample standard deviation.
+
+```{r, fig.width=7, fig.height=4}
+IF.ML <- optIF(radius = 0)
+IF.ML
+checkIF(IF.ML)
+summary(IF.ML)
+plot(IF.ML)
+```
+
+Both components of the IF are unbounded. That means a single observation can 
+have an unbounded influence on the corresponding estimates. Hence, the ML estimator 
+(i.e., arithmetic mean and sample standard deviation) is not robust and can be 
+strongly affected by outliers.
+
+Next, we compute and plot an IF of our optimally robust asymptotically linear
+(AL) estimators, where we choose a neighborhood radius of 0.25 corresponding to 
+a gross-error probability of 0.25/sqrt(n); see Chapter~8 of @Kohl2005. The IF 
+can also be regarded as the IF of a radius-minimax (RMX) estimator with 
+minimax-radius 0.25 [@Rieder2008].
+
+```{r, fig.width=7, fig.height=4}
+IF.AL <- optIF(radius = 0.25)
+IF.AL
+checkIF(IF.AL)
+summary(IF.AL)
+plot(IF.AL)
+```
+
+Both coordinates of the IF are bounded, where the mean component is re-descending. 
+Hence, single observations may only have a bounded influence on the estimates 
+and the corresponding estimators are regarded as robust against outliers or 
+more generally against deviations from assumed models.
+In the robust literature several estimators with re-descending influence functions 
+have been proposed (e.g., by Tukey, Hampel, Andrews, etc.); for examples see 
+Chapter 8 of @Kohl2005.
+
+Finally, we plot the IF of the minimum bias (MB) estimator, which represents
+the most conservative estimate in our class of AL estimators. If we would consider
+location (mean) alone the MB estimator would be the median, if we would consider 
+scale (sd) alone the MB estimator would be the MAD (median absolute deviation)
+or IQR (interquartile range), respectively. MAD and IQR have the same influence
+function (local robustness), but different breakdown points (global robustness). 
+The breakdown point represents the amount of observations that may be changed 
+in a dataset without arbitrarily disturbing the estimator [@Donoho1983]. Arithmetic 
+mean and sample standard deviation have breakdown points of 0, whereas median and 
+MAD have breakdown points of 50%. However, the IQR has a breakdown point of 25%. 
+The example of MAD and IQR also shows the importance of estimator construction. 
+That is, how we obtain an estimator based on a given influence function. Possible 
+solutions are for instance the use of M-equations or k-step (k >= 1) constructions. 
+For our RMX estimators we use k-step constructions [@Kohl2005, @Kohl2010]. For more 
+details on the construction of estimators we refer to Chapter 6 of @Rieder1994.
+
+```{r, fig.width=7, fig.height=4}
+IF.MB <- optIF(radius = Inf)
+IF.MB
+checkIF(IF.MB)
+summary(IF.MB)
+plot(IF.MB)
+```
+
+The result particularly shows that the MB estimator for mean and sd is not
+identical to the combination of median and MAD, which have IFs of different 
+shapes as shown below.
+
+```{r, fig.width=7, fig.height=4}
+library(ggplot2)
+library(gridExtra)
+IFmed <- function(x){
+  1.253327*ifelse(x < 0, -1, 1)
+}
+IFmad <- function(x){
+  1.166403*ifelse(x^2 - qnorm(0.75)^2 < 0, -1, 1)
+}
+gg1 <- ggplot(data = data.frame(x = c(-3, 3)), aes(x = x)) +
+  stat_function(fun = IFmed) + ggtitle("IF of median") + ylab("IF")
+gg2 <- ggplot(data = data.frame(x = c(-3, 3)), aes(x = x)) +
+  stat_function(fun = IFmad) + ggtitle("IF of MAD") + ylab("IF")
+grid.arrange(gg1, gg2, nrow = 1)
+```
+
+The IF of our optimally robust estimators for normal location or normal scale can 
+for instance be computed and plotted with package RobLox [@RobLox] or package 
+ROptEst [@ROptEst].
+
+The shapes of the components of the MB estimator for location and scale are 
+similar to the previous AL estimator for finite radius. However, the range of 
+the y-axes are different. That is, the MB estimator assigns less influence to 
+each of the observations than the AL estimator for finite radius.
+
+
+## RMX estimates
+
+We consider the estimation of mean and standard deviation (SD) of normal 
+distributions, where we use the chem dataset from package MASS for the 
+demonstration.
+
+```{r}
+library(MASS)
+data(chem)
+```
+
+We first have a look at the data by using a normal qq-plot.
+```{r, fig.width=7, fig.height=7}
+qqnorm(chem)
+qqline(chem)
+```
+
+There is at least one clear outlier in the data. We compute mean, SD, median 
+and MAD.
+
+```{r}
+mean(chem)
+median(chem)
+sd(chem)
+mad(chem)
+```
+
+It is no surprise that mean and SD are strongly influenced by the clear outlier.
+We now compute the rmx-estimator. We assume between 1 and 2 outliers 
+in the data; that is, the proportion of gross-errors is between 1/24 and 2/24.
+The RMX-estimator is constructed as a k-step estimate using a default value of 
+k = 3 and median and MAD as initial estimates. In addition, we apply a finite-sample
+correction. That is, the asymptotic optimal procedure is replaced by a procedure
+that minimizes the empirical MSE. The finite-sample correction was determined 
+offline by Monte-Carlo simulations.
+
+```{r}
+rmx.chem <- rmx(chem, model = "norm", eps.lower = 1/24, eps.upper = 2/24)
+rmx.chem
+```
+
+The results seem not to be affected by the clear outlier. We take a closer look
+at the result.
+
+```{r}
+checkIF(rmx.chem)
+coef(rmx.chem)
+vcov(rmx.chem)
+sqrt(diag(vcov(rmx.chem)))
+bias(rmx.chem)
+mse(rmx.chem)
+```
+
+As is also noted in the output, the covariance as well as the standard errors
+are asymptotic values. Bias and MSE (mean squared error) correspond to the 
+maximum asymptotic bias and MSE, respectively. A more comprehensive output 
+containing the above values can be generated by function summary.
+
+```{r}
+summary(rmx.chem)
+```
+
+Since we expect outliers in the data, we also be aware of the bias that is usually 
+unavoidable in this case leading to the consideration of MSE instead of (co)variance 
+alone. For simplicity we restrict ourselves to MSE, but one could also consider 
+a whole class of convex risks [@Ruckdeschel2004].
+
+Next, we perform some diagnostics. We start with the calculation of cniper and
+outlier region, respectively.
+
+```{r}
+cniper(rmx.chem)
+outlier(rmx.chem)
+```
+
+That is, observations below 2.04 or above 4.39 can be considered as cniper points. 
+If such points exist, the rmx estimator can be expected to be (asymptotically) more 
+precise than the respective maximum-likelihood (ML) estimator; see @Kohl2005 or
+@Kohl2010.
+
+Any observation below 1.04 or above 5.39 is very unlikely from the assumed 
+model and should be considered as an outlier. The probability to get a value
+of 1.04 or smaller, respectively 5.39 or larger is 0.1%.
+
+```{r}
+getCnipers(rmx.chem)
+getOutliers(rmx.chem)
+```
+
+The dataset includes two cniper and one outlier points. We can also plot the
+cniper region including the data points.
+
+```{r, fig.width=7, fig.height=7}
+plot(cniper(rmx.chem))
+```
+
+Since the plot function is based on package ggplot2 and returns a ggplot 
+object, we can modify the plot without interferring with the existing function.
+
+```{r, fig.width=7, fig.height=7, warning = FALSE}
+plot(cniper(rmx.chem)) + ylim(c(-1, 10)) + xlim(c(0.5, 5.5))
+```
+
+The first plot indicates the enormous effect of the extreme outlier on the performance
+of the ML estimator. As shown by the second plot, the second largest values has 
+a quite strong effect, too.
+
+There are several more diagnostic plots. First, we plot the influence functions.
+
+```{r, fig.width=7, fig.height=4}
+ifPlot(rmx.chem)
+```
+
+The plot shows the two coordinates of the influence function (IF), which are the
+IF for mean and sd. The plot also shows the (absolute) information (info) that 
+is associated with each observation. The (absolute) information corresponds to 
+the square of the length of the IF evaluated at the respective data point. 
+In case of our rmx estimators the length of the influence function and hence 
+the information is bounded. Consequently, a single observation can only have a 
+bounded influence on the estimates. The orange and red vertical lines represent
+the boundaries of the cniper and outlier regions, respectively.
+
+We use the functions of packages ggplot2 and grid for plotting, where each plot 
+function (invisibly) returns the respective plot object. Hence, we can also modify 
+the plots afterwards by extending the plot objects. In our example, we want to 
+restrict the x-axis.
+
+```{r, fig.width=7, fig.height=4, warning = FALSE}
+gg <- ifPlot(rmx.chem, plot = FALSE)
+grid.arrange(gg[[1]] + xlim(0.5, 5.5), gg[[2]] + xlim(0.5, 5.5), nrow = 1)
+```
+
+Next, we plot the (absolute) information.
+
+```{r, fig.width=7, fig.height=7}
+aiPlot(rmx.chem)
+```
+
+We can also plot the relative information, which shows how the information is
+distributed for estimation of mean and sd.
+
+```{r, fig.width=7, fig.height=4}
+riPlot(rmx.chem)
+```
+
+We restrict the x-axis to get a better overview of the center region.
+
+```{r, fig.width=7, fig.height=4, warning = FALSE}
+gg <- riPlot(rmx.chem, plot = FALSE)
+grid.arrange(gg[[1]] + xlim(0.5, 5.5), gg[[2]] + xlim(0.5, 5.5), nrow = 1)
+```
+
+We can see that values around the mean are rather uninformative and most of 
+the information is used for estimating sd. Values around mean - sd and mean + sd 
+are most informative for estimating mean. Moreover, the more extreme the 
+observations are the more of the information is used for estimating sd. 
+
+We can also compare the (absolute) information our rmx estimator attributes
+to the data with respective information of the ML estimator.
+
+```{r, fig.width=7, fig.height=7}
+iiPlot(rmx.chem)
+```
+
+Again, the scaling of the axis is strongly disturbed by the outlier. We repeat 
+the plot where we restrict the y-axis.
+
+```{r, fig.width=7, fig.height=7, warning=FALSE}
+iiPlot(rmx.chem) + ylim(0, 10) + xlim(0, 10)
+```
+
+The orange line represents the maximum information our RMX estimator is attributing 
+to a single observation. The black line corresponds to y = x. Hence, in all
+cases the ML estimator attributes higher information to the observations than 
+our RMX estimator. 
+
+We can also generate standard diagnostic plots, which are pp- and qq-plots.
+
+```{r, fig.width=7, fig.height=7}
+ppPlot(rmx.chem)
+qqPlot(rmx.chem)
+```
+
+Furthermore, the density of the estimated model can be compared with the 
+empirical density.
+
+```{r, fig.width=7, fig.height=7}
+dPlot(rmx.chem)
+```
+
+We can also add the density of the models estimated by mean and sd, respectively
+median and MAD.
+
+```{r, fig.width=7, fig.height=7}
+dPlot(rmx.chem) + 
+  stat_function(fun = function(x) dnorm(x, mean = mean(chem), sd = sd(chem)),
+                color = "darkred", lwd = 1) +
+  stat_function(fun = function(x) dnorm(x, mean = median(chem), sd = mad(chem)),
+                color = "darkgreen", lwd = 1, n = 501) +
+  annotate(geom = "text", x = c(15, 15, 15), y = c(0.65, 0.60, 0.55), 
+           label = c("mean and sd", "median and MAD", "RMX"),
+           color = c("darkred", "darkgreen", "black"))
+```
+
+Based on the diagnostic plots, the normal distribution seems to fit well to 
+the data, if we consider the most extreme value as an outlier not belonging 
+to the (ideal) model; that is, our inference with the RMX approach should be 
+reliable. Hence, we finally compute confidence intervals for the estimates.
+
+```{r}
+confint(rmx.chem)
+confint(rmx.chem, method = "as.bias")
+```
+
+The first confidence interval ignores a potential bias and is only based on 
+the asymptotic (co)variance. The second interval also takes the maximum 
+asymptotic bias into consideration and therefore is more conservative; i.e., 
+leads to longer confidence intervals.
+
+As an alternative approach, we have also implemented a bootstrap option based on
+the functions of package boot.  
+
+```{r}
+confint(rmx.chem, method = "boot")
+```
+
+The bootstrap results are between the results of the asymptotic intervals with 
+and without considering bias.
+
+We can use rmx also to compute ML estimates.
+
+```{r}
+rmx.chem.ML <- rmx(chem, model = "norm", eps = 0)
+rmx.chem.ML
+checkIF(rmx.chem.ML)
+ML <- fitdistr(chem, densfun = "normal")
+ML
+confint(rmx.chem.ML)
+confint(rmx.chem.ML, method = "boot")
+confint(ML)
+```
+
+In addition, we can compute the most robust estimator (for some given sample size).
+
+```{r}
+rmx.chem.MB <- rmx(chem, model = "norm", eps = 0.5)
+rmx.chem.MB
+checkIF(rmx.chem.MB)
+confint(rmx.chem.MB)
+confint(rmx.chem.MB, method = "as.bias")
+confint(rmx.chem.MB, method = "boot")
+```
+
+
+For high-dimensional datasets such as omics-data there are also functions for
+row- and column-wise computation of RMX estimators as developed for @Kohl2010a.
+By using the equivariance of the model in combination with saved results and 
+interpolations. The computations for thousands of samples takes less than a second.
+We use some simulated data (10000 samples of sample size 20). 
+
+```{r}
+M <- matrix(rnorm(200000), ncol = 20)
+rowRmx(M, eps.lower = 0, eps.upper = 0.05)
+colRmx(t(M), eps.lower = 0, eps.upper = 0.05)
+```
+
+
+## sessionInfo
+```{r}
+sessionInfo()
+```
+
+
+## References
