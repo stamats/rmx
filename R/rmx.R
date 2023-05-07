@@ -270,6 +270,7 @@ confint.rmx <- function(object, parm, level = 0.95, method = "as", R = 9999,
   if(method == "boot"){
     Method <- "Bootstrap confidence interval"
     n <- length(object$x)
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) runif(1)
     seed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
     X <- matrix(sample(object$x, size = R*n, replace = TRUE), nrow = R)
     if(object$rmxIF$model == "binom"){
