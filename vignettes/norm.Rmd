@@ -15,7 +15,7 @@ vignette: >
 
 ## Introduction
 
-We first consider one of the most important models in statistics, which is 
+We consider one of the most important models in statistics, which is 
 normal location (mean) and scale (sd). For more details we refer to Chapter 8
 of @Kohl2005.
 
