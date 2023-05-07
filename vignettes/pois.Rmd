@@ -98,7 +98,16 @@ sqrt(mean(rutherford)/length(rutherford))
 fitdistr(rutherford, densfun = "Poisson")
 ```
 
-We now compute the rmx-estimator.
+We compute the variance of the data.
+
+```{r}
+var(rutherford)
+```
+
+The variance is slightly smaller which indicates a small underdispersion of the 
+data. We will ignore this and will use the Poisson distribution to model the data.
+
+We compute the rmx-estimator.
 The RMX-estimator is constructed as a k-step estimate using a default value of 
 k = 3, where we use a Cramer von Mises minimum distance (MD) estimate as initial 
 estimate. We assume 0 and 5% outliers in the data, which is typical in case of
