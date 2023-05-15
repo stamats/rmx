@@ -1,5 +1,5 @@
 ###############################################################################
-## optimal IF for normal location and scale
+## optimal IF for binomial probability
 ###############################################################################
 optIF.binom <- function(radius, size = 1, prob = 0.5, aUp = 100*size, cUp = 1e4, 
                         delta = 1e-9){

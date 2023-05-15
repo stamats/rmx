@@ -1,5 +1,5 @@
 ###############################################################################
-## optimal IF for normal location and scale
+## optimal IF for Poisson mean
 ###############################################################################
 optIF.pois <- function(radius, lambda = 1, aUp = 100*lambda, cUp = 1e4, 
                         delta = 1e-9){
