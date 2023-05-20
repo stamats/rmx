@@ -1,10 +1,10 @@
 \name{optIF.pois}
 \alias{optIF.pois}
-\title{Computation of Optimally Robust IFs for poisial Probability}
+\title{Computation of Optimally Robust IFs for Poisson Mean}
 \description{
-  The function computes the optimally robust IF for poisial probability 
-  (size known!). The function is rarely called directly, but via function
-  \code{\link{optIF}} and is mainly for internal use.
+  The function computes the optimally robust IF for Poisson mean. The function 
+  is rarely called directly, but via function \code{\link{optIF}} and is mainly 
+  for internal use.
 }
 \usage{
 optIF.pois(radius, lambda = 1, aUp = 100*lambda, cUp = 1e4, 
