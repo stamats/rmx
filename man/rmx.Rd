@@ -95,7 +95,8 @@ rmx.binom(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
   As models we have implemented so far:
   \enumerate{
     \item \code{"norm"}: normal location (mean) and scale (sd).
-    \item \code{"binom"}: binomial probability (size known!).
+    \item \code{"binom"}: binomial probability (prob) with known size.
+    \item \code{"pois"}: Poisson mean (lambda).
   }
   
   As plots we have implemented:
