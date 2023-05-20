@@ -50,7 +50,15 @@ optIF <- function(model = "norm", radius = NULL, ...){
     IF <- optIF.pois(radius = radius, lambda = lambda, aUp = aUp, cUp = cUp, 
                      delta = delta)
   }
-  if(!model %in% c("norm", "binom", "pois")){
+  if(model == "exp"){# Exponential distribution
+    scale <- ifelse("scale" %in% names(listDots), listDots$scale, 1) 
+    aUp <- ifelse("aUp" %in% names(listDots), listDots$aUp, 1)
+    cUp <- ifelse("cUp" %in% names(listDots), listDots$cUp, 0.97)
+    delta <- ifelse("delta" %in% names(listDots), listDots$delta, 1e-9)
+    IF <- optIF.exp(radius = radius, scale = scale, aUp = aUp, cUp = cUp, 
+                    delta = delta)
+  }
+  if(!model %in% c("norm", "binom", "pois", "exp")){
     stop("Given 'model' not yet implemented")
   }
   
@@ -157,10 +165,10 @@ plot.optIF <- function(x, alpha = 1e-6, digits = 2, plot = TRUE, n = 501, ...){
   }
   if(x$model %in% c("binom", "pois")){
     if(x$model == "binom"){
-      y <- x$range(alpha = 0)
+      y <- x$range(alpha = alpha)
     }
     if(x$model == "pois"){
-      y <- x$range(alpha = 1e-15)
+      y <- x$range(alpha = alpha)
     }
     IF <- x$IFun(y)
     IFmin <- min(IF)
@@ -171,6 +179,20 @@ plot.optIF <- function(x, alpha = 1e-6, digits = 2, plot = TRUE, n = 501, ...){
                    sep = " = ")
     gg <- ggplot(DF, aes(x = y, y = .data[[names(DF)[2]]])) +
       geom_point() + geom_line() + xlab("x") + ylab("IF(x)") + 
+      ylim(c(IFmin, IFmax)) + ggtitle(paste0(IFnames, " (", Param, ")"))
+    if(plot) print(gg)
+  }
+  if(x$model == "exp"){
+    y <- x$range(alpha = alpha)
+    IF <- x$IFun(y)
+    IFmin <- min(IF)
+    IFmax <- max(IF)
+    IFnames <- colnames(IF)
+    DF <- data.frame(y, IF)
+    Param <- paste(names(x$parameter), signif(x$parameter, digits), 
+                   sep = " = ")
+    gg <- ggplot(DF, aes(x = y, y = .data[[names(DF)[2]]])) +
+      geom_line() + xlab("x") + ylab("IF(x)") + 
       ylim(c(IFmin, IFmax)) + ggtitle(paste0(IFnames, " (", Param, ")"))
     if(plot) print(gg)
   }

@@ -47,6 +47,7 @@ optIF(model = "norm", radius = NULL, \dots)
     \item \code{"binom"}: binomial probability (size known); see also
     \code{\link{optIF.binom}}.
     \item \code{"pois"}: Poisson mean; see also \code{\link{optIF.pois}}.
+    \item \code{"exp"}: Exponential scale; see also \code{\link{optIF.exp}}.
   }
 }
 \value{
@@ -93,5 +94,11 @@ IF3 <- optIF(model = "pois", radius = 0.5)
 IF3
 summary(IF3)
 plot(IF3)
+
+## Exponential scale
+IF4 <- optIF(model = "exp", radius = 0.5)
+IF4
+summary(IF4)
+plot(IF4)
 }
 \keyword{robust}

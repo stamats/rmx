@@ -11,6 +11,9 @@ checkIF.optIF <- function(x, rel.tol = .Machine$double.eps^0.5, ...){
   if(x$model == "pois"){
     chs <- .checkIF.pois(IF = x)
   }
+  if(x$model == "exp"){
+    chs <- .checkIF.exp(IF = x)
+  }
   
   check <- list(Fisher = chs$Fisher, center = chs$center, mse.eq = chs$mse.eq)
   class(check) <- "checkIF"
@@ -153,9 +156,42 @@ print.checkIF <- function(x, digits = getOption("digits"), prefix = " ", ...){
   }  
   
   Fisher <- ch1 - 1
-  names(Fisher) <- "prob"
+  names(Fisher) <- "lambda"
   center <- ch2
-  names(center) <- "prob"
+  names(center) <- "lambda"
+  
+  list(Fisher = Fisher, center = center, mse.eq = mse.eq)
+}
+.checkIF.exp <- function(IF, rel.tol = .Machine$double.eps^0.5){
+  scale <- IF$parameter
+  b <- IF$b
+  r <- IF$radius
+  
+  fisher.fun <- function(x, IF, scale){
+    (x/scale - 1)*IF$IFun(x)*dexp(x, rate = 1/scale)/scale
+  }
+  ch1 <- integrate(f = fisher.fun, lower = 0, upper = Inf, rel.tol = rel.tol, 
+                   IF = IF, scale = scale)$value
+  center.fun <- function(x, IF, scale){
+    IF$IFun(x)*dexp(x, rate = 1/scale)
+  }
+  ch2 <- integrate(f = center.fun, lower = 0, upper = Inf, rel.tol = rel.tol, 
+                   IF = IF, scale = scale)$value
+  
+  if(r == 0 || is.infinite(r)){
+    mse.eq <- NULL
+  }else{
+    mse.eq.fun <- function(x, IF, scale){
+      pmax(abs(IF$A*(x/scale-1)/scale - IF$a)-IF$b, 0)*dexp(x, rate = 1/scale)
+    }
+    mse.eq <- integrate(f = mse.eq.fun, lower = 0, upper = Inf, rel.tol = rel.tol, 
+                     IF = IF, scale = scale)$value - r^2*b
+  }  
+  
+  Fisher <- ch1 - 1
+  names(Fisher) <- "scale"
+  center <- ch2
+  names(center) <- "scale"
   
   list(Fisher = Fisher, center = center, mse.eq = mse.eq)
 }
