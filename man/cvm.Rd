@@ -3,6 +3,7 @@
 \alias{cvm.norm}
 \alias{cvm.binom}
 \alias{cvm.pois}
+\alias{cvm.exp}
 \alias{rowCVM}
 \title{Calculate Cramer von Mises Minimum Distance Estimates}
 \description{
@@ -19,6 +20,8 @@ cvm.norm(x, mu, startPar = NULL)
 cvm.binom(x, mu, size)
 
 cvm.pois(x, mu)
+
+cvm.exp(x, mu)
 
 rowCVM(x, model, mu = "model", na.rm = TRUE, parallel = FALSE, ncores = NULL, \dots)
 }
@@ -56,6 +59,7 @@ rowCVM(x, model, mu = "model", na.rm = TRUE, parallel = FALSE, ncores = NULL, \d
     \item \code{"norm"}: normal location (\code{mean}) and scale (\code{sd}).
     \item \code{"binom"}: probability of success (\code{prob}).
     \item \code{"pois"}: mean (\code{lambda}).
+    \item \code{"exp"}: scale (\code{1/rate}).
   }
 }
 \value{
@@ -87,6 +91,13 @@ x <- rpois(100, lambda = 1.5)
 cvm(x, model = "pois")
 cvm(x, model = "pois", mu = "data")
 
+x <- rexp(100, rate = 3)
+cvm(x, model = "exp")
+cvm(x, model = "exp", mu = "data")
+
+###############################################################################
+## row-wise computations for data matrices
+###############################################################################
 X <- matrix(rnorm(200), ncol = 10)
 rowCVM(X, model = "norm")
 
@@ -95,5 +106,8 @@ rowCVM(X, model = "binom", size = 3)
 
 X <- matrix(rpois(200, lambda = 1.5), ncol = 10)
 rowCVM(X, model = "pois")
+
+X <- matrix(rexp(200, rate = 3), ncol = 10)
+rowCVM(X, model = "exp")
 }
 \keyword{robust}

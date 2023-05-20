@@ -40,6 +40,9 @@ cvm <- function(x, model = "norm", mu = "model", na.rm = TRUE, ...){
   if(model == "pois"){# Poisson distribution
     est <- cvm.pois(x = x, mu = mu)
   }
+  if(model == "exp"){# Exponential distribution
+    est <- cvm.exp(x = x, mu = mu)
+  }
   est
 }
 ## helper function to compute Cramer von Mises distance
@@ -71,14 +74,10 @@ cvm.norm <- function(x, mu, startPar = NULL){
   fn <- function(par, Data, mu){
     if(par[2] <= 0) par[2] <- abs(par[2]) + .Machine$double.eps
     M <- S <- NULL
-    pfun <- function(q){
-      pnorm(q, mean = M, sd = S)
-    }
+    pfun <- function(q){}
     body(pfun) <- substitute({ pnorm(q, mean = M, sd = S) },
                              list(M = par[1], S = par[2]))
-    dfun <- function(x){
-      dnorm(x, mean = M, sd = S)
-    }
+    dfun <- function(x){}
     body(dfun) <- substitute({ dnorm(x, mean = M, sd = S) },
                              list(M = par[1], S = par[2]))
     .cvmdist(x = Data, pfun = pfun, dfun = dfun, mu = mu, 
@@ -91,14 +90,10 @@ cvm.norm <- function(x, mu, startPar = NULL){
 cvm.binom <- function(x, mu, size){
   f <- function(par, Data, mu){
     S <- P <- NULL
-    pfun <- function(q){
-      pbinom(q, size = S, prob = P)
-    }
+    pfun <- function(q){}
     body(pfun) <- substitute({ pbinom(q, size = S, prob = P) },
                              list(S = size, P = par))
-    dfun <- function(x){
-      dbinom(x, size = S, prob = P)
-    }
+    dfun <- function(x){}
     body(dfun) <- substitute({ dbinom(x, size = S, prob = P) },
                              list(S = size, P = par))
     .cvmdist(x = Data, pfun = pfun, dfun = dfun, mu = mu, 
@@ -112,13 +107,9 @@ cvm.binom <- function(x, mu, size){
 cvm.pois <- function(x, mu){
   f <- function(par, Data, mu){
     L <- NULL
-    pfun <- function(q){
-      ppois(q, lambda = L)
-    }
+    pfun <- function(q){}
     body(pfun) <- substitute({ ppois(q, lambda = L) }, list(L = par))
-    dfun <- function(x){
-      dpois(x, lambda = L)
-    }
+    dfun <- function(x){}
     body(dfun) <- substitute({ dpois(x, lambda = L) }, list(L = par))
     .cvmdist(x = Data, pfun = pfun, dfun = dfun, mu = mu, 
              abscont = FALSE, supp = seq(from = 0, 
@@ -130,6 +121,21 @@ cvm.pois <- function(x, mu){
   names(est) <- "lambda"
   est
 }
+cvm.exp <- function(x, mu){
+  f <- function(par, Data, mu){
+    L <- NULL
+    pfun <- function(q){}
+    body(pfun) <- substitute({ pexp(q, rate = 1/S) }, list(S = par))
+    dfun <- function(x){}
+    body(dfun) <- substitute({ dexp(x, rate = 1/S) }, list(S = par))
+    .cvmdist(x = Data, pfun = pfun, dfun = dfun, mu = mu, 
+             abscont = TRUE, supp = NULL)
+  }
+  est <- optimize(f = f, interval = c(.Machine$double.eps, max(x)),
+                  Data = x, mu = mu)$minimum
+  names(est) <- "scale"
+  est
+}
 rowCVM <- function(x, model, mu = "model", na.rm = TRUE, parallel = FALSE, 
                    ncores = NULL, ...){
   if(parallel){
@@ -139,7 +145,7 @@ rowCVM <- function(x, model, mu = "model", na.rm = TRUE, parallel = FALSE,
     }else{
       cl <- makeCluster(ncores)
     }
-    clusterExport(cl, list(".cvmdist", "cvm.norm", "cvm.binom", "cvm.pois"), 
+    clusterExport(cl, list(".cvmdist", "cvm.norm", "cvm.binom", "cvm.pois", "cvm.exp"), 
                   envir = environment(fun = rowCVM))
     res <- parApply(cl = cl, X = x, MARGIN = 1, FUN = cvm, model = model, 
                      mu = mu, na.rm = na.rm, ...)
