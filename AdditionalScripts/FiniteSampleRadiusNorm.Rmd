@@ -1,7 +1,7 @@
 ---
 title: "Computation of finite-sample correction for normal location and scale"
 author: "Matthias Kohl"
-date: "26 12 2021"
+date: "20 May 2023"
 output: html_document
 ---
 
@@ -21,7 +21,7 @@ We load the required functions and data we need for the computations.
 
 ```{r}
 library(robustbase)
-source("../R/ZZZinternal.R")
+source("../R/rmxNorm.R")
 source("../R/rowRmxNorm.R")
 load("../R/sysdata.rda")
 ```
