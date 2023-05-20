@@ -163,11 +163,29 @@ rmx.norm <- function(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
     class(RMX) <- "rmx"
     RMX
 }
-
 ###############################################################################
 ## computation of radius-minimax IC
-## using predefined functions included in "sysdata.rda"
+## using pre-computed results included in "sysdata.rda"
 ###############################################################################
+.getA1.norm <- function(r){
+    approx(x = .radius.gitter.norm, y = .A1.norm, xout = r, yleft = 1)$y
+}
+.getA2.norm <- function(r){
+    approx(x = .radius.gitter.norm, y = .A2.norm, xout = r, yleft = 0.5)$y
+}
+.geta.norm <- function(r){
+    approx(x = .radius.gitter.norm, y = .a.norm, xout = r, yleft = 0)$y
+}
+.getb.norm <- function(r){
+    approx(x = .radius.gitter.norm, y = .b.norm, xout = r, yleft = Inf)$y
+}
+.getAsVar.norm.approx <- function(r){
+    asVar.mean <- approx(x = .radius.gitter.norm, y = .asVar.mean.norm, xout = r, 
+                         yleft = 1.0)$y
+    asVar.sd <- approx(x = .radius.gitter.norm, y = .asVar.sd.norm, xout = r, 
+                       yleft = 0.5)$y
+    diag(c(asVar.mean, asVar.sd))
+}
 .getInterval.norm <- function(r, rlo, rup){
     if(r > 10){
         b <- 1.618128043
