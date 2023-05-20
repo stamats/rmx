@@ -151,7 +151,7 @@ rmx.binom(x, eps.lower=0, eps.upper=NULL, eps=NULL, k = 3L,
 \seealso{\code{\link{optIF}}, \code{\link{rowRmx}}, \code{\link{fsRadius}}}
 \examples{
 ###########################################################
-## For more details see vignette (A Guide to rmx)
+## For more details see vignettes!
 ###########################################################
 
 ## normal location (mean) and scale (sd)
@@ -164,16 +164,5 @@ confint(res1) # method = "as"
 confint(res1, method = "as.bias")
 plot(res1, which = 1)
 plot(res1, which = 2)
-
-## binomial probability
-ind <- rbinom(100, size=1, prob=0.05) 
-x <- rbinom(100, size=5, prob=(1-ind)*0.1 + ind*0.5)
-res2 <- rmx(x, model = "binom", size = 5, eps.lower = 0.01, eps.upper = 0.1)
-res2
-summary(res2)
-confint(res2) # method = "as"
-confint(res2, method = "as.bias")
-plot(res2, which = 1)
-plot(res2, which = 4)
 }
 \keyword{robust}
